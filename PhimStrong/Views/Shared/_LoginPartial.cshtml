@@ -1,0 +1,35 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using SharedLibrary.Models
+
+@inject SignInManager<User> SignInManager
+@inject UserManager<User> UserManager
+
+<ul class="navbar-nav ms-md-3">
+@if (SignInManager.IsSignedIn(User))
+{
+    <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+            @{
+                var user = await UserManager.GetUserAsync(User);
+            }
+            <img src="@(user.Avatar ?? "/src/img/UserAvatars/default_avatar.png")" class="avatar">
+            @user.DisplayName
+        </a>
+        <div class="dropdown-menu dropdown-menu-end">
+            <a class="dropdown-item" asp-area="Identity" asp-controller="Account" asp-action="Index">Profile</a>
+            <form id="logoutForm" class="form-inline" asp-area="Identity" asp-controller="Authentication" asp-action="Logout">
+                <button id="logout" type="submit" class="dropdown-item nav-link btn btn-link">Đăng xuất</button>
+            </form>
+        </div>
+    </li>
+}
+else
+{
+    <li class="nav-item">
+        <a class="nav-link" id="register" asp-area="Identity" asp-controller="Authentication" asp-action="Register">Đăng ký</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" id="login" asp-area="Identity" asp-controller="Authentication" asp-action="Login">Đăng nhập</a>
+    </li>
+}
+</ul>

@@ -1,0 +1,124 @@
+﻿@model EditUserModel
+@inject UserManager<User> UserManager
+@{
+	ViewData["Title"] = "Chỉnh sửa User";
+	var allRoles = new SelectList(Model.RoleList);
+
+	var isLockout = await UserManager.IsLockedOutAsync(Model.User);
+
+	string lockDiv = isLockout ? "none" : "block";
+	string unlockDiv = !isLockout ? "none" : "block";
+}
+
+<h2 class="mt-2">@ViewData["Title"]</h2>
+
+<div class="row mt-3">
+	<div class="col-md-6">
+		<div>
+			<h5 class="mt-3 text-success"> ** Chỉnh sửa role cho : @Model.User.DisplayName</h5>
+
+			<div class="form-group">
+				<label class="me-3 mt-3 mb-3">Role : </label>
+				<select id="role-list" asp-items="@(new SelectList(Model.RoleList))" asp-for="@Model.UserRole"></select>
+				<button id="edit-role-btn" class="btn btn-success ms-4 disabled">Lưu</button>
+			</div>
+		</div>
+
+		<div class="pt-3 unlock-user border-top" style="display: @unlockDiv">
+			<h3 class="text-danger">Tài khoản này đang bị khóa</h3>
+			<h5 class="mt-3 text-success"> **Mở Khóa tài khoản của User : @Model.User.DisplayName</h5>
+
+			<div class="form-group">
+				<label class="me-3 mt-3 mb-3">Ấn vào đây để mở khóa : </label>
+				<button id="unlock-user-btn" class="btn btn-success ms-4">Mở khóa</button>
+			</div>
+		</div>
+		<div class="pt-3 lock-user border-top" style="display: @lockDiv">
+			<h5 class="mt-3 text-success"> ** Khóa tài khoản của User : @Model.User.DisplayName</h5>
+
+			<div class="form-group">
+				<label class="me-3 mt-3 mb-3">Ấn vào đây để khóa : </label>
+				<button id="lock-user-btn" class="btn btn-danger ms-4">Khóa</button>
+			</div>
+		</div>
+
+		<div class="pt-3 delete-user border-top">
+			<h5 class="mt-3 text-success"> ** Xóa tài khoản của User : @Model.User.DisplayName</h5>
+
+			<form method="post" asp-action="Delete" asp-route-userid="@Model.User.Id">
+				<div class="form-group">
+					<label class="me-3 mt-3 mb-3">Ấn vào đây để xóa : </label>
+					<button id="delete-user-btn" type="submit" class="btn btn-danger ms-4">Xóa</button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+
+@section Scripts{
+	<script type="text/javascript">
+		$('select').on('change', function (e) {
+			$('#edit-role-btn').removeClass('disabled');
+		});
+
+		// event khi click button edit role :
+		$('#edit-role-btn').click(function () {
+			$.post(
+				'@Url.Action("EditRole", "User", new { area = "Admin" })',
+				{
+					userid: '@Model.User.Id',
+					UserRole: $('select').val()
+				},
+				function(data) {
+					if (data.success) {
+						toastr.success('Sửa Role thành công !');
+					} else {
+						toastr.error('Sửa Role thất bại !');
+					}
+				}
+			);
+
+			$(this).addClass('disabled');
+		});
+
+		// event khi click button lock user :
+		$('#lock-user-btn').click(function () {
+			$.post(
+				'@Url.Action("ToggleLockUser", "User", new { area = "Admin" })',
+				{
+					userid: '@Model.User.Id'
+				},
+				function (data) {
+					if (data.success) {
+						$('.unlock-user').show();
+						$('.lock-user').hide();
+
+						toastr.success('Đã khóa User !');
+					} else {
+						toastr.error('Khóa User thất bại !');
+					}
+				}
+			);
+		});
+
+		// event khi click button unlock user :
+		$('#unlock-user-btn').click(function () {
+			$.post(
+				'@Url.Action("ToggleLockUser", "User", new { area = "Admin" })',
+				{
+					userid: '@Model.User.Id'
+				},
+				function (data) {
+					if (data.success) {
+						$('.unlock-user').hide();
+						$('.lock-user').show();
+
+						toastr.success('Đã mở khóa User !');
+					} else {
+						toastr.error('Mở khóa User thất bại !');
+					}
+				}
+			);
+		});
+	</script>
+}

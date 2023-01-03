@@ -1,0 +1,134 @@
+﻿@using PhimStrong.Models;
+@model List<User>
+@{
+    ViewData["Title"] = "Quản lí User";
+}
+
+@inject UserManager<User> UserManager
+@inject RoleManager<IdentityRole> RoleManager
+
+
+<div class="d-flex mt-4 mb-2" style="justify-content: space-between">
+    <h2>@ViewData["Title"]</h2>
+
+    <div>
+        <ul class="d-flex align-items-center" style="list-style: none">
+            <li class="me-3 nav-item dropdown ignore-hover">
+                <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" 
+                    aria-haspopup="true" aria-expanded="false">
+                    Lọc theo Role
+                </a>
+                <div class="dropdown-menu">
+                    <a class="dropdown-item" href="@Url.Action("Index", "User", new { area = "Admin", page = 1 } )">Tất cả</a>
+                    @foreach(var role in RoleManager.Roles)
+                    {
+                        <a class="dropdown-item" href="@Url.Action("Index", "User", new
+                            {
+                                area = "Admin",
+                                page = 1, 
+                                filter = $"<{PageFilterConstant.FILTER_BY_ROLE}>{role.Name}"
+                            })">
+                            @role.Name
+                        </a>
+                    }
+                </div>
+            </li>
+            <li class="nav-item">
+                <form id="search-name-form" class="d-flex" method="get" asp-route-page="1">
+                    <input name="filter" class="form-control me-sm-2" type="text" placeholder="Nhập tên">
+                    <button id="search-name-btn" class="btn btn-secondary my-2 my-sm-0" type="submit">Search</button>
+                </form>
+            </li>
+        </ul>
+    </div>
+</div>
+
+@if (TempData["FilterMessage"] != null)
+{
+    <h3 class="text-success">Kết quả tìm kiếm cho User có @TempData["FilterMessage"].</h3>
+}
+
+@if(Model != null && Model.Count > 0)
+{
+    <table class="table table-hover">
+        <thead>
+            <tr class="table-info">
+                <th scope="col">User</th>
+                <th scope="col">Tên</th>
+                <th scope="col" class="d-md-table-cell d-none">Email</th>
+                <th scope="col">Vai trò</th>
+                <th scope="col">Tác vụ</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var user in Model)
+            {
+                string roleString = "";
+                var roles = await UserManager.GetRolesAsync(user);
+            
+                string rowColor = "table-dark";
+
+                // chuyển list các roles thành 1 string :
+                @foreach (var role in roles)
+                {
+                    roleString += role;
+
+                    // thay đổi màu của row tùy theo role :
+                    if (role == "Thủy Tổ") rowColor = "table-warning";
+                    else if (role == "Admin") rowColor = "table-danger";
+                }
+
+                <tr class="@rowColor">
+                    <th scope="row">
+                        <img src="@(user.Avatar ?? "/src/img/UserAvatars/default_avatar.png")" class="avatar" style="width: 30px; height:30px;">
+                    </th>
+                    <th class="overflow-hidden">@user.DisplayName</th>
+                    <td class="d-md-table-cell d-none overflow-hidden">@user.Email</td>
+                    <td class="overflow-hidden">@roleString</td>
+                    <td>
+                        <a class="btn btn-success" asp-area="Admin" asp-controller="User" asp-action="Edit" asp-route-userid="@user.Id">Chỉnh sửa</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <h3>Không có kết quả :((</h3>
+}
+
+@{
+    PagingModel pagingModel = new PagingModel
+            {
+                NumberOfPages = (int)(TempData["NumberOfPages"] ?? 1),
+                CurrentPage = (int)(TempData["CurrentPage"] ?? 1),
+                Callback = (int page) => Url.Action("Index", "User", new
+                {
+                    area = "Admin",
+                    page = page,
+                    filter = (string)(TempData["filter"] ?? "")
+                })
+            };
+}
+
+<partial name="/Views/Shared/_PagingPartial.cshtml" for="@pagingModel"></partial>
+
+@section Scripts{
+    <script type="text/javascript">
+        // trước khi sumbit thì thay lại giá trị cho thẻ input
+        $('#search-name-form').submit(function (e) {
+            e.preventDefault();
+
+            var searchBtn = $('input[name="filter"]');
+
+            if(!searchBtn.val() || searchBtn.val().trim() == "") return;
+            
+            searchBtn.val(`<@PageFilterConstant.FILTER_BY_NAME>${searchBtn.val()}`);
+            
+            this.submit();
+        
+            searchBtn.val('');
+        });
+    </script>
+}

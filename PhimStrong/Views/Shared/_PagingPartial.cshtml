@@ -1,0 +1,49 @@
+﻿@model PagingModel
+@{
+    int prevCount = 5; // số trang đằng trước trang hiện tại.
+    int nextCount = 5; // số trang đằng sau trang hiện tại.
+
+    List<int> prevPages = new List<int>();
+    List<int> nextPages = new List<int>();
+
+    if (Model.NumberOfPages <= 0) Model.NumberOfPages = 1;
+
+    Model.CurrentPage = Math.Clamp(Model.CurrentPage, 1, Model.NumberOfPages);
+
+    int firstPage = Math.Clamp(Model.CurrentPage - prevCount, 1, Model.NumberOfPages);
+    int lastPage = Math.Clamp(Model.CurrentPage + nextCount, 1, Model.NumberOfPages);
+
+    for (int i = firstPage; i < Model.CurrentPage; i++)
+    {
+        prevPages.Add(i);
+    }
+
+    for (int i = Model.CurrentPage + 1; i <= lastPage; i++)
+    {
+        nextPages.Add(i);
+    }
+}
+
+<div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
+    <div class="btn-group me-2" role="group" aria-label="First group">
+        <a class="btn btn-secondary" href="@Model.Callback(1)">First</a>
+        <a class="btn btn-secondary" href="@Model.Callback(Model.CurrentPage - 1)">Prev</a>
+    </div>
+    <div class="btn-group me-2" role="group" aria-label="Second group">
+        @foreach (int prev in prevPages)
+        {
+            <a class="btn btn-secondary" href="@Model.Callback(prev)">@prev</a>
+        }
+
+        <a class="btn btn-secondary active" href="@Model.Callback(Model.CurrentPage)">@Model.CurrentPage</a>
+
+        @foreach (int next in nextPages)
+        {
+            <a class="btn btn-secondary" href="@Model.Callback(next)">@next</a>
+        }
+    </div>
+    <div class="btn-group" role="group" aria-label="Third group">
+        <a class="btn btn-secondary" href="@Model.Callback(Model.CurrentPage + 1)">Next</a>
+        <a class="btn btn-secondary" href="@Model.Callback(Model.NumberOfPages)">Last</a>
+    </div>
+</div>

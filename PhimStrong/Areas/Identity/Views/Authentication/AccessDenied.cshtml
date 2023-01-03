@@ -1,0 +1,11 @@
+﻿@model string
+@{
+    ViewData["Title"] = "Truy cập bị từ chối";
+
+    string content = Model != null ? Model : "Bạn không có quyền truy cập vào trang này :((";
+}
+
+<header>
+    <h1 class="text-danger">@ViewData["Title"]</h1>
+    <p class="text-danger">@content</p>
+</header>

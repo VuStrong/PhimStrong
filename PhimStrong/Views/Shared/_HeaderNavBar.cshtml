@@ -1,0 +1,67 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using SharedLibrary.Models
+@inject UserManager<User> UserManager
+
+@{
+    var user = await UserManager.GetUserAsync(User);
+}
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">PhimStrong</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarColor02" aria-controls="navbarColor02" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarColor02">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item">
+                    <a class="nav-link text-uppercase" href="#">phim lẻ</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-uppercase" href="#">phim bộ</a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle text-uppercase" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">thể loại</a>
+                    <div class="dropdown-menu">
+                        <a class="dropdown-item" href="#">Action</a>
+                        <a class="dropdown-item" href="#">Another action</a>
+                        <a class="dropdown-item" href="#">Something else here</a>
+                        <a class="dropdown-item" href="#">Separated link</a>
+                    </div>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle text-uppercase" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">quốc gia</a>
+                    <div class="dropdown-menu">
+                        <a class="dropdown-item" href="#">Action</a>
+                        <a class="dropdown-item" href="#">Another action</a>
+                        <a class="dropdown-item" href="#">Something else here</a>
+                        <a class="dropdown-item" href="#">Separated link</a>
+                    </div>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle text-uppercase" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">năm phát hành</a>
+                    <div class="dropdown-menu">
+                        <a class="dropdown-item" href="#">Action</a>
+                        <a class="dropdown-item" href="#">Another action</a>
+                        <a class="dropdown-item" href="#">Something else here</a>
+                        <a class="dropdown-item" href="#">Separated link</a>
+                    </div>
+                </li>
+                @if (user != null && (await UserManager.IsInRoleAsync(user, RoleConstant.ADMIN) || await UserManager.IsInRoleAsync(user, RoleConstant.THUY_TO)))
+                {
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle text-uppercase" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">quản lý</a>
+                        <div class="dropdown-menu">
+                            <a class="dropdown-item" asp-area="Admin" asp-controller="User" asp-action="Index">Quản lý Users</a>
+                        </div>
+                    </li>
+                }
+            </ul>
+            <form class="d-flex">
+                <input class="form-control me-sm-2" type="search" placeholder="Tìm tên phim, diễn viên...">
+                <button class="btn btn-secondary my-2 my-sm-0" type="submit">Search</button>
+            </form>
+        </div>
+        <partial name="_LoginPartial.cshtml"></partial>
+    </div>
+</nav>

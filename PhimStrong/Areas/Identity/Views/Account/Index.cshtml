@@ -1,0 +1,129 @@
+﻿@using SharedLibrary.Models;
+@model User
+@{
+    TempData["currentNav"] = "Index";
+}
+
+<div class="row g-0">
+    <div class="col-md-4 gradient-custom text-center text-white"
+         style="border-top-left-radius: .5rem; border-bottom-left-radius: .5rem;">
+        <img id="avatar" src="@(Model.Avatar ?? "/src/img/UserAvatars/default_avatar.png")"
+             alt="Avatar" class="mt-5 mb-4 avatar avatar-profile" />
+        <p id="avatar-text" style="display:none;">Thay Avatar</p>
+        <p hidden></p>
+        <input type="file" class="pb-2 edit-elements" id="edit-avatar" style="display:none;" value=""/>
+        <h5 id="display-name">@Model.DisplayName</h5>
+        <input type="text" class="form-control edit-elements" id="edit-name" style="display:none;" value="">
+    </div>
+    <div class="col-md-8">
+        <div class="card-body p-4">
+            <h6>Thông tin</h6>
+            <hr class="mt-0 mb-4">
+            <div class="row pt-1">
+                <div class="col-6 mb-3">
+                    <h6>Email</h6>
+                    <p class="text-muted">@Model.Email</p>
+                </div>
+                <div class="col-6 mb-3">
+                    <h6>Phone</h6>
+                    <p id="phone" class="text-muted user-infor">@Model.PhoneNumber</p>
+                    <input type="text" class="form-control edit-elements" id="edit-phone" style="display:none;" value="">
+                </div>
+            </div>
+            <hr class="mt-0 mb-4">
+            <div class="row pt-1">
+                <div class="col-6 mb-3">
+                    <h6>Phim yêu thích nhất</h6>
+                    <p id="fav-movie" class="text-muted user-infor">@Model.FavoriteMovie</p>
+                    <input type="text" class="form-control edit-elements" id="edit-fav-movie" style="display:none;" value="">
+                </div>
+                <div class="col-6 mb-3">
+                    <h6>Sở thích</h6>
+                    <p id="hobby" class="text-muted user-infor">@Model.Hobby</p>
+                    <input type="text" class="form-control edit-elements" id="edit-hobby" style="display:none;" value="">
+                </div>
+            </div>
+
+            <button id="edit-button" class="btn btn-primary">Chỉnh sửa Profile</button>
+            <button id="save-button" class="btn btn-success" style="display:none;">Lưu</button>
+            <button id="cancel-button" class="btn btn-danger" style="display:none;">Hủy</button>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script type="text/javascript">
+        $(function () {
+
+            $("#edit-button").click(function () {
+                $(this).hide();
+                $("#save-button").show();
+                $("#cancel-button").show();
+                $("#avatar-text").show();
+
+                $(".edit-elements").each(function() {
+                    let item = $(this);
+                    item.show().val(item.prev().text());
+                    item.prev().hide();
+                });
+            });
+
+            $("#cancel-button").click(function () {
+                cancel();
+            });
+
+            $("#save-button").click(function () {
+                let myFiles = $("#edit-avatar").prop('files');
+                let formData = new FormData();
+
+                if (myFiles.length > 0) {
+                    for (let i = 0; i < myFiles.length; i++) {
+                        formData.append('AvatarFile', myFiles[i]);
+                    }
+                }
+
+                formData.append('DisplayName', $("#edit-name").val());
+                formData.append('PhoneNumber', $("#edit-phone").val());
+                formData.append('FavoriteMovie', $("#edit-fav-movie").val());
+                formData.append('Hobby', $("#edit-hobby").val());
+
+                $.ajax({
+                    url: '@Url.Action("EditInformation", "Account", new { area = "Identity"})',
+                    dataType: "json",
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function (data) {
+                        cancel();
+                        if (data.success) {
+                            $("#display-name").text(data.displayname);
+                            $("#phone").text(data.phone);
+                            $("#fav-movie").text(data.favoritemovie);
+                            $("#hobby").text(data.hobby);
+                            $("#avatar").attr("src", data.avatar);
+
+                            toastr.success("Cập nhập thông tin thành công !");
+                        } else {
+                            toastr.error("Cập nhập thông tin thất bại !");
+                        }
+
+                    }
+                });
+            });
+
+            function cancel() {
+                $("#cancel-button").hide();
+                $("#save-button").hide();
+                $("#edit-button").show();
+                $("#avatar-text").hide();
+
+                $(".edit-elements").each(function () {
+                    let item = $(this);
+                    item.hide();
+                    item.prev().show();
+                });
+            }
+        });
+    </script>
+}
