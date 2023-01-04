@@ -1,4 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Http;
+using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SharedLibrary.Models
@@ -21,7 +23,11 @@ namespace SharedLibrary.Models
 
         public int View { get; set; }
 
+        [NotMapped]
+        [DisplayName("Ảnh phim")]
+        public IFormFile? ImageFile { get; set; }
         public string? Image { get; set; }
+
         public string? Trailer { get; set; }
 
         public Category? Category { get; set; }

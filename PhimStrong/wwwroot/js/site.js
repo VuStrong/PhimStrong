@@ -9,3 +9,15 @@ $(document).ready(function () {
         $(this).find('.dropdown-menu').stop(true, true).delay(100).fadeOut(200);
     });
 });
+
+// show modal :
+function showModal(title, body) {
+    $('#modal').fadeIn(200).slideDown();
+    $('#modal .modal-title').text(title);
+    $('#modal .modal-body p').text(body);
+}
+
+// hide modal :
+function hideModal() {
+    $('#modal').hide();
+}

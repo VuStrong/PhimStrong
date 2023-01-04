@@ -1,0 +1,31 @@
+﻿@model Movie
+@{
+    ViewData["Title"] = "Thêm phim mới";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<partial name="_StatusMessage" for="@TempData["status"]" />
+
+<div class="mt-4">
+    <form method="post">
+        <div asp-validation-summary="All" class="text-danger"></div>
+        <div class="form-group">
+            <label asp-for="Name">Tên phim</label>
+            <input asp-for="Name" class="form-control" placeholder="Nhập tên phim">
+        </div>
+        <div class="form-group">
+            <label asp-for="ImageFile"></label>
+            <input asp-for="ImageFile" type="file" class="form-control">
+        </div>
+        <div class="form-group form-check">
+            <label asp-for="ReleaseDate">Nhập ngày ra mắt</label>
+            <input asp-for="ReleaseDate"/>
+        </div>
+        <button type="submit" class="btn btn-primary">Tạo phim</button>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="/Views/Shared/_ValidationScriptsPartial.cshtml" />
+}

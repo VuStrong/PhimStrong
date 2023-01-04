@@ -1,0 +1,93 @@
+﻿@model List<Movie>
+@{
+    ViewData["Title"] = "Quản lí phim";
+}
+
+<div class="d-flex mt-4 mb-2" style="justify-content: space-between">
+    <h2>@ViewData["Title"]</h2>
+
+    <a class="btn btn-success" asp-controller="Movie" asp-action="Create">Thêm phim mới</a>
+
+    <div>
+        <ul class="d-flex align-items-center" style="list-style: none">
+            <li class="nav-item">
+                <form id="search-name-form" class="d-flex" method="get" asp-route-page="1">
+                    <input name="filter" class="form-control me-sm-2" type="text" placeholder="Nhập tên phim">
+                    <button id="search-name-btn" class="btn btn-secondary my-2 my-sm-0" type="submit">Search</button>
+                </form>
+            </li>
+        </ul>
+    </div>
+</div>
+
+@if (TempData["FilterMessage"] != null)
+{
+    <h3 class="text-success">Kết quả tìm kiếm cho phim có @TempData["FilterMessage"].</h3>
+}
+
+@if (Model != null && Model.Count > 0)
+{
+    <table class="table table-hover">
+        <thead>
+            <tr class="table-info">
+                <th scope="col">Phim</th>
+                <th scope="col">Tên</th>
+                <th scope="col">Tác vụ</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var movie in Model)
+            {
+                <tr>
+                    <th scope="row">
+                        <img src="@(movie.Image ?? "")" class="avatar" style="width: 50px; height:50px;">
+                    </th>
+                    <th class="overflow-hidden">@movie.Name</th>
+                    <td>
+                        <a class="btn btn-success" asp-area="Admin" asp-controller="Movie" asp-action="Edit" asp-route-userid="@movie.Id">Chỉnh sửa</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <h3>Không có kết quả :((</h3>
+}
+
+@{
+    PagingModel pagingModel = new PagingModel
+            {
+                NumberOfPages = (int)(TempData["NumberOfPages"] ?? 1),
+                CurrentPage = (int)(TempData["CurrentPage"] ?? 1),
+                Callback = (int page) => Url.Action("Index", "Movie", new
+                {
+                    area = "Admin",
+                    page = page,
+                    filter = (string)(TempData["filter"] ?? "")
+                })
+            };
+}
+
+<partial name="/Views/Shared/_PagingPartial.cshtml" for="@pagingModel"></partial>
+
+@section Scripts{
+    <script type="text/javascript">
+        // trước khi sumbit thì thay lại giá trị cho thẻ input
+        $('#search-name-form').submit(function (e) {
+            e.preventDefault();
+
+            var searchBtn = $('input[name="filter"]');
+
+            if (!searchBtn.val() || searchBtn.val().trim() == "") return;
+
+            searchBtn.val(`<@PageFilterConstant.FILTER_BY_NAME>${searchBtn.val()}`);
+
+            this.submit();
+
+            searchBtn.val('');
+        });
+    </script>
+}
+

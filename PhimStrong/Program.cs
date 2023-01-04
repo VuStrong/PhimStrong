@@ -48,8 +48,8 @@ builder.Services.AddAuthentication()
         // Map the external picture claim to the internally used image claim
         googleOptions.ClaimActions.MapJsonKey("image", "picture");
     });     
-    //.AddFacebook(facebookOptions => { // thêm provider Facebook và cấu hình
-    //                                  // 
+    //.AddFacebook(facebookOptions => { 
+    //                                   
     //});  
 
 // Truy cập IdentityOptions
@@ -73,7 +73,7 @@ builder.Services.Configure<IdentityOptions>(options =>
     options.User.RequireUniqueEmail = true;  // Email là duy nhất
     
     // Cấu hình đăng nhập.
-    options.SignIn.RequireConfirmedEmail = true;   // Cấu hình xác thực địa chỉ email (email phải tồn tại)
+    options.SignIn.RequireConfirmedEmail = false;
     options.SignIn.RequireConfirmedAccount = false;
 
 });

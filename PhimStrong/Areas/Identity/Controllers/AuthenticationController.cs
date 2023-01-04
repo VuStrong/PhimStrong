@@ -57,8 +57,7 @@ namespace PhimStrong.Areas.Identity.Controllers
                 { 
                     UserName = model.Email,
                     Email = model.Email,
-                    DisplayName = model.Name,
-                    EmailConfirmed = true
+                    DisplayName = model.Name
                 };
                 
                 var result = await _userManager.CreateAsync(user, model.Password);
@@ -67,6 +66,25 @@ namespace PhimStrong.Areas.Identity.Controllers
 
 				if (result.Succeeded)
                 {
+                    string token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                    token = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token));
+
+                    string callbackUrl = Url.Action("ConfirmEmail", "Authentication",
+                            new
+                            {
+                                area = "Identity",
+                                token = token,
+                                userid = user.Id
+                            },
+                            protocol: Request.Scheme
+                        );
+
+                    await _emailSender.SendEmailAsync(
+                        user.Email,
+                        "Xác thực Email",
+                        $"Yô người mới !, click vào <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>đây</a> để xác thực Email của bạn nhé :)"
+                    );
+
                     await _signInManager.SignInAsync(user, false);
                     return LocalRedirect(returnUrl);
                 }
@@ -142,6 +160,32 @@ namespace PhimStrong.Areas.Identity.Controllers
             {
                 return RedirectToAction("Index", "Home", new { area = "" });
             }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ConfirmEmail(string userid, string token)
+        {
+            if (userid == null || token == null)
+            {
+                return View(model: "Lỗi xác thực Email.");
+            }
+
+            var user = await _userManager.FindByIdAsync(userid);
+
+            if (user == null)
+            {
+                return View(model: "Lỗi xác thực Email.");
+            }
+
+            token = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(token));
+            var result = await _userManager.ConfirmEmailAsync(user, token);
+
+            if (!result.Succeeded)
+            {
+                return View(model: "Lỗi xác thực Email.");
+            }
+
+            return View(model: "Xác thực Email thành công. Chúc xem phim vui vẻ nhé :>");
         }
 
         [HttpGet]
