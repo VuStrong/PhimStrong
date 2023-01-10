@@ -18,12 +18,18 @@ namespace PhimStrong.Areas.Admin.Controllers
 		private readonly AppDbContext _db;
 		private readonly UserManager<User> _userManager;
 		private readonly RoleManager<IdentityRole> _roleManager;
+		private readonly IWebHostEnvironment _environment;
 
-        public UserController(AppDbContext db, UserManager<User> userManager, RoleManager<IdentityRole> roleManager)
+		public UserController(
+			AppDbContext db, 
+			UserManager<User> userManager, 
+			RoleManager<IdentityRole> roleManager, 
+			IWebHostEnvironment environment)
 		{
 			_db = db;
 			_userManager = userManager;
 			_roleManager = roleManager;
+			_environment = environment;
 		}
 
 		private const int USERS_PER_PAGE = 15;
@@ -74,7 +80,7 @@ namespace PhimStrong.Areas.Admin.Controllers
                     }
                 }
 
-                numberOfPages = (int)Math.Ceiling((double)users.Count() / USERS_PER_PAGE);
+                numberOfPages = (int)Math.Ceiling((double)users.Count / USERS_PER_PAGE);
                 if (page > numberOfPages) page = numberOfPages;
                 if (page <= 0) page = 1;
 
@@ -208,6 +214,15 @@ namespace PhimStrong.Areas.Admin.Controllers
 				TempData["error"] = "Xóa tài khoản thất bại.";
 				return RedirectToAction("Index");
 			}
+
+			try
+			{
+				var file = Path.Combine(_environment.ContentRootPath, "wwwroot/src/img/CastAvatars", user.Id + ".jpg");
+
+				FileInfo fileInfo = new FileInfo(file);
+				fileInfo.Delete();
+			}
+			catch { }
 
 			var result = await _userManager.DeleteAsync(user);
 

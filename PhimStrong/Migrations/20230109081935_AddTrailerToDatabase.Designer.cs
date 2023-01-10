@@ -12,8 +12,8 @@ using PhimStrong.Data;
 namespace PhimStrong.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20221231165017_UpdateUserV2")]
-    partial class UpdateUserV2
+    [Migration("20230109081935_AddTrailerToDatabase")]
+    partial class AddTrailerToDatabase
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -23,6 +23,51 @@ namespace PhimStrong.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
+
+            modelBuilder.Entity("CastMovie", b =>
+                {
+                    b.Property<int>("CastsId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("MoviesId")
+                        .HasColumnType("int");
+
+                    b.HasKey("CastsId", "MoviesId");
+
+                    b.HasIndex("MoviesId");
+
+                    b.ToTable("CastMovie");
+                });
+
+            modelBuilder.Entity("CategoryMovie", b =>
+                {
+                    b.Property<int>("CategoriesId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("MoviesId")
+                        .HasColumnType("int");
+
+                    b.HasKey("CategoriesId", "MoviesId");
+
+                    b.HasIndex("MoviesId");
+
+                    b.ToTable("CategoryMovie");
+                });
+
+            modelBuilder.Entity("DirectorMovie", b =>
+                {
+                    b.Property<int>("DirectorsId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("MoviesId")
+                        .HasColumnType("int");
+
+                    b.HasKey("DirectorsId", "MoviesId");
+
+                    b.HasIndex("MoviesId");
+
+                    b.ToTable("DirectorMovie");
+                });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
                 {
@@ -157,34 +202,31 @@ namespace PhimStrong.Migrations
                     b.ToTable("UserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("MoviePeople", b =>
+            modelBuilder.Entity("SharedLibrary.Models.Cast", b =>
                 {
-                    b.Property<int>("DirectedMoviesId")
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    b.Property<int>("DirectorsId")
-                        .HasColumnType("int");
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.HasKey("DirectedMoviesId", "DirectorsId");
+                    b.Property<string>("About")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.HasIndex("DirectorsId");
+                    b.Property<string>("Avatar")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.ToTable("MoviePeople");
-                });
+                    b.Property<DateTime?>("DateOfBirth")
+                        .HasColumnType("datetime2");
 
-            modelBuilder.Entity("MoviePeople1", b =>
-                {
-                    b.Property<int>("CastsId")
-                        .HasColumnType("int");
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
-                    b.Property<int>("JoinedMoviesId")
-                        .HasColumnType("int");
+                    b.HasKey("Id");
 
-                    b.HasKey("CastsId", "JoinedMoviesId");
-
-                    b.HasIndex("JoinedMoviesId");
-
-                    b.ToTable("MoviePeople1");
+                    b.ToTable("Casts");
                 });
 
             modelBuilder.Entity("SharedLibrary.Models.Category", b =>
@@ -254,6 +296,9 @@ namespace PhimStrong.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
+                    b.Property<string>("About")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -261,6 +306,33 @@ namespace PhimStrong.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Countries");
+                });
+
+            modelBuilder.Entity("SharedLibrary.Models.Director", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("About")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Avatar")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("DateOfBirth")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Directors");
                 });
 
             modelBuilder.Entity("SharedLibrary.Models.Movie", b =>
@@ -271,14 +343,14 @@ namespace PhimStrong.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<int?>("CategoryId")
-                        .HasColumnType("int");
-
                     b.Property<int?>("CountryId")
                         .HasColumnType("int");
 
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("EpisodeCount")
+                        .HasColumnType("int");
 
                     b.Property<string>("Image")
                         .HasColumnType("nvarchar(max)");
@@ -296,11 +368,12 @@ namespace PhimStrong.Migrations
                     b.Property<DateTime?>("ReleaseDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Trailer")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("Type")
+                    b.Property<int?>("TrailerId")
                         .HasColumnType("int");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UserId")
                         .HasColumnType("nvarchar(450)");
@@ -310,16 +383,16 @@ namespace PhimStrong.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CategoryId");
-
                     b.HasIndex("CountryId");
+
+                    b.HasIndex("TrailerId");
 
                     b.HasIndex("UserId");
 
                     b.ToTable("Movies");
                 });
 
-            modelBuilder.Entity("SharedLibrary.Models.People", b =>
+            modelBuilder.Entity("SharedLibrary.Models.Trailer", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -327,17 +400,22 @@ namespace PhimStrong.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<DateTime?>("DateOfBirth")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Name")
+                    b.Property<string>("Clip")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Length")
+                        .HasColumnType("int");
+
+                    b.Property<int>("MovieId")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Casts");
+                    b.HasIndex("MovieId")
+                        .IsUnique();
+
+                    b.ToTable("Trailer");
                 });
 
             modelBuilder.Entity("SharedLibrary.Models.User", b =>
@@ -417,6 +495,78 @@ namespace PhimStrong.Migrations
                     b.ToTable("Users", (string)null);
                 });
 
+            modelBuilder.Entity("SharedLibrary.Models.Video", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<int?>("Episode")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("Length")
+                        .HasColumnType("int");
+
+                    b.Property<int>("MovieId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("VideoUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MovieId");
+
+                    b.ToTable("Videos");
+                });
+
+            modelBuilder.Entity("CastMovie", b =>
+                {
+                    b.HasOne("SharedLibrary.Models.Cast", null)
+                        .WithMany()
+                        .HasForeignKey("CastsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SharedLibrary.Models.Movie", null)
+                        .WithMany()
+                        .HasForeignKey("MoviesId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("CategoryMovie", b =>
+                {
+                    b.HasOne("SharedLibrary.Models.Category", null)
+                        .WithMany()
+                        .HasForeignKey("CategoriesId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SharedLibrary.Models.Movie", null)
+                        .WithMany()
+                        .HasForeignKey("MoviesId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("DirectorMovie", b =>
+                {
+                    b.HasOne("SharedLibrary.Models.Director", null)
+                        .WithMany()
+                        .HasForeignKey("DirectorsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SharedLibrary.Models.Movie", null)
+                        .WithMany()
+                        .HasForeignKey("MoviesId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -468,36 +618,6 @@ namespace PhimStrong.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("MoviePeople", b =>
-                {
-                    b.HasOne("SharedLibrary.Models.Movie", null)
-                        .WithMany()
-                        .HasForeignKey("DirectedMoviesId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("SharedLibrary.Models.People", null)
-                        .WithMany()
-                        .HasForeignKey("DirectorsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("MoviePeople1", b =>
-                {
-                    b.HasOne("SharedLibrary.Models.People", null)
-                        .WithMany()
-                        .HasForeignKey("CastsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("SharedLibrary.Models.Movie", null)
-                        .WithMany()
-                        .HasForeignKey("JoinedMoviesId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("SharedLibrary.Models.Comment", b =>
                 {
                     b.HasOne("SharedLibrary.Models.Movie", "Movie")
@@ -525,26 +645,43 @@ namespace PhimStrong.Migrations
 
             modelBuilder.Entity("SharedLibrary.Models.Movie", b =>
                 {
-                    b.HasOne("SharedLibrary.Models.Category", "Category")
-                        .WithMany("Movies")
-                        .HasForeignKey("CategoryId");
-
                     b.HasOne("SharedLibrary.Models.Country", "Country")
                         .WithMany("Movies")
                         .HasForeignKey("CountryId");
+
+                    b.HasOne("SharedLibrary.Models.Trailer", "Trailer")
+                        .WithMany()
+                        .HasForeignKey("TrailerId");
 
                     b.HasOne("SharedLibrary.Models.User", null)
                         .WithMany("LikedMovies")
                         .HasForeignKey("UserId");
 
-                    b.Navigation("Category");
-
                     b.Navigation("Country");
+
+                    b.Navigation("Trailer");
                 });
 
-            modelBuilder.Entity("SharedLibrary.Models.Category", b =>
+            modelBuilder.Entity("SharedLibrary.Models.Trailer", b =>
                 {
-                    b.Navigation("Movies");
+                    b.HasOne("SharedLibrary.Models.Movie", "Movie")
+                        .WithOne()
+                        .HasForeignKey("SharedLibrary.Models.Trailer", "MovieId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Movie");
+                });
+
+            modelBuilder.Entity("SharedLibrary.Models.Video", b =>
+                {
+                    b.HasOne("SharedLibrary.Models.Movie", "Movie")
+                        .WithMany("Videos")
+                        .HasForeignKey("MovieId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Movie");
                 });
 
             modelBuilder.Entity("SharedLibrary.Models.Comment", b =>
@@ -555,6 +692,11 @@ namespace PhimStrong.Migrations
             modelBuilder.Entity("SharedLibrary.Models.Country", b =>
                 {
                     b.Navigation("Movies");
+                });
+
+            modelBuilder.Entity("SharedLibrary.Models.Movie", b =>
+                {
+                    b.Navigation("Videos");
                 });
 
             modelBuilder.Entity("SharedLibrary.Models.User", b =>

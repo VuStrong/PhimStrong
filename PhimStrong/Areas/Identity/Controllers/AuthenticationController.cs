@@ -7,6 +7,7 @@ using SharedLibrary.Models;
 using System.Text.Encodings.Web;
 using System.Text;
 using System.Security.Claims;
+using SharedLibrary.Constants;
 
 #pragma warning disable
 namespace PhimStrong.Areas.Identity.Controllers
@@ -62,10 +63,10 @@ namespace PhimStrong.Areas.Identity.Controllers
                 
                 var result = await _userManager.CreateAsync(user, model.Password);
 
-				await _userManager.AddToRoleAsync(user, "Member");
-
 				if (result.Succeeded)
                 {
+                    await _userManager.AddToRoleAsync(user, RoleConstant.MEMBER);
+
                     string token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
                     token = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token));
 

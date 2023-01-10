@@ -4,7 +4,7 @@
 
 namespace PhimStrong.Migrations
 {
-    public partial class Add100TestUser : Migration
+    public partial class Add50User : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -28,7 +28,7 @@ namespace PhimStrong.Migrations
                     values: new object[]
                     {
                         Guid.NewGuid().ToString(),
-                        "TestUser" + i.ToString(),
+                        "User" + i.ToString(),
                         "email" + i.ToString() + "@example.com",
                         Guid.NewGuid().ToString(),
                         true,
@@ -36,7 +36,7 @@ namespace PhimStrong.Migrations
                         false,
                         false,
                         0,
-                        "Test User " + i.ToString()
+                        "Tester " + i.ToString(),
                     }
                 );
             }

@@ -1,0 +1,39 @@
+﻿@model Cast
+@{
+    ViewData["Title"] = "Thêm diễn viên";
+}
+
+<h2 class="text-success">@ViewData["Title"]</h2>
+
+<partial name="_StatusMessage" for="@TempData["status"]" />
+
+<div class="mt-4">
+    <form method="post" enctype="multipart/form-data">
+        <div asp-validation-summary="All" class="text-danger"></div>
+        <div class="form-group">
+            <label asp-for="Name">Tên</label>
+            <input asp-for="Name" class="form-control" placeholder="Nhập tên diễn viên">
+            <span asp-validation-for="Name" class="text-danger"></span>
+        </div>
+        <div class="form-group mt-3">
+            <label asp-for="AvatarFile">Ảnh</label>
+            <input asp-for="AvatarFile" class="form-control">
+            <span asp-validation-for="AvatarFile" class="text-danger"></span>
+        </div>
+        <div class="form-group mt-3">
+            <label asp-for="About">Tiểu sử, sự nghiệp</label>
+            <textarea asp-for="About" class="form-control" placeholder="tiểu sử, sự nghiệp"></textarea>
+            <span asp-validation-for="About" class="text-danger"></span>
+        </div>
+        <div class="form-group mt-3">
+            <label asp-for="DateOfBirth">Ngày sinh</label>
+            <input asp-for="DateOfBirth" class="form-control" placeholder="Ngày sinh">
+            <span asp-validation-for="DateOfBirth" class="text-danger"></span>
+        </div>
+        <button type="submit" class="btn btn-primary mt-4">Thêm</button>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="/Views/Shared/_ValidationScriptsPartial.cshtml" />
+}

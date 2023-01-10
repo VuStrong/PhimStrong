@@ -165,6 +165,12 @@ namespace PhimStrong.Areas.Identity.Controllers
 
             if (userModel.AvatarFile != null)
             {
+                //if (!userModel.AvatarFile.FileName.EndsWith(".png") &&
+                //    !userModel.AvatarFile.FileName.EndsWith(".jpg"))
+                //{
+                //    return Json(new { success = false , error = "Định dạng ảnh phải là .png, .jpg !"});
+                //}
+
                 var file = Path.Combine(_environment.ContentRootPath, "wwwroot/src/img/UserAvatars", user.Id + ".jpg");
                 
                 using (var fileStream = new FileStream(file, FileMode.Create))
@@ -172,7 +178,8 @@ namespace PhimStrong.Areas.Identity.Controllers
                     await userModel.AvatarFile.CopyToAsync(fileStream);
                 }
 
-                user.Avatar = "/src/img/UserAvatars/" + user.Id + ".jpg";
+                if(user.Avatar != "/src/img/UserAvatars/" + user.Id + ".jpg") 
+                    user.Avatar = "/src/img/UserAvatars/" + user.Id + ".jpg";
             }
 
             Regex validatePhoneNumberRegex = new Regex("^\\+?\\d{1,4}?[-.\\s]?\\(?\\d{1,3}?\\)?[-.\\s]?\\d{1,4}[-.\\s]?\\d{1,4}[-.\\s]?\\d{1,9}$");

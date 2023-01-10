@@ -1,0 +1,29 @@
+﻿@model Category
+@{
+    ViewData["Title"] = "Thêm thể loại mới";
+}
+
+<h2 class="text-success">@ViewData["Title"]</h2>
+
+<partial name="_StatusMessage" for="@TempData["status"]" />
+
+<div class="mt-4">
+    <form method="post">
+        <div asp-validation-summary="All" class="text-danger"></div>
+        <div class="form-group">
+            <label asp-for="Name">Tên thể loại</label>
+            <input asp-for="Name" class="form-control" placeholder="Nhập tên thể loại">
+            <span asp-validation-for="Name" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="Description">Miêu tả</label>
+            <input asp-for="Description" class="form-control" placeholder="Miêu tả">
+            <span asp-validation-for="Description" class="text-danger"></span>
+        </div>
+        <button type="submit" class="btn btn-primary mt-4">Tạo</button>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="/Views/Shared/_ValidationScriptsPartial.cshtml" />
+}

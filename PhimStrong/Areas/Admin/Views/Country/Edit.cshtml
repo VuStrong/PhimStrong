@@ -1,0 +1,45 @@
+﻿@model Country
+@{
+    ViewData["Title"] = "Chỉnh sửa quốc gia";
+}
+
+<h2 class="text-success">@ViewData["Title"]</h2>
+
+<partial name="_StatusMessage" for="@TempData["status"]" />
+
+<div class="mt-4">
+    <form method="post" enctype="multipart/form-data">
+        <div asp-validation-summary="All" class="text-danger"></div>
+        <div class="form-group">
+            <label asp-for="Name">Tên</label>
+            <input asp-for="Name" class="form-control" placeholder="Nhập tên quốc gia">
+            <span asp-validation-for="Name" class="text-danger"></span>
+        </div>
+        <div class="form-group mt-3">
+            <label asp-for="About">Tiểu sử, sự nghiệp</label>
+            <input asp-for="About" class="form-control" placeholder="Miêu tả">
+            <span asp-validation-for="About" class="text-danger"></span>
+        </div>
+        <button type="submit" class="btn btn-primary mt-4">Chỉnh sửa</button>
+    </form>
+
+    <form id="delete-country" method="post" asp-action="Delete" asp-route-countryid="@Model.Id">
+        <button id="delete-country-btn" type="submit" class="btn btn-danger mt-4">Xóa quốc gia</button>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="/Views/Shared/_ValidationScriptsPartial.cshtml" />
+    <script src="~/js/ModalConfirm.js" asp-append-version="true"></script>
+    <script type="text/javascript">
+        $('#delete-country-btn').click(function (e) {
+            e.preventDefault();
+            showModal("Xóa ?", "Xác nhận xóa quốc gia này ?");
+        });
+
+        modalConfirm(function() {
+            $('#delete-country').submit();
+        });
+    </script>
+}
+

@@ -74,6 +74,7 @@
 </div>
 
 @section Scripts{
+    <script src="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
     <script type="text/javascript">
         $(function () {
 
@@ -127,7 +128,10 @@
 
                             toastr.success("Cập nhập thông tin thành công !");
                         } else {
-                            toastr.error("Cập nhập thông tin thất bại !");
+                            if (data.error)
+                                toastr.error(data.error);
+                            else 
+                                toastr.error("Cập nhập thông tin thất bại !");
                         }
 
                     }

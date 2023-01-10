@@ -29,6 +29,14 @@ body {
     height: 100px;
 }
 
+.avatar.avatar-square {
+    border-radius: 0;
+}
+
+.img-fit {
+    object-fit: cover;
+}
+
 .background-profile {
     background-image: linear-gradient(0, rgba(93, 26, 26, 0.418), rgba(50, 216, 61, 0.423));
     background-repeat: no-repeat;

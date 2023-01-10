@@ -1,0 +1,96 @@
+﻿@model List<Director>
+@{
+    ViewData["Title"] = "Quản lí đạo diễn";
+}
+
+<div class="d-flex mt-4 mb-2" style="justify-content: space-between">
+    <h2 class="text-success">@ViewData["Title"]</h2>
+
+    <div>
+        <ul class="d-flex align-items-center" style="list-style: none">
+            <li class="nav-item">
+                <form id="search-name-form" class="d-flex" method="get" asp-route-page="1">
+                    <input name="filter" class="form-control me-sm-2" type="text" placeholder="Nhập tên">
+                    <button id="search-name-btn" class="btn btn-secondary my-2 my-sm-0" type="submit">Search</button>
+                </form>
+            </li>
+        </ul>
+    </div>
+</div>
+<div class="my-3">
+    <a class="btn btn-success" asp-controller="Director" asp-action="Create">Thêm đạo diễn</a>
+</div>
+
+@if (TempData["FilterMessage"] != null)
+{
+    <h3 class="text-success">Kết quả tìm kiếm cho đạo diễn có @TempData["FilterMessage"].</h3>
+}
+
+@if (Model != null && Model.Count > 0)
+{
+    <table class="table table-hover">
+        <thead>
+            <tr class="table-info">
+                <th scope="col">Đạo diễn</th>
+                <th scope="col">Tên</th>
+                <th scope="col">Tác vụ</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var director in Model)
+            {
+                <tr>
+                    <th scope="row">
+                        <img src="@(director.Avatar ?? "/src/img/UserAvatars/default_avatar.png")" class="avatar  avatar-square img-fit" style="width: 50px; height:50px;">
+                    </th>
+                    <td class="overflow-hidden">@director.Name</td>
+                    <td>
+                        <a class="btn btn-success" asp-area="Admin" asp-controller="Director" asp-action="Edit" asp-route-directorid="@director.Id">Chỉnh sửa</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <h3>Không có kết quả :((</h3>
+}
+
+@{
+    PagingModel pagingModel = new PagingModel
+            {
+                NumberOfPages = (int)(TempData["NumberOfPages"] ?? 1),
+                CurrentPage = (int)(TempData["CurrentPage"] ?? 1),
+                Callback = (int page) => Url.Action("Index", "Director", new
+                {
+                    area = "Admin",
+                    page = page,
+                    filter = (string)(TempData["filter"] ?? "")
+                })
+            };
+}
+
+<partial name="/Views/Shared/_PagingPartial.cshtml" for="@pagingModel"></partial>
+
+@section Scripts{
+    <script type="text/javascript">
+        // trước khi sumbit thì thay lại giá trị cho thẻ input
+        $('#search-name-form').submit(function (e) {
+            e.preventDefault();
+
+            var searchBtn = $('input[name="filter"]');
+
+            if (!searchBtn.val() || searchBtn.val().trim() == "") return;
+
+            searchBtn.val(`<@PageFilterConstant.FILTER_BY_NAME>${searchBtn.val()}`);
+
+            this.submit();
+
+            searchBtn.val('');
+        });
+    </script>
+}
+
+
+

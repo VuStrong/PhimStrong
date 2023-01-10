@@ -1,6 +1,8 @@
 ﻿@using Microsoft.AspNetCore.Identity
 @using SharedLibrary.Models
+
 @inject UserManager<User> UserManager
+@inject AppDbContext AppDbContext
 
 @{
     var user = await UserManager.GetUserAsync(User);
@@ -22,29 +24,35 @@
                 </li>
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle text-uppercase" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">thể loại</a>
-                    <div class="dropdown-menu">
-                        <a class="dropdown-item" href="#">Action</a>
-                        <a class="dropdown-item" href="#">Another action</a>
-                        <a class="dropdown-item" href="#">Something else here</a>
-                        <a class="dropdown-item" href="#">Separated link</a>
+                    <div class="dropdown-menu row" style="width:400px">
+                        <div class="row">
+                            @foreach (var category in AppDbContext.Categories)
+                            {
+                                <a class="dropdown-item" style="width:50%;" href="#">@category.Name</a>
+                            }
+                        </div>
                     </div>
                 </li>
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle text-uppercase" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">quốc gia</a>
-                    <div class="dropdown-menu">
-                        <a class="dropdown-item" href="#">Action</a>
-                        <a class="dropdown-item" href="#">Another action</a>
-                        <a class="dropdown-item" href="#">Something else here</a>
-                        <a class="dropdown-item" href="#">Separated link</a>
+                    <div class="dropdown-menu row" style="width:400px">
+                        <div class="row">
+                            @foreach (var country in AppDbContext.Countries)
+                            {
+                                <a class="dropdown-item" style="width:50%;" href="#">@country.Name</a>
+                            }
+                        </div>
                     </div>
                 </li>
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle text-uppercase" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">năm phát hành</a>
-                    <div class="dropdown-menu">
-                        <a class="dropdown-item" href="#">Action</a>
-                        <a class="dropdown-item" href="#">Another action</a>
-                        <a class="dropdown-item" href="#">Something else here</a>
-                        <a class="dropdown-item" href="#">Separated link</a>
+                    <div class="dropdown-menu row" style="width:400px">
+                        <div class="row">
+                            @for (int i = 2000; i <= 2023; i++)
+                            {
+                                <a class="dropdown-item" style="width:50%;" href="#">@i</a>
+                            }
+                        </div>
                     </div>
                 </li>
                 @if (user != null && (await UserManager.IsInRoleAsync(user, RoleConstant.ADMIN) || await UserManager.IsInRoleAsync(user, RoleConstant.THUY_TO)))
@@ -54,6 +62,10 @@
                         <div class="dropdown-menu">
                             <a class="dropdown-item" asp-area="Admin" asp-controller="User" asp-action="Index">Quản lý Users</a>
                             <a class="dropdown-item" asp-area="Admin" asp-controller="Movie" asp-action="Index">Quản lý phim</a>
+                            <a class="dropdown-item" asp-area="Admin" asp-controller="Category" asp-action="Index">Quản lý thể loại</a>
+                            <a class="dropdown-item" asp-area="Admin" asp-controller="Cast" asp-action="Index">Quản lý diễn viên</a>
+                            <a class="dropdown-item" asp-area="Admin" asp-controller="Director" asp-action="Index">Quản lý dạo diễn</a>
+                            <a class="dropdown-item" asp-area="Admin" asp-controller="Country" asp-action="Index">Quản lý quốc gia</a>
                         </div>
                     </li>
                 }

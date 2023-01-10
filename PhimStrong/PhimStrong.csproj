@@ -34,4 +34,11 @@
     <ProjectReference Include="..\SharedLibrary\SharedLibrary.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Migrations\" />
+    <Folder Include="wwwroot\src\img\CastAvatars\" />
+    <Folder Include="wwwroot\src\img\DirectorAvatars\" />
+    <Folder Include="wwwroot\src\img\MovieImages\" />
+  </ItemGroup>
+
 </Project>

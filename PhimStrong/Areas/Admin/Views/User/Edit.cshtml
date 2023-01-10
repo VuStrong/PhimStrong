@@ -18,7 +18,7 @@
 			<h5 class="mt-3 text-success"> ** Chỉnh sửa role cho : @Model.User.DisplayName</h5>
 
 			<div class="form-group">
-				<label class="me-3 mt-3 mb-3">Role : </label>
+				<label class="me-3 my-3">Role : </label>
 				<select id="role-list" asp-items="@(new SelectList(Model.RoleList))" asp-for="@Model.UserRole"></select>
 				<button id="edit-role-btn" class="btn btn-success ms-4 disabled">Lưu</button>
 			</div>
@@ -29,7 +29,7 @@
 			<h5 class="mt-3 text-success"> **Mở Khóa tài khoản của User : @Model.User.DisplayName</h5>
 
 			<div class="form-group">
-				<label class="me-3 mt-3 mb-3">Ấn vào đây để mở khóa : </label>
+				<label class="me-3 my-3">Ấn vào đây để mở khóa : </label>
 				<button id="unlock-user-btn" class="btn btn-success ms-4">Mở khóa</button>
 			</div>
 		</div>
@@ -37,7 +37,7 @@
 			<h5 class="mt-3 text-success"> ** Khóa tài khoản của User : @Model.User.DisplayName</h5>
 
 			<div class="form-group">
-				<label class="me-3 mt-3 mb-3">Ấn vào đây để khóa : </label>
+				<label class="me-3 my-3">Ấn vào đây để khóa : </label>
 				<button id="lock-user-btn" class="btn btn-danger ms-4">Khóa</button>
 			</div>
 		</div>
@@ -56,6 +56,8 @@
 </div>
 
 @section Scripts{
+	<script src="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+	<script src="~/js/ModalConfirm.js" asp-append-version="true"></script>
 	<script type="text/javascript">
 		$('select').on('change', function (e) {
 			$('#edit-role-btn').removeClass('disabled');
@@ -121,14 +123,13 @@
 			);
 		});
 
-		$('#delete-user-form').submit(function(e) {
+		$('#delete-user-btn').click(function (e) {
 			e.preventDefault();
+			showModal('Xóa User này ?', 'Bạn có chắc muốn xóa User này không ?');
+		});
 
-			showModal('Xóa User này ?', 'Bạn có chắc muốn xóa User này không ?, người ấy sẽ rất buồn đó :(');
-
-			$('#confirm-modal-btn').click(() => {
-				this.submit();
-			});
+		modalConfirm(function() {
+			$('#delete-user-form').submit();
 		});
 	</script>
 }

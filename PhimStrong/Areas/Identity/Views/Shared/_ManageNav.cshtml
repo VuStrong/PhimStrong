@@ -3,7 +3,7 @@
     string page = "";
     if (TempData["currentNav"] != null)
     {
-        page = (string)TempData["currentNav"];
+        page = (string)(TempData["currentNav"] ?? "");
     }
 }
 

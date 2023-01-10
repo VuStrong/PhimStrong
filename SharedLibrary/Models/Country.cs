@@ -11,6 +11,8 @@ namespace SharedLibrary.Models
         [Required]
         public string Name { get; set; }
 
-        public List<Movie> Movies { get; set; } 
+        public string? About { get; set; }
+
+        public List<Movie>? Movies { get; set; } 
     }
 }

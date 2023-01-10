@@ -16,7 +16,8 @@ namespace PhimStrong.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    DateOfBirth = table.Column<DateTime>(type: "datetime2", nullable: true)
+                    DateOfBirth = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    About = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -51,6 +52,21 @@ namespace PhimStrong.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Directors",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    DateOfBirth = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    About = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Directors", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Roles",
                 columns: table => new
                 {
@@ -69,7 +85,10 @@ namespace PhimStrong.Migrations
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    DisplayName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Avatar = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    FavoriteMovie = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Hobby = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
@@ -124,20 +143,15 @@ namespace PhimStrong.Migrations
                     View = table.Column<int>(type: "int", nullable: false),
                     Image = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Trailer = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    CategoryId = table.Column<int>(type: "int", nullable: true),
                     CountryId = table.Column<int>(type: "int", nullable: true),
                     Rating = table.Column<float>(type: "real", nullable: false),
-                    Type = table.Column<int>(type: "int", nullable: false),
+                    Type = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    EpisodeCount = table.Column<int>(type: "int", nullable: false),
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Movies", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Movies_Categories_CategoryId",
-                        column: x => x.CategoryId,
-                        principalTable: "Categories",
-                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Movies_Countries_CountryId",
                         column: x => x.CountryId,
@@ -236,6 +250,54 @@ namespace PhimStrong.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "CastMovie",
+                columns: table => new
+                {
+                    CastsId = table.Column<int>(type: "int", nullable: false),
+                    MoviesId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CastMovie", x => new { x.CastsId, x.MoviesId });
+                    table.ForeignKey(
+                        name: "FK_CastMovie_Casts_CastsId",
+                        column: x => x.CastsId,
+                        principalTable: "Casts",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_CastMovie_Movies_MoviesId",
+                        column: x => x.MoviesId,
+                        principalTable: "Movies",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "CategoryMovie",
+                columns: table => new
+                {
+                    CategoryId = table.Column<int>(type: "int", nullable: false),
+                    MoviesId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CategoryMovie", x => new { x.CategoryId, x.MoviesId });
+                    table.ForeignKey(
+                        name: "FK_CategoryMovie_Categories_CategoryId",
+                        column: x => x.CategoryId,
+                        principalTable: "Categories",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_CategoryMovie_Movies_MoviesId",
+                        column: x => x.MoviesId,
+                        principalTable: "Movies",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Comments",
                 columns: table => new
                 {
@@ -271,52 +333,60 @@ namespace PhimStrong.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "MovieDirector",
+                name: "DirectorMovie",
                 columns: table => new
                 {
-                    DirectedMoviesId = table.Column<int>(type: "int", nullable: false),
-                    DirectorsId = table.Column<int>(type: "int", nullable: false)
+                    DirectorsId = table.Column<int>(type: "int", nullable: false),
+                    MoviesId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_MovieDirector", x => new { x.DirectedMoviesId, x.DirectorsId });
+                    table.PrimaryKey("PK_DirectorMovie", x => new { x.DirectorsId, x.MoviesId });
                     table.ForeignKey(
-                        name: "FK_MovieDirector_Casts_DirectorsId",
+                        name: "FK_DirectorMovie_Directors_DirectorsId",
                         column: x => x.DirectorsId,
-                        principalTable: "Casts",
+                        principalTable: "Directors",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_MovieDirector_Movies_DirectedMoviesId",
-                        column: x => x.DirectedMoviesId,
+                        name: "FK_DirectorMovie_Movies_MoviesId",
+                        column: x => x.MoviesId,
                         principalTable: "Movies",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "MovieCast",
+                name: "Videos",
                 columns: table => new
                 {
-                    CastsId = table.Column<int>(type: "int", nullable: false),
-                    JoinedMoviesId = table.Column<int>(type: "int", nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    MovieId = table.Column<int>(type: "int", nullable: false),
+                    VideoUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Episode = table.Column<int>(type: "int", nullable: true),
+                    Length = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_MovieCast", x => new { x.CastsId, x.JoinedMoviesId });
+                    table.PrimaryKey("PK_Videos", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_MovieCast_Casts_CastsId",
-                        column: x => x.CastsId,
-                        principalTable: "Casts",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_MovieCast_Movies_JoinedMoviesId",
-                        column: x => x.JoinedMoviesId,
+                        name: "FK_Videos_Movies_MovieId",
+                        column: x => x.MovieId,
                         principalTable: "Movies",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CastMovie_MoviesId",
+                table: "CastMovie",
+                column: "MoviesId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CategoryMovie_MoviesId",
+                table: "CategoryMovie",
+                column: "MoviesId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Comments_MovieId",
@@ -334,19 +404,9 @@ namespace PhimStrong.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_MovieDirector_DirectorsId",
-                table: "MovieDirector",
-                column: "DirectorsId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_MovieCast_JoinedMoviesId",
-                table: "MovieCast",
-                column: "JoinedMoviesId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Movies_CategoryId",
-                table: "Movies",
-                column: "CategoryId");
+                name: "IX_DirectorMovie_MoviesId",
+                table: "DirectorMovie",
+                column: "MoviesId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Movies_CountryId",
@@ -396,18 +456,26 @@ namespace PhimStrong.Migrations
                 column: "NormalizedUserName",
                 unique: true,
                 filter: "[NormalizedUserName] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Videos_MovieId",
+                table: "Videos",
+                column: "MovieId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
+                name: "CastMovie");
+
+            migrationBuilder.DropTable(
+                name: "CategoryMovie");
+
+            migrationBuilder.DropTable(
                 name: "Comments");
 
             migrationBuilder.DropTable(
-                name: "MovieDirector");
-
-            migrationBuilder.DropTable(
-                name: "MovieCast");
+                name: "DirectorMovie");
 
             migrationBuilder.DropTable(
                 name: "RoleClaims");
@@ -425,16 +493,22 @@ namespace PhimStrong.Migrations
                 name: "UserTokens");
 
             migrationBuilder.DropTable(
+                name: "Videos");
+
+            migrationBuilder.DropTable(
                 name: "Casts");
 
             migrationBuilder.DropTable(
-                name: "Movies");
+                name: "Categories");
+
+            migrationBuilder.DropTable(
+                name: "Directors");
 
             migrationBuilder.DropTable(
                 name: "Roles");
 
             migrationBuilder.DropTable(
-                name: "Categories");
+                name: "Movies");
 
             migrationBuilder.DropTable(
                 name: "Countries");

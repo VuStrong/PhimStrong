@@ -4,19 +4,19 @@
 
 namespace PhimStrong.Migrations
 {
-    public partial class UpdateUserV2 : Migration
+    public partial class AddAvatarToCastAndDirector : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AddColumn<string>(
-                name: "FavoriteMovie",
-                table: "Users",
+                name: "Avatar",
+                table: "Directors",
                 type: "nvarchar(max)",
                 nullable: true);
 
             migrationBuilder.AddColumn<string>(
-                name: "Hobby",
-                table: "Users",
+                name: "Avatar",
+                table: "Casts",
                 type: "nvarchar(max)",
                 nullable: true);
         }
@@ -24,12 +24,12 @@ namespace PhimStrong.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
-                name: "FavoriteMovie",
-                table: "Users");
+                name: "Avatar",
+                table: "Directors");
 
             migrationBuilder.DropColumn(
-                name: "Hobby",
-                table: "Users");
+                name: "Avatar",
+                table: "Casts");
         }
     }
 }

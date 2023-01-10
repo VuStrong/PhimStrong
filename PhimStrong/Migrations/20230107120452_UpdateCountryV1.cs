@@ -4,13 +4,13 @@
 
 namespace PhimStrong.Migrations
 {
-    public partial class AddDisplayNameToUser : Migration
+    public partial class UpdateCountryV1 : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AddColumn<string>(
-                name: "DisplayName",
-                table: "Users",
+                name: "About",
+                table: "Countries",
                 type: "nvarchar(max)",
                 nullable: true);
         }
@@ -18,8 +18,8 @@ namespace PhimStrong.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
-                name: "DisplayName",
-                table: "Users");
+                name: "About",
+                table: "Countries");
         }
     }
 }
