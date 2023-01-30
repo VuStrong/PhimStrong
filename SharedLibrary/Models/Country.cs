@@ -10,9 +10,10 @@ namespace SharedLibrary.Models
 
         [Required]
         public string Name { get; set; }
+		public string? NormalizeName { get; set; }
 
-        public string? About { get; set; }
+		public string? About { get; set; }
 
-        public List<Movie>? Movies { get; set; } 
+        public virtual List<Movie>? Movies { get; set; } 
     }
 }

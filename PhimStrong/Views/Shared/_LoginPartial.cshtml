@@ -12,8 +12,8 @@
             @{
                 var user = await UserManager.GetUserAsync(User);
             }
-            <img src="@(user.Avatar ?? "/src/img/UserAvatars/default_avatar.png")" class="avatar">
-            @user.DisplayName
+            <img src="@(user != null ? user.Avatar ?? "/src/img/UserAvatars/default_avatar.png" : "/src/img/UserAvatars/default_avatar.png")" class="avatar">
+            @(user != null ? user.DisplayName : "null")
         </a>
         <div class="dropdown-menu dropdown-menu-end">
             <a class="dropdown-item" asp-area="Identity" asp-controller="Account" asp-action="Index">Profile</a>

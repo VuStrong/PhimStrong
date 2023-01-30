@@ -8,6 +8,7 @@ using SharedLibrary.Models;
 using SharedLibrary.Constants;
 using System.Data;
 using System.Text.RegularExpressions;
+using SharedLibrary.Helpers;
 
 namespace PhimStrong.Areas.Admin.Controllers
 {
@@ -42,11 +43,14 @@ namespace PhimStrong.Areas.Admin.Controllers
 			int numberOfPages = 0;
 
             List<User> users = new List<User>();
-            if (filter == null || filter.Trim() == "")
+			int count = 0; // total of search result
+			if (filter == null || filter.Trim() == "")
             {
-                numberOfPages = (int)Math.Ceiling((double)_db.Users.Count() / USERS_PER_PAGE);
+				count = _db.Users.Count();
+				numberOfPages = (int)Math.Ceiling((double)count / USERS_PER_PAGE);
+				TempData["TotalCount"] = count;
 
-                if (page > numberOfPages) page = numberOfPages;
+				if (page > numberOfPages) page = numberOfPages;
                 if (page <= 0) page = 1;
 
                 users = _db.Users.Skip((page - 1) * USERS_PER_PAGE).Take(USERS_PER_PAGE).ToList();
@@ -64,23 +68,28 @@ namespace PhimStrong.Areas.Admin.Controllers
                     {
                         case PageFilterConstant.FILTER_BY_ROLE:
                             users = (await _userManager.GetUsersInRoleAsync(filterValue) ?? new List<User>()).ToList();
-                            TempData["FilterMessage"] = "Role là " + filterValue;
 
-                            break;
+							TempData["FilterMessage"] = "Role là " + filterValue;
+
+							break;
 						case PageFilterConstant.FILTER_BY_NAME:
+							TempData["FilterMessage"] = "tên là " + filterValue;
+						 	filterValue = filterValue.RemoveMarks();
+
                             users = _db.Users.Where(u => 
-                                (u.DisplayName ?? "").ToLower().Contains(filterValue.ToLower())
+                                (u.NormalizeDisplayName ?? "").Contains(filterValue)
                             ).ToList();
 
-                            TempData["FilterMessage"] = "tên là " + filterValue;
-
-                            break;
+							break;
                         default:
                             break;
                     }
                 }
 
-                numberOfPages = (int)Math.Ceiling((double)users.Count / USERS_PER_PAGE);
+				count = users.Count;
+				TempData["TotalCount"] = count;
+
+				numberOfPages = (int)Math.Ceiling((double)count / USERS_PER_PAGE);
                 if (page > numberOfPages) page = numberOfPages;
                 if (page <= 0) page = 1;
 
@@ -141,6 +150,7 @@ namespace PhimStrong.Areas.Admin.Controllers
 				return Json(new { success = false });
 			}
 
+			user.RoleName = null;
 			var result = await _userManager.RemoveFromRolesAsync(user, await _userManager.GetRolesAsync(user));
             if (!result.Succeeded)
             {
@@ -155,6 +165,9 @@ namespace PhimStrong.Areas.Admin.Controllers
 				{
 					return Json(new { success = false });
 				}
+
+				user.RoleName = model.UserRole;
+				await _userManager.UpdateAsync(user);
 			}
 
 			return Json(new { success = true });

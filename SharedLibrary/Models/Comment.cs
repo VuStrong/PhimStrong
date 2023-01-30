@@ -9,10 +9,10 @@ namespace SharedLibrary.Models
         public int Id { get; set; }
 
         [Required]
-        public Movie Movie { get; set; }
+        public virtual Movie Movie { get; set; }
 
         [Required]
-        public User User { get; set; }
+        public virtual User User { get; set; }
         
         public string? Content { get; set; }
 
@@ -20,7 +20,7 @@ namespace SharedLibrary.Models
 
         public int Like { get; set; }
 
-        public Comment? ResponseTo { get; set; }
-        public List<Comment>? Responses { get; set; }
+        public virtual Comment? ResponseTo { get; set; }
+        public virtual List<Comment>? Responses { get; set; }
     }
 }

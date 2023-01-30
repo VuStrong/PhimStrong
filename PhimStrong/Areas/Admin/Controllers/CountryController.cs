@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using PhimStrong.Data;
 using SharedLibrary.Constants;
+using SharedLibrary.Helpers;
 using SharedLibrary.Models;
 using System.Data;
 using System.Text.RegularExpressions;
@@ -31,11 +32,15 @@ namespace PhimStrong.Areas.Admin.Controllers
             int numberOfPages = 0;
 
             List<Country> countries = new List<Country>();
-            if (filter == null || filter.Trim() == "")
+			int count = 0; // total of search result
+			if (filter == null || filter.Trim() == "")
             {
-                numberOfPages = (int)Math.Ceiling((double)_db.Countries.Count() / COUNTRY_PER_PAGE);
+                count = _db.Countries.Count();
 
-                if (page > numberOfPages) page = numberOfPages;
+                numberOfPages = (int)Math.Ceiling((double)count / COUNTRY_PER_PAGE);
+				TempData["TotalCount"] = count;
+
+				if (page > numberOfPages) page = numberOfPages;
                 if (page <= 0) page = 1;
 
                 countries = _db.Countries.Skip((page - 1) * COUNTRY_PER_PAGE).Take(COUNTRY_PER_PAGE).ToList();
@@ -52,11 +57,12 @@ namespace PhimStrong.Areas.Admin.Controllers
                     switch (matchValue)
                     {
                         case PageFilterConstant.FILTER_BY_NAME:
-                            countries = _db.Countries.Where(m =>
-                                (m.Name ?? "").ToLower().Contains(filterValue.ToLower())
-                            ).ToList();
-
                             TempData["FilterMessage"] = "tên là " + filterValue;
+                            filterValue = filterValue.RemoveMarks();
+
+                            countries = _db.Countries.Where(m =>
+                                (m.NormalizeName ?? "").Contains(filterValue)
+                            ).ToList();
 
                             break;
                         default:
@@ -64,7 +70,10 @@ namespace PhimStrong.Areas.Admin.Controllers
                     }
                 }
 
-                numberOfPages = (int)Math.Ceiling((double)countries.Count / COUNTRY_PER_PAGE);
+                count = countries.Count;
+				TempData["TotalCount"] = count;
+
+				numberOfPages = (int)Math.Ceiling((double)count / COUNTRY_PER_PAGE);
                 if (page > numberOfPages) page = numberOfPages;
                 if (page <= 0) page = 1;
 
@@ -100,7 +109,8 @@ namespace PhimStrong.Areas.Admin.Controllers
             }
 
             // chỉnh lại format tên :
-            country.Name = Regex.Replace(country.Name.ToLower(), @"(^\w)|(\s\w)", m => m.Value.ToUpper());
+            country.Name = Regex.Replace(country.Name.ToLower().Trim(), @"(^\w)|(\s\w)", m => m.Value.ToUpper());
+            country.NormalizeName = country.Name.RemoveMarks();
 
             try
             {
@@ -152,8 +162,11 @@ namespace PhimStrong.Areas.Admin.Controllers
                 return NotFound("Không tìm thấy quốc gia.");
             }
 
-            if(country.Name != countryToEdit.Name) 
-                countryToEdit.Name = Regex.Replace(country.Name.ToLower(), @"(^\w)|(\s\w)", m => m.Value.ToUpper());
+            if(country.Name != countryToEdit.Name)
+            {
+                countryToEdit.Name = Regex.Replace(country.Name.ToLower().Trim(), @"(^\w)|(\s\w)", m => m.Value.ToUpper());
+                countryToEdit.NormalizeName = countryToEdit.Name.RemoveMarks();
+			}
             if(country.About != countryToEdit.About) countryToEdit.About = country.About;
 
             try

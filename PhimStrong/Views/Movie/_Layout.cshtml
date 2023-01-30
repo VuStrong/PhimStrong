@@ -1,0 +1,40 @@
+﻿@{
+	Layout = "/Views/Shared/_Layout.cshtml";
+}
+
+<div class="movie-detail">
+	<div class="text-success mt-4 mb-2 px-3" style="background-color: #423e3e">
+		<p>@ViewData["MovieName"]</p>
+	</div>
+
+	@RenderBody()
+
+	<!-- Comments -->
+	<!-- Nav tabs -->
+	<ul class="nav nav-tabs" id="myTab" role="tablist">
+		<li class="nav-item" role="presentation">
+			<button class="nav-link active" id="phimstrong-tab" data-bs-toggle="tab" data-bs-target="#phimstrong" type="button" role="tab" aria-controls="phimstrong" aria-selected="true">PhimStrong</button>
+		</li>
+		<li class="nav-item" role="presentation">
+			<button class="nav-link" id="facebook-tab" data-bs-toggle="tab" data-bs-target="#facebook" type="button" role="tab" aria-controls="facebook" aria-selected="false">Facebook</button>
+		</li>
+	</ul>
+	<!-- Tab panes -->
+	<div class="tab-content">
+		<div class="tab-pane active" id="phimstrong" role="tabpanel" aria-labelledby="phimstrong-tab" tabindex="0">
+			<div id="cmt-container" class="py-2 px-3 mb-2" style="background-color: white"></div>
+		</div>
+		<div class="tab-pane" id="facebook" role="tabpanel" aria-labelledby="facebook-tab" tabindex="0">
+			<div class="fb-comments" data-href="https://localhost:7007" data-width="100%" data-numposts="12"></div>
+		</div>
+	</div>
+
+	<!-- Phim liên quan -->
+	<div id="relate-movies" class="py-4 border-bottom border-top position-relative" style="border-color: gray !important"></div>
+</div>
+
+
+@section Scripts{
+	@await RenderSectionAsync("Scripts", required: false)
+	<script src="/js/Movie/MovieLayout.js"></script>
+}

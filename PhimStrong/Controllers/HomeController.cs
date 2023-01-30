@@ -1,25 +1,69 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using PhimStrong.Data;
 using PhimStrong.Models;
+using SharedLibrary.Models;
 using System.Diagnostics;
 
 namespace PhimStrong.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
+        private readonly AppDbContext _db;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(AppDbContext db)
         {
-            _logger = logger;
+            _db = db;
         }
 
         public IActionResult Index()
         {
+            List<Movie> randomMovies = new();
+            Movie[] movies = _db.Movies.ToArray();
+            int count = movies.Length;
+
+            Random random = new();
+            int randomNum;
+            for (int i = 0; i < 10; i++)
+            {
+                randomNum = random.Next(0, count);
+
+                while (randomMovies.Contains(movies[randomNum]))
+                {
+					randomNum = random.Next(0, count);
+				}
+
+                randomMovies.Add(movies[randomNum]);
+            }
+
+            ViewData["MoviesSlide"] = randomMovies;
+            ViewData["ListMovieNew"] = _db.Movies.OrderByDescending(m => m.CreatedDate).Take(12).ToArray();
+            ViewData["ListMovieTopRating"] = _db.Movies.OrderByDescending(m => m.Rating).Take(12).ToArray();
+            ViewData["ListPhimLe"] = _db.Movies.Where(m => m.Type == "Phim lẻ").OrderByDescending(m => m.CreatedDate).Take(12).ToArray();
+            ViewData["ListPhimBo"] = _db.Movies.Where(m => m.Type == "Phim bộ").OrderByDescending(m => m.CreatedDate).Take(12).ToArray();
+
             return View();
         }
 
+        [Route("/chinh-sach-rieng-tu")]
         public IActionResult Privacy()
+        {
+			return View();
+        }
+
+        [Route("/dieu-khoan-su-dung")]
+        public IActionResult TermsOfUse()
+        {
+            return View();
+        }
+
+        [Route("/khieu-nai-ban-quyen")]
+        public IActionResult License()
+        {
+            return View();
+        }
+
+        [Route("/contact")]
+        public IActionResult Contact()
         {
             return View();
         }

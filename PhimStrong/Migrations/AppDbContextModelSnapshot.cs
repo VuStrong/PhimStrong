@@ -200,6 +200,21 @@ namespace PhimStrong.Migrations
                     b.ToTable("UserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("MovieUser", b =>
+                {
+                    b.Property<int>("LikedMoviesId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("LikedUsersId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("LikedMoviesId", "LikedUsersId");
+
+                    b.HasIndex("LikedUsersId");
+
+                    b.ToTable("MovieUser");
+                });
+
             modelBuilder.Entity("SharedLibrary.Models.Cast", b =>
                 {
                     b.Property<int>("Id")
@@ -222,6 +237,9 @@ namespace PhimStrong.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
+                    b.Property<string>("NormalizeName")
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("Id");
 
                     b.ToTable("Casts");
@@ -242,6 +260,9 @@ namespace PhimStrong.Migrations
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("NormalizeName")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -301,6 +322,9 @@ namespace PhimStrong.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("NormalizeName")
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("Id");
 
                     b.ToTable("Countries");
@@ -328,6 +352,9 @@ namespace PhimStrong.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
+                    b.Property<string>("NormalizeName")
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("Id");
 
                     b.ToTable("Directors");
@@ -343,6 +370,9 @@ namespace PhimStrong.Migrations
 
                     b.Property<int?>("CountryId")
                         .HasColumnType("int");
+
+                    b.Property<DateTime?>("CreatedDate")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
@@ -360,21 +390,35 @@ namespace PhimStrong.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("NormalizeName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NormalizeTranslateName")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<float>("Rating")
                         .HasColumnType("real");
 
                     b.Property<DateTime?>("ReleaseDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("TrailerId")
-                        .HasColumnType("int");
+                    b.Property<bool>("ShowInSlide")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Trailer")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TranslateName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Type")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
 
                     b.Property<int>("View")
                         .HasColumnType("int");
@@ -383,14 +427,10 @@ namespace PhimStrong.Migrations
 
                     b.HasIndex("CountryId");
 
-                    b.HasIndex("TrailerId");
-
-                    b.HasIndex("UserId");
-
                     b.ToTable("Movies");
                 });
 
-            modelBuilder.Entity("SharedLibrary.Models.Trailer", b =>
+            modelBuilder.Entity("SharedLibrary.Models.Tag", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -398,22 +438,18 @@ namespace PhimStrong.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<string>("Clip")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("Length")
-                        .HasColumnType("int");
-
                     b.Property<int>("MovieId")
                         .HasColumnType("int");
 
+                    b.Property<string>("TagName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("MovieId")
-                        .IsUnique();
+                    b.HasIndex("MovieId");
 
-                    b.ToTable("Trailer");
+                    b.ToTable("Tags");
                 });
 
             modelBuilder.Entity("SharedLibrary.Models.User", b =>
@@ -453,6 +489,9 @@ namespace PhimStrong.Migrations
                     b.Property<DateTimeOffset?>("LockoutEnd")
                         .HasColumnType("datetimeoffset");
 
+                    b.Property<string>("NormalizeDisplayName")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("NormalizedEmail")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
@@ -469,6 +508,9 @@ namespace PhimStrong.Migrations
 
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("bit");
+
+                    b.Property<string>("RoleName")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
@@ -616,10 +658,25 @@ namespace PhimStrong.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("MovieUser", b =>
+                {
+                    b.HasOne("SharedLibrary.Models.Movie", null)
+                        .WithMany()
+                        .HasForeignKey("LikedMoviesId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SharedLibrary.Models.User", null)
+                        .WithMany()
+                        .HasForeignKey("LikedUsersId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("SharedLibrary.Models.Comment", b =>
                 {
                     b.HasOne("SharedLibrary.Models.Movie", "Movie")
-                        .WithMany()
+                        .WithMany("Comments")
                         .HasForeignKey("MovieId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -647,24 +704,14 @@ namespace PhimStrong.Migrations
                         .WithMany("Movies")
                         .HasForeignKey("CountryId");
 
-                    b.HasOne("SharedLibrary.Models.Trailer", "Trailer")
-                        .WithMany()
-                        .HasForeignKey("TrailerId");
-
-                    b.HasOne("SharedLibrary.Models.User", null)
-                        .WithMany("LikedMovies")
-                        .HasForeignKey("UserId");
-
                     b.Navigation("Country");
-
-                    b.Navigation("Trailer");
                 });
 
-            modelBuilder.Entity("SharedLibrary.Models.Trailer", b =>
+            modelBuilder.Entity("SharedLibrary.Models.Tag", b =>
                 {
                     b.HasOne("SharedLibrary.Models.Movie", "Movie")
-                        .WithOne()
-                        .HasForeignKey("SharedLibrary.Models.Trailer", "MovieId")
+                        .WithMany("Tags")
+                        .HasForeignKey("MovieId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -694,12 +741,11 @@ namespace PhimStrong.Migrations
 
             modelBuilder.Entity("SharedLibrary.Models.Movie", b =>
                 {
-                    b.Navigation("Videos");
-                });
+                    b.Navigation("Comments");
 
-            modelBuilder.Entity("SharedLibrary.Models.User", b =>
-                {
-                    b.Navigation("LikedMovies");
+                    b.Navigation("Tags");
+
+                    b.Navigation("Videos");
                 });
 #pragma warning restore 612, 618
         }

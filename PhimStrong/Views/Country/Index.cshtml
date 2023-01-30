@@ -1,0 +1,38 @@
+﻿@model List<Movie>
+@{
+	ViewData["Title"] = TempData["Title"] ?? "none";
+}
+
+@if (ViewData["Description"] != null)
+{
+	<h1 class="text-success mt-5 mb-2">@($"{ViewData["Filter"]}: {ViewData["Title"]}")</h1>
+	<div class="px-3 py-2" style="background-color: #423e3e">
+		<p>@ViewData["Description"]</p>
+	</div>
+}
+else
+{
+	<h1 class="text-success my-5">@($"{ViewData["Filter"]}: {ViewData["Title"]}")</h1>
+}
+
+<h2 class="text-success mt-5">Phim : </h2>
+<partial name="_MovieContainerPartial" for="@Model"></partial>
+
+@{
+	PagingModel pagingModel = new PagingModel
+			{
+				NumberOfPages = (int)(TempData["NumberOfPages"] ?? 1),
+				CurrentPage = (int)(TempData["CurrentPage"] ?? 1),
+				Callback = (int page) => Url.Action(
+					(TempData["Action"] ?? "Index").ToString(),
+					"Country",
+					new
+					{
+						area = "",
+						page = page,
+						value = TempData["RouteValue"]
+					})
+			};
+}
+
+<partial name="/Views/Shared/_PagingPartial.cshtml" for="@pagingModel"></partial>

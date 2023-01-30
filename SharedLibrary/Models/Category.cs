@@ -11,9 +11,10 @@ namespace SharedLibrary.Models
         [Required]
         [StringLength(50)]
         public string Name { get; set; }
+		public string? NormalizeName { get; set; }
 
-        public string? Description { get; set; }
+		public string? Description { get; set; }
 
-        public List<Movie>? Movies { get; set; } 
+        public virtual List<Movie>? Movies { get; set; } 
     }
 }

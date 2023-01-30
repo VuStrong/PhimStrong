@@ -4,36 +4,76 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - PhimStrong</title>
-@*    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />*@
     <link rel="stylesheet" href="~/css/BootswatchTheme.min.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/PhimStrong.styles.css" asp-append-version="true" />
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" />
-    <link rel="stylesheet" href="https://unpkg.com/multiple-select@1.5.2/dist/multiple-select.min.css">
+    @*<link rel="stylesheet" href="https://unpkg.com/multiple-select@1.5.2/dist/multiple-select.min.css">*@
 </head>
 <body>
+    <!-- Facebook comment -->
+    <div id="fb-root"></div>
+    <script async defer crossorigin="anonymous" src="https://connect.facebook.net/vi_VN/sdk.js#xfbml=1&version=v15.0&appId=704182008049475&autoLogAppEvents=1" nonce="ocr3C23S"></script>
+    
     <header>
-        <partial name="_HeaderNavBar"></partial>
+        @await Html.PartialAsync("_HeaderNavBar")
     </header>
 
-    <div class="container">
+    <!-- Scroll to top button -->
+    <div id="scroll-top-btn" class="scroll-top-btn" role="button">
+        <i class="bi bi-arrow-up-circle-fill"></i>
+    </div>
+    
+    <div class="container mb-4" style="min-height: 100vh">
         <main role="main" class="pb-3">
             <partial name="_Notification"></partial>
-            <partial name="_ModalConfirm"></partial>
 
             @RenderBody()
         </main>
     </div>
 
-    <footer class="border-top footer text-muted">
+    <!-- Footer -->
+    <footer class="border-top footer text-muted" style="position: initial">
         <div class="container">
-            &copy; 2022 - PhimStrong - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            <div class="row row-cols-md-5 row-cols-sm-4 row-cols-2 mt-3">
+                <div class="d-md-block d-none">
+                    <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">PhimStrong</a>
+                </div>
+                <div class="d-sm-block d-none">
+                    <h5 class="text-success d-block">Phim Mới</h5>
+                    <a href="/Category/hành động" class="my-link">Phim hành động</a>
+                    <a href="/Category/viễn tưởng" class="my-link">Phim viễn tưởng</a>
+                    <a href="/Category/hài hước" class="my-link">Phim hài hước</a>
+                    <a href="/Category/tâm lý" class="my-link">Phim tâm lý</a>
+                    <a href="/Category/kinh dị" class="my-link">Phim kinh dị</a>
+                </div>
+                <div class="d-sm-block d-none">
+                    <h5 class="text-success d-block">Phim Hay</h5>
+                    <a href="/Country/âu mỹ" class="my-link">Phim Âu Mỹ</a>
+                    <a href="/Country/hàn quốc" class="my-link">Phim Hàn Quốc</a>
+                    <a href="/Country/nhật bản" class="my-link">Phim Nhật Bản</a>
+                    <a href="/Country/trung quốc" class="my-link">Phim Trung Quốc</a>
+                    <a href="/Country/việt nam" class="my-link">Phim Việt Nam</a>
+                </div>
+                <div>
+                    <h5 class="text-success d-block">Trợ Giúp</h5>
+                    <a class="my-link">Hỏi Đáp</a>
+                    <a class="my-link" asp-area="" asp-controller="Home" asp-action="Contact">Liên Hệ</a>
+                    <a class="my-link">Tin Tức</a>
+                </div>
+                <div>
+                    <h5 class="text-success d-block">Thông Tin</h5>
+                    <a class="my-link" asp-area="" asp-controller="Home" asp-action="TermsOfUse">Điều khoản sử dụng</a>
+                    <a class="my-link" asp-area="" asp-controller="Home" asp-action="Privacy">Chính sách riêng tư</a>
+                    <a class="my-link" asp-area="" asp-controller="Home" asp-action="License">Khiếu nại bản quyền</a>
+                    <p>&copy; 2023 - PhimStrong</p>
+                </div>
+            </div>
         </div>
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    @*<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>*@
     <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>

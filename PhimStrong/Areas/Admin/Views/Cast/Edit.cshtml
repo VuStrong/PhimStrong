@@ -5,6 +5,7 @@
 
 <h2 class="text-success">@ViewData["Title"]</h2>
 
+<partial name="/Views/Shared/_ModalConfirm.cshtml"></partial>
 <partial name="_StatusMessage" for="@TempData["status"]" />
 
 <div class="mt-4">
@@ -17,7 +18,8 @@
         </div>
         <div class="my-3">
             <h5>Ảnh</h5>
-            <img src="@(Model.Avatar ?? "/src/img/UserAvatars/default_avatar.png")" class="avatar avatar-square img-fit" style="width: 200px; height:200px;">
+            <img src="@(Model.Avatar ?? "/src/img/UserAvatars/default_avatar.png")" 
+                class="avatar avatar-square img-fit" style="width: 200px; height:200px;">
         </div>
         <div class="form-group mt-3">
             <label asp-for="AvatarFile">Sửa ảnh diễn viên</label>

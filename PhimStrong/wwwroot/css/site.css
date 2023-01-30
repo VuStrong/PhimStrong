@@ -1,20 +1,20 @@
-html {
-  font-size: 14px;
-}
-
-@media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
+:root {
+    --movie-col-flutter: 0.6rem;
+    --movie-item-height: 134px;
 }
 
 html {
-  position: relative;
-  min-height: 100%;
+    font-size: 14px;
+    font-family: var(--bs-font-monospace);
+}
+
+html {
+    position: relative;
+    min-height: 100%;
 }
 
 body {
-  margin-bottom: 60px;
+    margin-bottom: 60px;
 }
 
 .avatar {
@@ -42,4 +42,238 @@ body {
     background-repeat: no-repeat;
     background-size: cover;
     background-position: center;
+}
+
+.background-blur {
+    background-color: rgba(0,0,0,0.5);
+}
+
+/* Scroll top btn */
+.scroll-top-btn {
+    color: rgb(0, 188, 140);
+    position: fixed;
+    right: 50px;
+    top: 85%;
+    font-size: 50px;
+    z-index: 10;
+}
+
+/* movie slide */
+.movie-slide-item {
+    height: 92px;
+    text-decoration: none;
+}
+
+    .movie-slide-item.active {
+        background-color: rgb(0, 188, 140);
+    }
+    .movie-slide-item:hover {
+        opacity: 0.9;
+    }
+
+        .movie-slide-item.active .movie-slide-name,
+        .movie-slide-item.active .movie-slide-desc {
+            color: black !important;
+        }
+
+.movie-slide-name {
+    font-size: 15px;
+}
+
+.movie-slide-desc {
+    font-size: 13px;
+    line-height: 16px;
+    color: white;
+    
+    overflow: hidden;
+    display: block;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+}
+
+/* nav */
+.nav-item:hover > a {
+    color: rgb(0, 188, 140);
+}
+
+.nav-link.active,
+.nav-item .dropdown-item:hover,
+.nav-tabs button.active {
+    background-color: rgb(0, 188, 140) !important;
+}
+
+/* Movie Container */
+.movie-container .movie-item-large {
+    width: 100%;
+    height: calc(var(--movie-item-height) * 2 + 0.3rem * 2) !important;
+}
+
+.movie-container .movie-item {
+    height: var(--movie-item-height);
+}
+
+.movie-container .movie-item img {
+    transition: all 0.2s ease-in-out;
+}
+
+.movie-container .movie-item:hover img {
+    transform: scale(1.1);
+}
+
+.movie-container .movie-item-body {
+    overflow: hidden;
+    display: block;
+    height: 100%;
+    text-decoration: none;
+    position: relative;
+}
+    .movie-container .movie-item-body .movie-status {
+        background-image: linear-gradient(to right, rgb(0, 188, 140), rgba(50, 216, 61, 1));
+        position: absolute;
+        top: 0;
+        font-size: 13px;
+        color: white;
+        padding: 3px 6px;
+        border-radius: 4px;
+    }
+
+    .movie-container .movie-item-body:hover {
+        opacity: 0.9;
+    }
+
+.movie-container .movie-item-name {
+    color: white;
+    line-height: 40px;
+    transform: translateY(-40px);
+}
+
+.movie-container .movie-row {
+    margin-right: calc(var(--movie-col-flutter) / 2 * -1);
+    margin-left: calc(var(--movie-col-flutter) / 2 * -1);
+}
+
+.movie-container .movie-item-large,
+.movie-container .movie-row > * {
+    padding-right: calc(var(--movie-col-flutter) / 2);
+    padding-left: calc(var(--movie-col-flutter) / 2);
+    margin-bottom: var(--movie-col-flutter);
+}
+
+.movie-row-6 {
+    width: 100%;
+    max-width: none;
+}
+
+/* movie detail */
+.movie-detail-bg {
+    position: relative;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+    padding-bottom: 50%;
+}
+
+.movie-detail-btn {
+    font-size: 13px;
+    padding-top: 3px;
+    padding-bottom: 3px;
+}
+
+.play-btn {
+    top: 50%;
+    left: 50%;
+    opacity: 0.7;
+    transition: all 0.3s ease-in-out;
+    transform: translateX(-50%) translateY(-50%);
+    font-size: 60px;
+    z-index: 1;
+}
+
+.movie-detail .play-btn {
+    top: 30px;
+    left: calc(100% - 30px);
+}
+
+.play-btn:hover {
+    font-size: 70px;
+}
+
+/* link */
+.my-link {
+    text-decoration: none;
+    color: rgba(var(--bs-light-rgb), var(--bs-text-opacity)) !important;
+    line-height: 30px;
+    display: block;
+}
+
+.my-link.my-link-gray {
+    color: gray !important;
+}
+
+.my-link:hover {
+    cursor: pointer;
+    color: rgb(0, 188, 140) !important;
+}
+
+.prev-btn:hover,
+.next-btn:hover {
+    cursor: pointer;
+    opacity: 1 !important;
+}
+
+/* trailer */
+#trailer iframe {
+    width: 100%;
+    height: 300px;
+}
+
+/* Movie player */
+#movie-player video {
+    width: 100%;
+    height: 200px;
+}
+
+/* Comment */
+.cmt-user-name strong:hover {
+    text-decoration: underline !important;
+}
+
+@media (min-width: 768px) {
+    html {
+        font-size: 16px;
+    }
+
+    .play-btn,
+    .movie-detail .play-btn {
+        top: 50%;
+        left: 50%;
+    }
+
+    #trailer iframe {
+        width: 80%;
+        height: 400px;
+    }
+
+    #movie-player video {
+        height: 400px;
+    }
+}
+
+@media (min-width: 992px) {
+    .movie-container .movie-item-large {
+        width: 40%;
+    }
+
+    .movie-row-6 {
+        width: 60%;
+    }
+
+    #trailer iframe {
+        height: 600px;
+    }
+
+    #movie-player video {
+        height: 600px;
+    }
 }

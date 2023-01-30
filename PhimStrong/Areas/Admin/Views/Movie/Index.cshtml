@@ -28,6 +28,7 @@
 
 @if (Model != null && Model.Count > 0)
 {
+    <p class="text-success">@TempData["TotalCount"] kết quả.</p>
     <table class="table table-hover">
         <thead>
             <tr class="table-info">
@@ -43,7 +44,7 @@
                     <th scope="row">
                         <img src="@(movie.Image ?? "")" class="avatar" style="width: 50px; height:50px;">
                     </th>
-                    <th class="overflow-hidden">@movie.Name</th>
+                    <th class="overflow-hidden">@movie.TranslateName</th>
                     <td>
                         <a class="btn btn-success" asp-area="Admin" asp-controller="Movie" asp-action="Edit" asp-route-movieid="@movie.Id">Chỉnh sửa</a>
                     </td>

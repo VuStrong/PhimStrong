@@ -11,14 +11,17 @@ namespace SharedLibrary.Models
         public User() : base() { }
 
         public string? DisplayName { get; set; }
+        public string? NormalizeDisplayName { get; set; }
 
-        [NotMapped]
+		[NotMapped]
         public IFormFile AvatarFile { get; set; }
         public string? Avatar { get; set; }
 
         public string? FavoriteMovie { get; set; }
         public string? Hobby { get; set; }
 
-        public List<Movie>? LikedMovies { get; set; }
+        public string? RoleName { get; set; }
+
+        public virtual List<Movie>? LikedMovies { get; set; }
     }
 }

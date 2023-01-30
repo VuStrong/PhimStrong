@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using PhimStrong.Data;
 using SharedLibrary.Constants;
+using SharedLibrary.Helpers;
 using SharedLibrary.Models;
 using System.Data;
 using System.Text.RegularExpressions;
@@ -31,11 +32,15 @@ namespace PhimStrong.Areas.Admin.Controllers
             int numberOfPages = 0;
 
             List<Director> directors = new List<Director>();
-            if (filter == null || filter.Trim() == "")
+			int count = 0; // total of search result
+			if (filter == null || filter.Trim() == "")
             {
-                numberOfPages = (int)Math.Ceiling((double)_db.Directors.Count() / DIRECTOR_PER_PAGE);
+				count = _db.Directors.Count();
 
-                if (page > numberOfPages) page = numberOfPages;
+				numberOfPages = (int)Math.Ceiling((double)count / DIRECTOR_PER_PAGE);
+				TempData["TotalCount"] = count;
+
+				if (page > numberOfPages) page = numberOfPages;
                 if (page <= 0) page = 1;
 
 				directors = _db.Directors.Skip((page - 1) * DIRECTOR_PER_PAGE).Take(DIRECTOR_PER_PAGE).ToList();
@@ -52,11 +57,12 @@ namespace PhimStrong.Areas.Admin.Controllers
                     switch (matchValue)
                     {
                         case PageFilterConstant.FILTER_BY_NAME:
-							directors = _db.Directors.Where(m =>
-                                (m.Name ?? "").ToLower().Contains(filterValue.ToLower())
-                            ).ToList();
-
                             TempData["FilterMessage"] = "tên là " + filterValue;
+                            filterValue = filterValue.RemoveMarks();
+
+                            directors = _db.Directors.Where(m =>
+                                (m.NormalizeName ?? "").Contains(filterValue)
+                            ).ToList();
 
                             break;
                         default:
@@ -64,7 +70,10 @@ namespace PhimStrong.Areas.Admin.Controllers
                     }
                 }
 
-                numberOfPages = (int)Math.Ceiling((double)directors.Count / DIRECTOR_PER_PAGE);
+                count = directors.Count;
+				TempData["TotalCount"] = count;
+
+				numberOfPages = (int)Math.Ceiling((double)count / DIRECTOR_PER_PAGE);
                 if (page > numberOfPages) page = numberOfPages;
                 if (page <= 0) page = 1;
 
@@ -100,7 +109,8 @@ namespace PhimStrong.Areas.Admin.Controllers
             }
 
             // chỉnh lại format tên :
-            director.Name = Regex.Replace(director.Name.ToLower(), @"(^\w)|(\s\w)", m => m.Value.ToUpper());
+            director.Name = Regex.Replace(director.Name.ToLower().Trim(), @"(^\w)|(\s\w)", m => m.Value.ToUpper());
+            director.NormalizeName = director.Name.RemoveMarks();
 
             try
             {
@@ -165,8 +175,12 @@ namespace PhimStrong.Areas.Admin.Controllers
                 return View(directorToEdit);
             }
 
-            if (director.Name != directorToEdit.Name) 
-                directorToEdit.Name = Regex.Replace(director.Name.ToLower(), @"(^\w)|(\s\w)", m => m.Value.ToUpper());
+            if (director.Name != directorToEdit.Name)
+            {
+                directorToEdit.Name = Regex.Replace(director.Name.ToLower().Trim(), @"(^\w)|(\s\w)", m => m.Value.ToUpper());
+                directorToEdit.NormalizeName = directorToEdit.Name.RemoveMarks();
+			}
+
             if(director.About != directorToEdit.About) directorToEdit.About = director.About;
             if(director.DateOfBirth != directorToEdit.DateOfBirth) directorToEdit.DateOfBirth = director.DateOfBirth;
             if (director.AvatarFile != null)

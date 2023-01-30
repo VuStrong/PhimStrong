@@ -1,0 +1,24 @@
+﻿@model List<Movie>?
+
+<h3 class="text-success mb-5">Phim liên quan</h3>
+@if (Model != null)
+{
+	<div class="row row-cols-lg-5 row-cols-md-4 row-cols-2 flex-nowrap overflow-hidden
+						movie-container owl-slide position-relative" style="height: var(--movie-item-height)">
+		@foreach (var movie in Model)
+		{
+			<div class="movie-item">
+				<a href="/Movie/Detail/@movie.Id" class="movie-item-body">
+					<img src="@(movie.Image ?? "~/src/img/UserAvatars/default_avatar.png")"
+				 class="w-100 h-100 img-fit">
+					<p class="movie-item-name background-blur text-truncate w-100">@movie.Name</p>
+					<p class="movie-status">@movie.Status</p>
+				</a>
+			</div>
+		}
+	</div>
+	<span class="prev-btn carousel-control-prev-icon position-absolute top-50 start-0" style="background-color: rgb(0, 188, 140); opacity: 0.7;"></span>
+	<span class="visually-hidden">Previous</span>
+	<span class="next-btn carousel-control-next-icon position-absolute top-50 end-0" style="background-color: rgb(0, 188, 140); opacity: 0.7;"></span>
+	<span class="visually-hidden">Next</span>
+}

@@ -1,9 +1,8 @@
-﻿@inject UserManager<User> UserManager
-@model User
+﻿@model User
 @{
+    ViewData["Title"] = "Profile";
     TempData["currentNav"] = "Index";
-    var roleList = await UserManager.GetRolesAsync(Model);
-    string role = roleList.Count > 0 ? roleList[0] : "";
+    string role = Model.RoleName ?? "";
 }
 
 <div class="row g-0">
@@ -66,7 +65,7 @@
                 </div>
             </div>
 
-            <button id="edit-button" class="btn btn-primary">Chỉnh sửa Profile</button>
+            <button id="edit-button" class="btn btn-success">Chỉnh sửa Profile</button>
             <button id="save-button" class="btn btn-success" style="display:none;">Lưu</button>
             <button id="cancel-button" class="btn btn-danger" style="display:none;">Hủy</button>
         </div>
@@ -75,81 +74,5 @@
 
 @section Scripts{
     <script src="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
-    <script type="text/javascript">
-        $(function () {
-
-            $("#edit-button").click(function () {
-                $(this).hide();
-                $("#save-button").show();
-                $("#cancel-button").show();
-                $("#avatar-text").show();
-
-                $(".edit-elements").each(function() {
-                    let item = $(this);
-                    item.show().val(item.prev().text());
-                    item.prev().hide();
-                });
-            });
-
-            $("#cancel-button").click(function () {
-                cancel();
-            });
-
-            $("#save-button").click(function () {
-                let myFiles = $("#edit-avatar").prop('files');
-                let formData = new FormData();
-
-                if (myFiles.length > 0) {
-                    for (let i = 0; i < myFiles.length; i++) {
-                        formData.append('AvatarFile', myFiles[i]);
-                    }
-                }
-
-                formData.append('DisplayName', $("#edit-name").val());
-                formData.append('PhoneNumber', $("#edit-phone").val());
-                formData.append('FavoriteMovie', $("#edit-fav-movie").val());
-                formData.append('Hobby', $("#edit-hobby").val());
-
-                $.ajax({
-                    url: '@Url.Action("EditInformation", "Account", new { area = "Identity"})',
-                    dataType: "json",
-                    type: 'POST',
-                    data: formData,
-                    processData: false,
-                    contentType: false,
-                    success: function (data) {
-                        cancel();
-                        if (data.success) {
-                            $("#display-name").text(data.displayname);
-                            $("#phone").text(data.phone);
-                            $("#fav-movie").text(data.favoritemovie);
-                            $("#hobby").text(data.hobby);
-                            if (data.avatar) $("#avatar").attr("src", data.avatar);
-
-                            toastr.success("Cập nhập thông tin thành công !");
-                        } else {
-                            if (data.error)
-                                toastr.error(data.error);
-                            else 
-                                toastr.error("Cập nhập thông tin thất bại !");
-                        }
-
-                    }
-                });
-            });
-
-            function cancel() {
-                $("#cancel-button").hide();
-                $("#save-button").hide();
-                $("#edit-button").show();
-                $("#avatar-text").hide();
-
-                $(".edit-elements").each(function () {
-                    let item = $(this);
-                    item.hide();
-                    item.prev().show();
-                });
-            }
-        });
-    </script>
+    <script src="/js/Account/UserEdit.js"></script>
 }

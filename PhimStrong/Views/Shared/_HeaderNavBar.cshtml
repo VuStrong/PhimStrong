@@ -17,10 +17,10 @@
         <div class="collapse navbar-collapse" id="navbarColor02">
             <ul class="navbar-nav me-auto">
                 <li class="nav-item">
-                    <a class="nav-link text-uppercase" href="#">phim lẻ</a>
+                    <a class="nav-link text-uppercase" asp-area="" asp-controller="Movie" asp-action="GetPhimLe">phim lẻ</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link text-uppercase" href="#">phim bộ</a>
+                    <a class="nav-link text-uppercase" asp-area="" asp-controller="Movie" asp-action="GetPhimBo">phim bộ</a>
                 </li>
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle text-uppercase" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">thể loại</a>
@@ -28,7 +28,7 @@
                         <div class="row">
                             @foreach (var category in AppDbContext.Categories)
                             {
-                                <a class="dropdown-item" style="width:50%;" href="#">@category.Name</a>
+                                <a class="dropdown-item" style="width:50%;" href="/Category/@category.Name">@category.Name</a>
                             }
                         </div>
                     </div>
@@ -39,7 +39,7 @@
                         <div class="row">
                             @foreach (var country in AppDbContext.Countries)
                             {
-                                <a class="dropdown-item" style="width:50%;" href="#">@country.Name</a>
+                                <a class="dropdown-item" style="width:50%;" href="/Country/@country.Name">@country.Name</a>
                             }
                         </div>
                     </div>
@@ -50,12 +50,15 @@
                         <div class="row">
                             @for (int i = 2000; i <= 2023; i++)
                             {
-                                <a class="dropdown-item" style="width:50%;" href="#">@i</a>
+                                <a class="dropdown-item" style="width:50%;" href="/movie/year/@i">@i</a>
                             }
                         </div>
                     </div>
                 </li>
-                @if (user != null && (await UserManager.IsInRoleAsync(user, RoleConstant.ADMIN) || await UserManager.IsInRoleAsync(user, RoleConstant.THUY_TO)))
+                <li class="nav-item">
+                    <a class="nav-link text-uppercase" asp-area="" asp-controller="Movie" asp-action="GetTrailer">trailer</a>
+                </li>
+                @if (user != null && (user.RoleName == RoleConstant.ADMIN || user.RoleName == RoleConstant.THUY_TO))
                 {
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle text-uppercase" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">quản lý</a>
@@ -70,11 +73,11 @@
                     </li>
                 }
             </ul>
-            <form class="d-flex">
-                <input class="form-control me-sm-2" type="search" placeholder="Tìm tên phim, diễn viên...">
-                <button class="btn btn-secondary my-2 my-sm-0" type="submit">Search</button>
+            <form id="search-form" class="d-flex" method="get" action="/Movie/">
+                <input class="form-control me-sm-2" type="search" placeholder="Tìm phim...">
+                <button class="btn btn-secondary my-2 my-sm-0" type="submit">Tìm</button>
             </form>
         </div>
-        <partial name="_LoginPartial.cshtml"></partial>
+        @await Html.PartialAsync("_LoginPartial")
     </div>
 </nav>

@@ -1,36 +1,10 @@
 ﻿@model MovieModel
 @inject AppDbContext Db
 @{
-    ViewData["Title"] = "Thêm phim mới";
+    ViewData["Title"] = $"Sửa phim {Model.Name}";
 
-    var typeList = new SelectList(new List<string> { "Phim lẻ", "Phim bộ" });
-
-    // Khởi tạo list category
-    var categoryList = new List<string>();
-    Db.Categories.ToList().ForEach(c =>
-    {
-        categoryList.Add(c.Name);
-    });
-
-    var categories = new SelectList(categoryList);
-
-    // Khởi tạo list cast
-    var castList = new List<string>();
-    Db.Casts.ToList().ForEach(c =>
-    {
-        castList.Add(c.Name);
-    });
-
-    var casts = new SelectList(castList);
-
-    // Khởi tạo list director
-    var directorList = new List<string>();
-    Db.Directors.ToList().ForEach(d =>
-    {
-        directorList.Add(d.Name);
-    });
-
-    var directors = new SelectList(directorList);
+    var typeList = new SelectList(new List<string>{"none", "Phim lẻ", "Phim bộ"});
+    var statusList = new SelectList(new List<string> { "none", "Full HD", "CAM", "Trailer" });
 
     // Khởi tạo list country
     var countryList = new List<string>();
@@ -40,127 +14,146 @@
     });
 
     var countries = new SelectList(countryList);
+
+    string videoUrl = "";
+    if (Model.Videos != null && Model.Videos.Length > 0 && Model.Type == "Phim lẻ")
+    {
+        videoUrl = Model.Videos[0];
+    }
 }
 
 <h2 class="text-success">@ViewData["Title"]</h2>
 
+@{
+    var tempCateList = Model.Categories != null ? Model.Categories.ToList() : new List<string>();
+    var tempCastList = Model.Casts != null ? Model.Casts.ToList() : new List<string>();
+    var tempDirectorList = Model.Directors != null ? Model.Directors.ToList() : new List<string>();
+}
+
+<partial name="/Views/Shared/_ModalConfirm.cshtml"></partial>
 <partial name="_StatusMessage" for="@TempData["status"]" />
 
 <div class="mt-4">
-    <form method="post">
+    <div id="edit-movie-form">
         <div asp-validation-summary="All" class="text-danger"></div>
         <div class="form-group">
             <label asp-for="Name">Tên phim</label>
-            <input asp-for="Name" class="form-control" placeholder="Nhập tên phim">
-            <span asp-validation-for="Name" class="text-danger"></span>
+            <input id="movie-name" asp-for="Name" class="form-control" placeholder="Nhập tên phim" />
+            <span id="movie-name-valid" class="text-danger"></span>
+        </div>
+        <div class="form-group mt-3">
+            <label asp-for="TranslateName">Tên phim dịch sang Tiếng Việt</label>
+            <input id="movie-translate-name" asp-for="TranslateName" class="form-control" placeholder="Nhập tên" />
+            <span id="movie-translate-name-valid" class="text-danger"></span>
         </div>
         <div class="form-group mt-3">
             <label asp-for="Description">Nội dung</label>
-            <textarea asp-for="Description" class="form-control" placeholder="Nhập nội dung"></textarea>
+            <textarea id="movie-desc" asp-for="Description" class="form-control" placeholder="Nhập nội dung"></textarea>
             <span asp-validation-for="Description" class="text-danger"></span>
         </div>
         <div class="form-group mt-3">
-            <label asp-for="ImageFile"></label>
-            <input asp-for="ImageFile" type="file" class="form-control">
+            <label asp-for="Length">Thời lượng phim(phút)</label>
+            <input id="movie-length" type="number" asp-for="Length" class="form-control" />
         </div>
-        <div class="form-group mt-5">
+        <div class="form-group mt-3">
+            <label asp-for="Rating">Điểm Rating</label>
+            <input id="movie-rating" type="text" asp-for="Rating" class="form-control" />
+            <span id="movie-rating-valid" class="text-danger"></span>
+        </div>
+        <div class="form-group mt-3">
+            <h5>Ảnh</h5>
+            <img src="@(Model.Image ?? "/src/img/UserAvatars/default_avatar.png")" class="avatar avatar-square img-fit" 
+                style="width: 200px; height:200px;" />
+        </div>
+        <div class="form-group mt-3">
+            <label asp-for="ImageFile">Thay ảnh</label>
+            <input id="movie-img" asp-for="ImageFile" type="file" class="form-control">
+            <span id="movie-image-valid" class="text-danger"></span>
+        </div>
+        <div class="form-group mt-5 pb-2 border-bottom">
             <label asp-for="ReleaseDate">Nhập ngày ra mắt</label>
-            <input asp-for="ReleaseDate"/>
+            <input id="movie-date" asp-for="ReleaseDate"/>
+        </div>
+        <div class="d-flex align-items-center form-group mt-3 pb-2 border-bottom">
+            <label class="me-3 mt-3 mb-3">Thể loại : </label>
+            <textarea id="select-category" asp-for="CategoryToString" disabled></textarea>
+            <button onclick="showModalCategory()" class="btn btn-primary ms-2">Chọn</button>
+        </div>
+        <div class="d-flex align-items-center form-group mt-3 pb-2 border-bottom">
+            <label class="me-3 mt-3 mb-3">Diễn viên : </label>
+            <textarea id="select-cast" asp-for="CastToString" disabled></textarea>
+            <button onclick="showModalCast()" class="btn btn-primary ms-2">Chọn</button>
+        </div>
+        <div class="d-flex align-items-center form-group mt-3 pb-2 border-bottom">
+            <label class="me-3 mt-3 mb-3">Đạo diễn : </label>
+            <textarea id="select-director" asp-for="DirectorToString" disabled></textarea>
+            <button onclick="showModalDirector()" class="btn btn-primary ms-2">Chọn</button>
+        </div>
+        <div class="form-group mt-3 pb-2 border-bottom">
+            <label class="me-3 mt-3 mb-3">Quốc gia : </label>
+            <select id="select-country" asp-items="@countries" asp-for="Country"></select>
+        </div>
+        <div class="form-group mt-3 pb-2 border-bottom">
+            <label class="me-3 mt-3 mb-3">Trailer : (chỉ dán url video từ youtube)</label>
+            <input id="movie-trailer" type="text" placeholder="Dán trailer url vào đây." asp-for="Trailer" />
+        </div>
+        <div class="form-group mt-3 pb-2 border-bottom">
+            <label class="me-3 mt-3 mb-3">Trạng thái : </label>
+            <select id="status-list" asp-items="@statusList" asp-for="Status"></select>
+            <span id="status-list-valid" class="text-danger"></span>
+        </div>
+        <div class="d-flex flex-wrap align-items-center form-group mt-3 pb-2 border-bottom">
+            <label asp-for="Tags" class="me-3 mt-3 mb-3">Nhập tags : (các Tag cách nhau bằng dấu , nhé :^)</label>
+            <textarea id="select-tag" asp-for="Tags"></textarea>
         </div>
         <div class="form-group mt-3">
             <label class="me-3 mt-3 mb-3">Loại : </label>
             <select id="type-list" asp-items="@typeList" asp-for="Type"></select>
-        </div>
-        <div class="form-group mt-3">
-            <label class="me-3 mt-3 mb-3">Thể loại : </label>
-            <select id="select-category" class="select" multiple asp-items="@categories" asp-for="Categories">
-            </select>
-        </div>
-        <div class="form-group mt-3">
-            <label class="me-3 mt-3 mb-3">Diễn viên : </label>
-            <select id="select-cast" class="select" multiple asp-items="@casts" asp-for="Casts">
-            </select>
-        </div>
-        <div class="form-group mt-3">
-            <label class="me-3 mt-3 mb-3">Đạo diễn : </label>
-            <select id="select-director" class="select" multiple asp-items="@directors" asp-for="Directors">
-            </select>
-        </div>
-        <div class="form-group mt-3">
-            <label class="me-3 mt-3 mb-3">Quốc gia : </label>
-            <select id="select-country" asp-items="@countries" asp-for="Country"></select>
+            <span id="type-list-valid" class="text-danger"></span>
         </div>
         <div id="select-video" class="mx-5">
+            @if (Model.Type == "Phim lẻ")
+            {
+                <p class="text-success"> ** Video</p>
+                <label>Url video : </label>
+                <input class="url-video" value="@videoUrl" placeholder="Url"/>
+            }
+            else if (Model.Type == "Phim bộ")
+            {
+                <p class="text-success">Sửa số tập : </p>
+                <label>Số tập : </label>
+                <input id="select-episode" type="number" value="@Model.EpisodeCount" placeholder="0" />
+            }
         </div>
-        <button type="submit" class="btn btn-primary mt-4">Tạo phim</button>
-    </form>
+        <div id="select-url" class="mx-10">
+            @if (Model.Type == "Phim bộ")
+            {
+                for (int i = 0; i < Model.EpisodeCount; i++)
+                {
+                    if (Model.Videos == null || Model.Videos.Length <= i) continue;
 
-    <form id="delete-movie" method="post" asp-action="Delete" asp-route-movieid="@Model.Id">
-        <button id="delete-movie-btn" type="submit" class="btn btn-danger">Xóa phim</button>
-    </form>
+                    <div id="episodes" class="mx-5">
+                        <label>Tập @(i + 1) : </label>
+                        <input class="url-video" value="@Model.Videos[i]" placeholder="Dán Url vào đây" />
+                    </div>
+                }  
+            }
+        </div>
+        <button id="edit-movie-btn" class="btn btn-primary mt-4">Sửa</button>
+        <form id="delete-movie" method="post" asp-action="Delete" asp-route-movieid="@Model.Id">
+            <button id="delete-movie-btn" class="btn btn-danger mt-4">Xóa phim</button>
+        </form>
+    </div>
 </div>
 
 @section Scripts {
-    <partial name="/Views/Shared/_ValidationScriptsPartial.cshtml" />
+    <script src="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
     <script src="~/js/ModalConfirm.js" asp-append-version="true"></script>
-    <script src="https://unpkg.com/multiple-select@1.5.2/dist/multiple-select.min.js"></script>
+    <partial name="_ModalCategory" for="@tempCateList" />
+    <partial name="_ModalCast" for="@tempCastList" />
+    <partial name="_ModalDirector" for="@tempDirectorList" />
     <script type="text/javascript">
-        $('.select').multipleSelect({
-            selectAll: false,
-            keepOpen: false,
-            isOpen: false
-        });
-
-        $('#delete-movie-btn').click(function (e) {
-            e.preventDefault();
-            showModal("Xóa phim ư ?", "Xác nhận xóa phim này ?");
-        });
-
-        modalConfirm(function () {
-            $('#delete-movie').submit();
-        });
-
-        // event khi change thẻ select loại phim
-        $('#type-list').on('change', function (e) {
-
-            if ($(this).val() === 'Phim lẻ') {
-
-                $('#select-video').html(
-                    `<p class="text-success"> ** Video</p>
-                            <label>Dán Url Video vào đây : </label>
-                            <input placeholder="Url"/>`
-                );
-
-            } else if ($(this).val() === 'Phim bộ') {
-
-                $('#select-video').html(
-                    `<p class="text-success">Nhập số tập : </p>
-                            <label>Số tập : </label>
-                            <input id="select-episode" type="number" placeholder="0" />`
-                );
-
-                // blur khỏi thẻ input số tập thì sẽ sinh ra html tương ứng số tập
-                $('#select-episode').on('blur', function (e) {
-                    var episodeCount = $(this).val();
-                    var episodeHtml = '';
-                    for (let i = 1; i <= episodeCount; i++) {
-                        episodeHtml = episodeHtml.concat(
-                            `<div id="episodes" class="mx-5">
-                                    <label>Tập ${i} : </label>
-                                    <input placeholder="Dán Url vào đây"/>
-                                    </div>`
-                        );
-                    }
-
-                    $('#select-video').html(
-                        `<p class="text-success">Nhập số tập : </p>
-                                <label>Số tập : </label>
-                                <input id="select-episode" type="number" placeholder="${episodeCount}" />
-                                ${episodeHtml}`
-                    );
-                });
-            }
-
-        });
+        var movieid = @Model.Id;
     </script>
+    <script src="/js/Admin/Movie/MovieEdit.js"></script>
 }

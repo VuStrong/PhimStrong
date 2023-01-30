@@ -15,9 +15,30 @@ namespace SharedLibrary.Models
         [Required(ErrorMessage = "Chưa nhập tên phim :()")]
         public string Name { get; set; }
 
-        public string? Description { get; set; }
+        [Required(ErrorMessage = "Chưa nhập :()")]
+        public string TranslateName { get; set; }
 
-        public DateTime? ReleaseDate { get; set; }
+        public string? NormalizeName { get; set; }
+        public string? NormalizeTranslateName { get; set; }
+
+		public string? Description { get; set; }
+        [NotMapped]
+        public string[]? DescriptionSplit
+        {
+            get
+            {
+                if (this.Description != null)
+                {
+                    return this.Description.Split("<br>");
+                }
+                else return null;
+            }
+        } 
+
+		public DateTime? ReleaseDate { get; set; }
+        public DateTime? CreatedDate { get; set; }
+
+        public bool ShowInSlide { get; set; }
 
         [DisplayName("Thời lượng phim")]
         public int? Length { get; set; }
@@ -26,18 +47,16 @@ namespace SharedLibrary.Models
 
         public string? Image { get; set; }
 
+        public string? Trailer { get; set; }
 
-        [ForeignKey("TrailerId")]
-        public Trailer? Trailer { get; set; }
+        public virtual List<Category>? Categories { get; set; }
 
-        public List<Category>? Categories { get; set; }
-
-        public Country? Country { get; set; }
+        public virtual Country? Country { get; set; }
 
         [DisplayName("Đạo diễn")]
-        public List<Director>? Directors { get; set; }
+        public virtual List<Director>? Directors { get; set; }
         [DisplayName("Diễn viên")]
-        public List<Cast>? Casts { get; set; }
+        public virtual List<Cast>? Casts { get; set; }
 
         public float Rating { get; set; }
 
@@ -45,8 +64,27 @@ namespace SharedLibrary.Models
         [DisplayName("Loại phim")]
         public string Type { get; set; }
 
-        public List<Video>? Videos { get; set; }
+        public virtual List<Video>? Videos { get; set; }
         [DisplayName("Số tập")]
         public int EpisodeCount { get; set; }
+
+        public virtual List<User>? LikedUsers { get; set; }
+        public virtual List<Comment>? Comments { get; set; }
+
+		public virtual List<Tag>? Tags { get; set; }
+
+		[Required(ErrorMessage = "Chưa chọn trạng thái")]
+		[DisplayName("Trạng thái")]
+		public string Status { get; set; }
+
+        [NotMapped]
+        public string StatusToString
+        {
+            get
+            {
+                if (this.Type == "Phim lẻ") return this.Status;
+                else return "Tập " + this.EpisodeCount;
+            }
+        }
     }
 }

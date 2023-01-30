@@ -16,8 +16,9 @@ namespace PhimStrong.Data
         public DbSet<Director> Directors { get; set; }
         public DbSet<Cast> Casts { get; set; }
         public DbSet<Country> Countries { get; set; }
+        public DbSet<Tag> Tags { get; set; }
 
-        protected override void OnModelCreating(ModelBuilder builder)
+		protected override void OnModelCreating(ModelBuilder builder)
         {
 
             base.OnModelCreating(builder);

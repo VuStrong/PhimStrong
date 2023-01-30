@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using PhimStrong.Data;
 using SharedLibrary.Constants;
+using SharedLibrary.Helpers;
 using SharedLibrary.Models;
 using System.Data;
 using System.Text.RegularExpressions;
@@ -31,11 +32,15 @@ namespace PhimStrong.Areas.Admin.Controllers
             int numberOfPages = 0;
 
             List<Cast> casts = new List<Cast>();
-            if (filter == null || filter.Trim() == "")
+			int count = 0; // total of search result
+			if (filter == null || filter.Trim() == "")
             {
-                numberOfPages = (int)Math.Ceiling((double)_db.Casts.Count() / CAST_PER_PAGE);
+                count = _db.Casts.Count();
 
-                if (page > numberOfPages) page = numberOfPages;
+				numberOfPages = (int)Math.Ceiling((double)count / CAST_PER_PAGE);
+				TempData["TotalCount"] = count;
+
+				if (page > numberOfPages) page = numberOfPages;
                 if (page <= 0) page = 1;
 
                 casts = _db.Casts.Skip((page - 1) * CAST_PER_PAGE).Take(CAST_PER_PAGE).ToList();
@@ -52,11 +57,12 @@ namespace PhimStrong.Areas.Admin.Controllers
                     switch (matchValue)
                     {
                         case PageFilterConstant.FILTER_BY_NAME:
-                            casts = _db.Casts.Where(m =>
-                                (m.Name ?? "").ToLower().Contains(filterValue.ToLower())
-                            ).ToList();
-
                             TempData["FilterMessage"] = "tên là " + filterValue;
+                            filterValue = filterValue.RemoveMarks();
+
+                            casts = _db.Casts.Where(m =>
+                                (m.NormalizeName ?? "").Contains(filterValue)
+                            ).ToList();
 
                             break;
                         default:
@@ -64,7 +70,10 @@ namespace PhimStrong.Areas.Admin.Controllers
                     }
                 }
 
-                numberOfPages = (int)Math.Ceiling((double)casts.Count / CAST_PER_PAGE);
+                count = casts.Count;
+				TempData["TotalCount"] = count;
+
+				numberOfPages = (int)Math.Ceiling((double)count / CAST_PER_PAGE);
                 if (page > numberOfPages) page = numberOfPages;
                 if (page <= 0) page = 1;
 
@@ -100,7 +109,8 @@ namespace PhimStrong.Areas.Admin.Controllers
             }
 
             // chỉnh lại format tên :
-            cast.Name = Regex.Replace(cast.Name.ToLower(), @"(^\w)|(\s\w)", m => m.Value.ToUpper());
+            cast.Name = Regex.Replace(cast.Name.ToLower().Trim(), @"(^\w)|(\s\w)", m => m.Value.ToUpper());
+            cast.NormalizeName = cast.Name.RemoveMarks();
 
             try
             {
@@ -109,7 +119,7 @@ namespace PhimStrong.Areas.Admin.Controllers
 
                 if (cast.AvatarFile != null)
                 {
-                    var file = Path.Combine(_environment.ContentRootPath, "wwwroot/src/img/CastAvatars", cast.Id.ToString() + ".jpg");
+                    var file = Path.Combine(_environment.WebRootPath, "src/img/CastAvatars", cast.Id.ToString() + ".jpg");
 
                     using (var fileStream = new FileStream(file, FileMode.Create))
                     {
@@ -165,13 +175,16 @@ namespace PhimStrong.Areas.Admin.Controllers
                 return View(castToEdit);
             }
 
-            if (cast.Name != castToEdit.Name) 
-                castToEdit.Name = Regex.Replace(cast.Name.ToLower(), @"(^\w)|(\s\w)", m => m.Value.ToUpper());
+            if (cast.Name != castToEdit.Name)
+            {
+                castToEdit.Name = Regex.Replace(cast.Name.ToLower().Trim(), @"(^\w)|(\s\w)", m => m.Value.ToUpper());
+                castToEdit.NormalizeName = castToEdit.Name.RemoveMarks();
+            }
             if(cast.About != castToEdit.About) castToEdit.About = cast.About;
             if(cast.DateOfBirth != castToEdit.DateOfBirth) castToEdit.DateOfBirth = cast.DateOfBirth;
             if (cast.AvatarFile != null)
             {
-                var file = Path.Combine(_environment.ContentRootPath, "wwwroot/src/img/CastAvatars", castToEdit.Id.ToString() + ".jpg");
+                var file = Path.Combine(_environment.WebRootPath, "src/img/CastAvatars", castToEdit.Id.ToString() + ".jpg");
 
                 using (var fileStream = new FileStream(file, FileMode.Create))
                 {
@@ -209,10 +222,9 @@ namespace PhimStrong.Areas.Admin.Controllers
 
             try
             {
-                var file = Path.Combine(_environment.ContentRootPath, "wwwroot/src/img/CastAvatars", cast.Id.ToString() + ".jpg");
-
-                FileInfo fileInfo = new FileInfo(file);
-                fileInfo.Delete();
+                var file = Path.Combine(_environment.WebRootPath, "src\\img\\CastAvatars", cast.Id.ToString() + ".jpg");
+                
+                if (System.IO.File.Exists(file)) System.IO.File.Delete(file);
 
                 _db.Casts.Remove(cast);
                 await _db.SaveChangesAsync();

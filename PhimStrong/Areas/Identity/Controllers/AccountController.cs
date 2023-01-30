@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
 using NuGet.Common;
 using PhimStrong.Areas.Identity.Models;
+using SharedLibrary.Helpers;
 using SharedLibrary.Models;
 using System.Text;
 using System.Text.Encodings.Web;
@@ -29,6 +30,7 @@ namespace PhimStrong.Areas.Identity.Controllers
         }
 
         [HttpGet]
+        [Route("/Account")]
         public async Task<IActionResult> Index()
         {
             var user = await _userManager.GetUserAsync(User);
@@ -42,6 +44,7 @@ namespace PhimStrong.Areas.Identity.Controllers
         }
 
         [HttpGet]
+        [Route("/Account/ChangePassword")]
         public IActionResult ChangePassword()
         {
             return View();
@@ -73,6 +76,7 @@ namespace PhimStrong.Areas.Identity.Controllers
 		}
 
         [HttpGet]
+        [Route("/Account/Email")]
         public async Task<IActionResult> Email()
         {
             var user = await _userManager.GetUserAsync(User);
@@ -165,11 +169,11 @@ namespace PhimStrong.Areas.Identity.Controllers
 
             if (userModel.AvatarFile != null)
             {
-                //if (!userModel.AvatarFile.FileName.EndsWith(".png") &&
-                //    !userModel.AvatarFile.FileName.EndsWith(".jpg"))
-                //{
-                //    return Json(new { success = false , error = "Định dạng ảnh phải là .png, .jpg !"});
-                //}
+                if (!userModel.AvatarFile.FileName.EndsWith(".png") &&
+                    !userModel.AvatarFile.FileName.EndsWith(".jpg"))
+                {
+                    return Json(new { success = false, error = "Định dạng ảnh phải là .png, .jpg !" });
+                }
 
                 var file = Path.Combine(_environment.ContentRootPath, "wwwroot/src/img/UserAvatars", user.Id + ".jpg");
                 
@@ -192,6 +196,7 @@ namespace PhimStrong.Areas.Identity.Controllers
             if (userModel.DisplayName != null && userModel.DisplayName != user.DisplayName)
             {
                 user.DisplayName = userModel.DisplayName;
+                user.NormalizeDisplayName = user.DisplayName.RemoveMarks();
             }
 
             if (userModel.Hobby != null && userModel.Hobby != user.Hobby)

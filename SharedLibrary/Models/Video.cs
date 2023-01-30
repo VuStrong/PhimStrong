@@ -11,7 +11,7 @@ namespace SharedLibrary.Models
         public int Id { get; set; }
 
         [Required]
-        public Movie Movie { get; set; }
+        public virtual Movie Movie { get; set; }
 
         public string? VideoUrl { get; set; }
 

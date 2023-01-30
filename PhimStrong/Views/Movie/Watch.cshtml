@@ -1,0 +1,40 @@
+﻿@model WatchMovieModel
+@{
+	Layout = "/Views/Movie/_Layout.cshtml";
+
+	int currentVideoEpi = (int)(TempData["episode"] ?? "1");
+	
+	ViewData["Title"] = Model.Movie.Type == "Phim lẻ" ?
+		"Xem " + Model.Movie.TranslateName : $"Xem {Model.Movie.TranslateName} tập {currentVideoEpi}";
+	
+	ViewData["MovieName"] = Model.Movie.Type == "Phim lẻ" ?
+		Model.Movie.TranslateName : $"{Model.Movie.TranslateName} tập {currentVideoEpi}.";
+
+}
+
+<div id="movie-player" class="w-100 mb-4 mt-3">
+	<video controls autoplay name="media">
+		@*<source src="https://www.googleapis.com/drive/v3/files/1i328m4OfLLjHHEV-yenYjJgocj8_AO_z?alt=media&key=AIzaSyALAnovaVGD6gFejFLClsUB8Ho68ztlTPM" type='video/mp4'>*@
+		<source src="@(Model.Video != null ? Model.Video.VideoUrl : "")" type='video/mp4' />
+	</video>
+</div>
+@if (Model.Movie.Type == "Phim bộ")
+{
+	<div class="my-4 p-3" style="background-color: #423e3e">
+		<p class="text-success">Danh sách tập</p>
+		@for (int i = 0; i < Model.Movie.EpisodeCount; i++)
+		{
+			<a asp-area="" asp-controller="Movie" asp-action="Watch" asp-route-id="@Model.Movie.Id" asp-route-episode="@(i + 1)"
+				class="mb-1 btn @(currentVideoEpi == i + 1 ? "btn-success" : "btn-dark")">
+				Tập @(i + 1)
+			</a>
+		}
+	</div>
+}
+
+@section Scripts{
+	<script src="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+	<script type="text/javascript">
+		var movieid = @Model.Movie.Id;
+	</script>
+}

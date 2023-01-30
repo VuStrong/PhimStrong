@@ -1,0 +1,156 @@
+﻿@model Movie
+@{
+	Layout = "/Views/Movie/_Layout.cshtml";
+	ViewData["Title"] = Model.TranslateName;
+	ViewData["MovieName"] = Model.TranslateName;
+
+	int movieYear = Model.ReleaseDate != null ? Model.ReleaseDate.Value.Year : 0;
+	string movieCountry = Model.Country != null ? Model.Country.Name : "";
+	string movieLength = Model.Length != null ? 
+		(Model.Type == "Phim lẻ" ? $"{Model.Length} phút" : $"{Model.Length} phút / tập") : "0";
+}
+
+<div style="background-image: url(@(Model.Image ?? "/src/img/UserAvatars/default_avatar.png"))"
+	 class="movie-detail-bg mb-2">
+	<a asp-area="" asp-controller="Movie" asp-action="Watch" asp-route-id="@Model.Id" asp-route-episode="1" 
+		class="d-block position-absolute play-btn">
+		<i class="bi bi-play-circle-fill"></i>
+	</a>
+	<div class="position-absolute p-3 w-100 background-blur" style="bottom: 0;">
+		<h3 class="mb-3 d-block text-truncate text-success">@Model.TranslateName</h3>
+		<h5 class="mb-3 d-block text-truncate">@Model.Name</h5>
+		<div>
+			<a asp-area="" asp-controller="Movie" asp-action="Watch" asp-route-id="@Model.Id" asp-route-episode="1"
+				title="Xem phim" class="btn btn-success @(Model.Status == "Trailer" ? "disabled" : "")">
+				<i class="bi bi-play-circle-fill"></i>
+				Xem phim
+			</a>
+		</div>
+	</div>
+</div>
+
+<!-- Movie Info -->
+<div class="mb-3 py-3 px-3" style="background-color: #282828">
+	<div class="d-flex mb-3 like-movie">
+		@*			<a id="like-movie-btn" href="#" title="thích" class="btn btn-success movie-detail-btn">
+		<i class="bi bi-hand-thumbs-up-fill"></i>
+		<strong>Thích</strong>
+		<span class="ms-1">@(Model.LikedUsers != null ? Model.LikedUsers.Count : 0)</span>
+		</a>*@
+	</div>
+	<div class="row mb-3">
+		<div class="col-lg-4">
+			<div class="mb-2">
+				<strong>Trạng thái</strong>:
+				<p class="d-inline" style="color: gray">@Model.StatusToString</p>
+			</div>
+			<div class="mb-2">
+				<strong>Lượt xem</strong>:
+				<p class="d-inline" style="color: gray">@Model.View</p>
+			</div>
+			<div class="mb-2">
+				<strong>Thể loại</strong>:
+				@if (Model.Categories != null)
+				{
+					foreach (var cate in Model.Categories)
+					{
+						<a href="/Category/@cate.Name" class="d-inline my-link my-link-gray">@cate.Name</a>
+						<span style="color: gray">, </span>
+					}
+				}
+			</div>
+		</div>
+		<div class="col-lg-4">
+			<div class="mb-2">
+				<strong>Năm phát hành</strong>:
+				@if (movieYear > 0)
+				{
+					<a href="/movie/year/@movieYear" class="d-inline my-link my-link-gray">
+						@movieYear
+					</a>
+				}
+			</div>
+			<div class="mb-2">
+				<strong>Đạo diễn</strong>:
+				@if (Model.Directors != null)
+				{
+					foreach (var director in Model.Directors)
+					{
+						<a href="/Director/@director.Name" class="d-inline my-link my-link-gray">@director.Name</a>
+						<span style="color: gray">, </span>
+					}
+				}
+			</div>
+			<div class="mb-2">
+				<strong>Diễn viên</strong>:
+				@if (Model.Casts != null)
+				{
+					foreach (var cast in Model.Casts)
+					{
+						<a href="/Cast/@cast.Name" class="d-inline my-link my-link-gray">@cast.Name</a>
+						<span style="color: gray">, </span>
+					}
+				}
+			</div>
+		</div>
+		<div class="col-lg-4">
+			<div class="mb-2">
+				<strong>Quốc gia</strong>:
+				@if (movieCountry != "")
+				{
+					<a href="/Country/@movieCountry" class="d-inline my-link my-link-gray">
+						@movieCountry
+					</a>
+				}
+			</div>
+			<div class="mb-2">
+				<strong>Thời lượng</strong>:
+				<p class="d-inline" style="color: gray">@movieLength</p>
+			</div>
+			<div class="mb-2">
+				<strong>Rating</strong>:
+				<p class="d-inline" style="color: gray">@Model.Rating</p>
+			</div>
+		</div>
+	</div>
+	<div class="border-bottom border-top py-2" style="border-color: gray !important">
+		<h5 class="text-success">Nội dung phim và Trailer</h5>
+		<div class="mt-3 mb-4" style="color: #828282">
+			@if (Model.Description != null)
+			{
+			#nullable disable
+				foreach (string desc in Model.DescriptionSplit)
+				{
+					@desc
+
+					<br />
+				}
+			}
+		</div>
+		@if (Model.Trailer != null)
+		{
+			<div id="trailer" class="d-flex w-100 justify-content-center">
+				<iframe src="@Model.Trailer" allow="fullscreen"></iframe>
+			</div>
+		}
+	</div>
+	<div class="py-2">
+		<h5 class="text-success">Tags</h5>
+		@if (Model.Tags != null)
+		{
+			foreach (var tag in Model.Tags)
+			{
+				<a href="/Movie/tag/@tag.TagName" class="d-inline my-link my-link-gray">@tag.TagName</a>
+				<span style="color: gray">, </span>
+			}
+		}
+	</div>
+</div>
+
+@section Scripts{
+	<script src="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+	<script type="text/javascript">
+		var movieid = @Model.Id;
+	</script>
+	<script src="/js/Movie/MovieDetail.js"></script>
+}

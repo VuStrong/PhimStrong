@@ -1,0 +1,172 @@
+﻿@model CommentModel
+
+@if (Model.RenderCommentOnly)
+{
+	if (Model.Comments != null)
+	{
+		foreach (var comment in Model.Comments)
+		{
+			<div class="row flex-nowrap mb-2 border-bottom cmt-item" cmt-id="@comment.Id">
+				<a href="/User/@comment.User.Id" style="width: 80px; height: 80px;">
+					<img src="@(comment.User.Avatar ?? "/src/img/UserAvatars/default_avatar.png")" class="w-100" />
+				</a>
+				<div class="flex-fill">
+					<a href="/User/@comment.User.Id" class="text-success text-decoration-none cmt-user-name">
+						<strong>@comment.User.DisplayName</strong>
+						@{
+							string rowColor = "gray";
+							if (comment.User.RoleName == "Thủy Tổ") rowColor = "yellowgreen";
+							else if (comment.User.RoleName == "Admin") rowColor = "red";
+						}
+						<span class="ms-2" style="color: @rowColor; font-size: 13px;">(@(comment.User.RoleName ?? ""))</span>
+					</a>
+					<p class="text-dark">@comment.Content</p>
+					<div>
+						<a href="#" class="me-2 like-btn">Thích</a>
+						<a href="#" class="response-btn">Phản hồi</a>
+						<p class="text-dark d-inline mx-2 cmt-like-count">
+							<i class="bi bi-hand-thumbs-up-fill text-info"></i>
+							@comment.Like
+						</p>
+						<p class="d-inline" style="color: gray;">
+							@((DateTime.Now - (comment.CreatedAt ?? DateTime.Now)).Days)
+							ngày
+						</p>
+					</div>
+					<div class="response-area"></div>
+					<div class="response-container">
+						@if (comment.Responses != null && comment.Responses.Count > 0)
+						{
+							foreach (var resComment in comment.Responses)
+							{
+								<div class="row flex-nowrap mb-2 cmt-item" cmt-id="@resComment.Id">
+									<a href="/User/@resComment.User.Id" style="width: 80px; height: 80px;">
+										<img src="@(resComment.User.Avatar ?? "/src/img/UserAvatars/default_avatar.png")" class="w-100" />
+									</a>
+									<div class="flex-fill">
+										<a href="/User/@resComment.User.Id" class="text-success text-decoration-none cmt-user-name">
+											<strong>@resComment.User.DisplayName</strong>
+											@{
+												string resRowColor = "gray";
+												if (resComment.User.RoleName == "Thủy Tổ") resRowColor = "yellowgreen";
+												else if (resComment.User.RoleName == "Admin") resRowColor = "red";
+											}
+											<span class="ms-2" style="color: @resRowColor; font-size: 13px;">(@(resComment.User.RoleName ?? ""))</span>
+										</a>
+										<p class="text-dark">@resComment.Content</p>
+										<div>
+											<a href="#" class="me-2 like-btn">Thích</a>
+											<p class="text-dark d-inline mx-2 cmt-like-count">
+												<i class="bi bi-hand-thumbs-up-fill text-info"></i>
+												@resComment.Like
+											</p>
+											<p class="d-inline" style="color: gray;">
+												@((DateTime.Now - (resComment.CreatedAt ?? DateTime.Now)).Days)
+												ngày
+											</p>
+										</div>
+									</div>
+								</div>
+							}
+						}
+					</div>
+				</div>
+			</div>
+		}
+	}
+}
+else
+{
+	<strong id="cmt-count" class="mb-4 text-dark d-block">@Model.CommentCount bình luận</strong>
+	<div id="user-cmt" class="row flex-nowrap mb-2">
+		<div style="width: 100px; height: 100px;">
+			<img src="@(Model.UserAvatar ?? "/src/img/UserAvatars/default_avatar.png")" class="w-100" />
+		</div>
+		<div class="flex-fill">
+			<textarea id="user-cmt-input" class="w-100" type="text" placeholder="Bình luận"></textarea>
+			@if(Model.UserLogin)
+			{
+				<button id="cmt-btn" class="btn btn-success d-block">Bình luận</button>
+			}
+			else
+			{
+				<a id="cmt-login-btn" class="btn btn-info d-block" href="/login?returnUrl=/Movie/Detail/@Model.MovieId">Đăng nhập để bình luận</a>
+			}
+		</div>
+	</div>
+	<div id="cmt-body">
+	@if (Model.Comments != null)
+	{
+		@foreach (var comment in Model.Comments)
+		{
+			<div class="row flex-nowrap mb-2 border-bottom cmt-item" cmt-id="@comment.Id">
+				<a href="/User/@comment.User.Id" style="width: 80px; height: 80px;">
+					<img src="@(comment.User.Avatar ?? "/src/img/UserAvatars/default_avatar.png")" class="w-100" />
+				</a>
+				<div class="flex-fill">
+					<a href="/User/@comment.User.Id" class="text-success text-decoration-none cmt-user-name">
+						<strong>@comment.User.DisplayName</strong>
+						@{
+							string rowColor = "gray";
+							if (comment.User.RoleName == "Thủy Tổ") rowColor = "yellowgreen";
+							else if (comment.User.RoleName == "Admin") rowColor = "red";
+						}
+						<span class="ms-2" style="color: @rowColor; font-size: 13px;">(@(comment.User.RoleName ?? ""))</span>
+					</a>
+					<p class="text-dark">@comment.Content</p>
+					<div>
+						<a href="#" class="me-2 like-btn">Thích</a>
+						<a href="#" class="response-btn">Phản hồi</a>
+						<p class="text-dark d-inline mx-2 cmt-like-count">
+							<i class="bi bi-hand-thumbs-up-fill text-info"></i>
+							@comment.Like
+						</p>
+						<p class="d-inline" style="color: gray;">
+							@((DateTime.Now - (comment.CreatedAt ?? DateTime.Now)).Days)
+							ngày
+						</p>
+					</div>
+					<div class="response-area"></div>
+					<div class="response-container">
+						@if (comment.Responses != null && comment.Responses.Count > 0)
+						{
+							foreach (var resComment in comment.Responses)
+							{
+							<div class="row flex-nowrap mb-2 cmt-item" cmt-id="@resComment.Id">
+								<a href="/User/@resComment.User.Id" style="width: 80px; height: 80px;">
+										<img src="@(resComment.User.Avatar ?? "/src/img/UserAvatars/default_avatar.png")" class="w-100" />
+								</a>
+								<div class="flex-fill">
+									<a href="/User/@resComment.User.Id" class="text-success text-decoration-none cmt-user-name">
+										<strong>@resComment.User.DisplayName</strong>
+										@{
+										string resRowColor = "gray";
+										if (resComment.User.RoleName == "Thủy Tổ") resRowColor = "yellowgreen";
+										else if (resComment.User.RoleName == "Admin") resRowColor = "red";
+										}
+										<span class="ms-2" style="color: @resRowColor; font-size: 13px;">(@(resComment.User.RoleName ?? ""))</span>
+									</a>
+									<p class="text-dark">@resComment.Content</p>
+									<div>
+										<a href="#" class="me-2 like-btn">Thích</a>
+										<p class="text-dark d-inline mx-2 cmt-like-count">
+											<i class="bi bi-hand-thumbs-up-fill text-info"></i>
+											@resComment.Like
+										</p>
+										<p class="d-inline" style="color: gray;">
+											@((DateTime.Now - (resComment.CreatedAt ?? DateTime.Now)).Days)
+											ngày
+										</p>
+									</div>
+								</div>
+							</div>
+							}
+						}
+					</div>
+				</div>
+			</div>
+		}
+	}
+	</div>
+	<button id="expand-cmt-btn" class="btn btn-success w-100">Tải thêm bình luận</button>
+}

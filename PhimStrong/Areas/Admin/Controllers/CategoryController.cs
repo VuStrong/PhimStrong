@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using PhimStrong.Data;
 using SharedLibrary.Constants;
+using SharedLibrary.Helpers;
 using SharedLibrary.Models;
 using System.Data;
 using System.Text.RegularExpressions;
@@ -29,11 +30,15 @@ namespace PhimStrong.Areas.Admin.Controllers
             int numberOfPages = 0;
 
             List<Category> categories = new List<Category>();
-            if (filter == null || filter.Trim() == "")
+			int count = 0; // total of search result
+			if (filter == null || filter.Trim() == "")
             {
-                numberOfPages = (int)Math.Ceiling((double)_db.Categories.Count() / CATE_PER_PAGE);
+                count = _db.Categories.Count();
 
-                if (page > numberOfPages) page = numberOfPages;
+				numberOfPages = (int)Math.Ceiling((double)count / CATE_PER_PAGE);
+				TempData["TotalCount"] = count;
+
+				if (page > numberOfPages) page = numberOfPages;
                 if (page <= 0) page = 1;
 
                 categories = _db.Categories.Skip((page - 1) * CATE_PER_PAGE).Take(CATE_PER_PAGE).ToList();
@@ -50,11 +55,10 @@ namespace PhimStrong.Areas.Admin.Controllers
                     switch (matchValue)
                     {
                         case PageFilterConstant.FILTER_BY_NAME:
-                            categories = _db.Categories.Where(m =>
-                                (m.Name ?? "").ToLower().Contains(filterValue.ToLower())
-                            ).ToList();
-
                             TempData["FilterMessage"] = "tên là " + filterValue;
+                            filterValue = filterValue.RemoveMarks();
+
+                            categories = _db.Categories.ToList().Where(m => (m.NormalizeName ?? "").Contains(filterValue)).ToList();
 
                             break;
                         default:
@@ -62,7 +66,10 @@ namespace PhimStrong.Areas.Admin.Controllers
                     }
                 }
 
-                numberOfPages = (int)Math.Ceiling((double)categories.Count / CATE_PER_PAGE);
+				count = categories.Count;
+				TempData["TotalCount"] = count;
+
+				numberOfPages = (int)Math.Ceiling((double)count / CATE_PER_PAGE);
                 if (page > numberOfPages) page = numberOfPages;
                 if (page <= 0) page = 1;
 
@@ -99,6 +106,7 @@ namespace PhimStrong.Areas.Admin.Controllers
 
             // chỉnh lại format tên :
             category.Name = category.Name[0].ToString().ToUpper() + category.Name.Substring(1).ToLower();
+            category.NormalizeName = category.Name.RemoveMarks();
 
             try
             {
@@ -151,6 +159,7 @@ namespace PhimStrong.Areas.Admin.Controllers
             }
 
             categoryToEdit.Name = category.Name[0].ToString().ToUpper() + category.Name.Substring(1).ToLower();
+            categoryToEdit.NormalizeName = categoryToEdit.Name.RemoveMarks();
             categoryToEdit.Description = category.Description;
 
             try

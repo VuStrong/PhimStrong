@@ -1,8 +1,348 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Trang chủ";
+
+    // phim đề cử
+    var listMovieSlide = (List<Movie>?)(ViewData["MoviesSlide"]);
+    int listMovieSlideLength = listMovieSlide != null ? listMovieSlide.Count : 0;
+
+    // phim mới
+    var listMovieNew = (Movie[]?)(ViewData["ListMovieNew"]);
+    int listMovieNewLength = listMovieNew != null ? listMovieNew.Length : 0;
+
+    var listMovieTopRating = (Movie[]?)(ViewData["ListMovieTopRating"]);
+    int listMovieTopRatingLength = listMovieTopRating != null ? listMovieTopRating.Length : 0;
+
+    // Phim lẻ
+    var listPhimLe = (Movie[]?)(ViewData["ListPhimLe"]);
+    int listPhimLeLength = listPhimLe != null ? listPhimLe.Length : 0;
+
+    // Phim bộ
+    var listPhimBo = (Movie[]?)(ViewData["ListPhimBo"]);
+    int listPhimBoLength = listPhimBo != null ? listPhimBo.Length : 0;
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="row mb-5 mt-5" style="height: 500px;">
+    <h3 class="text-success text-uppercase">Phim đề cử</h3>
+    <div id="carouselExampleIndicators" class="carousel slide col-lg-9 col-12 h-100" data-bs-ride="true">
+        <div class="carousel-indicators">
+            @for (int i = 0; i < listMovieSlideLength; i++)
+            {
+                <button type="button" data-bs-target="#carouselExampleIndicators" 
+                    data-bs-slide-to="@i" class="@(i == 0 ? "active" : "")" 
+                    aria-current="true" aria-label="Slide @(i+1)">
+                </button>
+            }
+        </div>
+        <div class="carousel-inner h-100">
+            @{
+                bool first = true;
+                
+                if(listMovieSlide != null)
+                {
+                    foreach (var movie in listMovieSlide)
+                    {
+                        <div class="carousel-item h-100 @(first ? "active" : "")">
+                            <img src="@movie.Image" class="img-fit w-100 h-100" alt="...">
+                            <a href="/Movie/Detail/@movie.Id" class="d-block position-absolute play-btn">
+                                <i class="bi bi-play-circle-fill"></i>
+                            </a>
+                            <div class="carousel-caption d-none d-md-block background-blur" style="display: block !important">
+                                <h5 class="text-success">@movie.TranslateName</h5>
+                                <p class="movie-slide-desc">@movie.Description</p>
+                            </div>
+                        </div>
+                        first = false;
+                    }
+                }
+            }
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon background-blur" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
+            <span class="carousel-control-next-icon background-blur" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+        </button>
+    </div>
+    <div class="movie-slide d-lg-block d-none col-3 h-100 overflow-auto">
+        @{
+            bool first2 = true;
+
+            if (listMovieSlide != null)
+            {
+                foreach (var movie in listMovieSlide)
+                {
+                    <a href="/Movie/Detail/@movie.Id" class="movie-slide-item @(first2 ? "active" : "") row py-2">
+                        <div class="col-5 h-100">
+                            <img src="@movie.Image" class="img-fit w-100 h-100" alt="">
+                        </div>
+                        <div class="col-7">
+                            <p class="movie-slide-name text-success text-truncate my-0">@movie.TranslateName</p>
+                            <p class="movie-slide-desc my-0">@movie.Description</p>
+                        </div>
+                    </a>
+
+                    first2 = false;
+                }
+            }
+        }
+    </div>
 </div>
+
+<!-- New Movies -->
+<div class="movie-container mb-5 pt-5">
+    <div class="mb-4 position-relative">
+        <h3 class="text-success text-uppercase">phim mới cập nhật</h3>
+        <a class="btn btn-success position-absolute end-0 top-0" asp-area="" asp-controller="Movie" asp-action="Index">Xem tất cả</a>
+    </div>
+    <div class="w-100">
+        <div class="d-flex flex-wrap movie-row">
+            @if (listMovieNew != null && listMovieNewLength > 0)
+            {
+                <div class="movie-item movie-item-large">
+                    <a href="/Movie/Detail/@listMovieNew[0].Id" class="movie-item-body">
+                        <img src="@(listMovieNew[0].Image ?? "~/src/img/UserAvatars/default_avatar.png")" class="w-100 h-100 img-fit">
+                        <p class="movie-item-name background-blur text-truncate w-100">@listMovieNew[0].TranslateName</p>
+                        <p class="movie-status">@listMovieNew[0].StatusToString</p>
+                    </a>
+                </div>   
+            }
+            <div class="col row row-cols-lg-3 row-cols-2 flex-wrap movie-row movie-row-6">
+                @if (listMovieNew != null)
+                {
+                    for (int i = 1; i <= 6; i++)
+                    {
+                        if (i >= listMovieNewLength) break;
+
+                        <div class="movie-item">
+                            <a href="/Movie/Detail/@listMovieNew[i].Id" class="movie-item-body">
+                                <img src="@(listMovieNew[i].Image ?? "~/src/img/UserAvatars/default_avatar.png")"
+                                    class="w-100 h-100 img-fit">
+                                <p class="movie-item-name background-blur text-truncate w-100">@listMovieNew[i].TranslateName</p>
+                                <p class="movie-status">@listMovieNew[i].StatusToString</p>
+                            </a>
+                        </div>
+                    }
+                }
+            </div>
+        </div>
+        <div class="row row-cols-lg-5 row-cols-2 movie-row">
+            @if (listMovieNew != null)
+            {
+                for (int i = 7; i <= 11; i++)
+                {
+                    if (i >= listMovieNewLength) break;
+
+                    <div class="movie-item">
+                        <a href="/Movie/Detail/@listMovieNew[i].Id" class="movie-item-body">
+                            <img src="@(listMovieNew[i].Image ?? "~/src/img/UserAvatars/default_avatar.png")"
+                                class="w-100 h-100 img-fit">
+                            <p class="movie-item-name background-blur text-truncate w-100">@listMovieNew[i].TranslateName</p>
+                            <p class="movie-status">@listMovieNew[i].StatusToString</p>
+                        </a>
+                    </div>
+                }
+            }
+        </div>
+    </div>
+</div>
+
+<!-- Top Rating Movies -->
+<div class="movie-container mb-5">
+    <div class="mb-4 position-relative">
+        <h3 class="text-success text-uppercase">Top Rating</h3>
+        <a class="btn btn-success position-absolute end-0 top-0" href="/Movie/top-rating">Xem tất cả</a>
+    </div>
+    <div class="w-100">
+        <div class="d-flex flex-wrap movie-row">
+            @if (listMovieTopRating != null && listMovieTopRatingLength > 0)
+            {
+                <div class="movie-item movie-item-large">
+                    <a href="/Movie/Detail/@listMovieTopRating[0].Id" class="movie-item-body">
+                        <img src="@(listMovieTopRating[0].Image ?? "~/src/img/UserAvatars/default_avatar.png")" 
+                            class="w-100 h-100 img-fit">
+                        <p class="movie-item-name background-blur text-truncate w-100">@listMovieTopRating[0].TranslateName</p>
+                        <p class="movie-status">@listMovieTopRating[0].StatusToString</p>
+                    </a>
+                </div>
+            }
+            <div class="col row row-cols-lg-3 row-cols-2 flex-wrap movie-row movie-row-6">
+                @if (listMovieTopRating != null)
+                {
+                    for (int i = 1; i <= 6; i++)
+                    {
+                        if (i >= listMovieTopRatingLength) break;
+
+                        <div class="movie-item">
+                            <a href="/Movie/Detail/@listMovieTopRating[i].Id" class="movie-item-body">
+                                <img src="@(listMovieTopRating[i].Image ?? "~/src/img/UserAvatars/default_avatar.png")"
+                                     class="w-100 h-100 img-fit">
+                                <p class="movie-item-name background-blur text-truncate w-100">@listMovieTopRating[i].TranslateName</p>
+                                <p class="movie-status">@listMovieTopRating[i].StatusToString</p>
+                            </a>
+                        </div>
+                    }
+                }
+            </div>
+        </div>
+        <div class="row row-cols-lg-5 row-cols-2 movie-row">
+            @if (listMovieTopRating != null)
+            {
+                for (int i = 7; i <= 11; i++)
+                {
+                    if (i >= listMovieTopRatingLength) break;
+
+                    <div class="movie-item">
+                        <a href="/Movie/Detail/@listMovieTopRating[i].Id" class="movie-item-body">
+                            <img src="@(listMovieTopRating[i].Image ?? "~/src/img/UserAvatars/default_avatar.png")"
+                                class="w-100 h-100 img-fit">
+                            <p class="movie-item-name background-blur text-truncate w-100">@listMovieTopRating[i].TranslateName</p>
+                            <p class="movie-status">@listMovieTopRating[i].StatusToString</p>
+                        </a>
+                    </div>
+                }
+            }
+        </div>
+    </div>
+</div>
+
+<!-- Top phim lẻ -->
+<div class="movie-container mb-5">
+    <div class="mb-4 position-relative">
+        <h3 class="text-success text-uppercase">Phim lẻ</h3>
+        <a class="btn btn-success position-absolute end-0 top-0" href="/Movie/phim-le">Xem tất cả</a>
+    </div>
+    <div class="w-100">
+        <div class="d-flex flex-wrap movie-row">
+            @if (listPhimLe != null && listPhimLeLength > 0)
+            {
+                <div class="movie-item movie-item-large">
+                    <a href="/Movie/Detail/@listPhimLe[0].Id" class="movie-item-body">
+                        <img src="@(listPhimLe[0].Image ?? "~/src/img/UserAvatars/default_avatar.png")"
+                            class="w-100 h-100 img-fit">
+                        <p class="movie-item-name background-blur text-truncate w-100">@listPhimLe[0].TranslateName</p>
+                        <p class="movie-status">@listPhimLe[0].StatusToString</p>
+                    </a>
+                </div>
+            }
+            <div class="col row row-cols-lg-3 row-cols-2 flex-wrap movie-row movie-row-6">
+                @if (listPhimLe != null)
+                {
+                    for (int i = 1; i <= 6; i++)
+                    {
+                        if (i >= listPhimLeLength) break;
+
+                        <div class="movie-item">
+                            <a href="/Movie/Detail/@listPhimLe[i].Id" class="movie-item-body">
+                                <img src="@(listPhimLe[i].Image ?? "~/src/img/UserAvatars/default_avatar.png")"
+                                     class="w-100 h-100 img-fit">
+                                <p class="movie-item-name background-blur text-truncate w-100">@listPhimLe[i].TranslateName</p>
+                                <p class="movie-status">@listPhimLe[i].StatusToString</p>
+                            </a>
+                        </div>
+                    }
+                }
+            </div>
+        </div>
+        <div class="row row-cols-lg-5 row-cols-2 movie-row">
+            @if (listPhimLe != null)
+            {
+                for (int i = 7; i <= 11; i++)
+                {
+                    if (i >= listPhimLeLength) break;
+
+                    <div class="movie-item">
+                        <a href="/Movie/Detail/@listPhimLe[i].Id" class="movie-item-body">
+                            <img src="@(listPhimLe[i].Image ?? "~/src/img/UserAvatars/default_avatar.png")"
+                                class="w-100 h-100 img-fit">
+                            <p class="movie-item-name background-blur text-truncate w-100">@listPhimLe[i].TranslateName</p>
+                            <p class="movie-status">@listPhimLe[i].StatusToString</p>
+                        </a>
+                    </div>
+                }
+            }
+        </div>
+    </div>
+</div>
+
+<!-- Top Phim bộ -->
+<div class="movie-container mb-5">
+    <div class="mb-4 position-relative">
+        <h3 class="text-success text-uppercase">Phim bộ</h3>
+        <a class="btn btn-success position-absolute end-0 top-0" href="/Movie/phim-bo">Xem tất cả</a>
+    </div>
+    <div class="w-100">
+        <div class="d-flex flex-wrap movie-row">
+            @if (listPhimBo != null && listPhimBoLength > 0)
+            {
+                <div class="movie-item movie-item-large">
+                    <a href="/Movie/Detail/@listPhimBo[0].Id" class="movie-item-body">
+                        <img src="@(listPhimBo[0].Image ?? "~/src/img/UserAvatars/default_avatar.png")"
+                            class="w-100 h-100 img-fit">
+                        <p class="movie-item-name background-blur text-truncate w-100">@listPhimBo[0].TranslateName</p>
+                        <p class="movie-status">@listPhimBo[0].StatusToString</p>
+                    </a>
+                </div>
+            }
+            <div class="col row row-cols-lg-3 row-cols-2 flex-wrap movie-row movie-row-6">
+                @if (listPhimBo != null)
+                {
+                    for (int i = 1; i <= 6; i++)
+                    {
+                        if (i >= listPhimBoLength) break;
+
+                        <div class="movie-item">
+                            <a href="/Movie/Detail/@listPhimBo[i].Id" class="movie-item-body">
+                                <img src="@(listPhimBo[i].Image ?? "~/src/img/UserAvatars/default_avatar.png")"
+                                    class="w-100 h-100 img-fit">
+                                <p class="movie-item-name background-blur text-truncate w-100">@listPhimBo[i].TranslateName</p>
+                                <p class="movie-status">@listPhimBo[i].StatusToString</p>
+                            </a>
+                        </div>
+                    }
+                }
+            </div>
+        </div>
+        <div class="row row-cols-lg-5 row-cols-2 movie-row">
+            @if (listPhimBo != null)
+            {
+                for (int i = 7; i <= 11; i++)
+                {
+                    if (i >= listPhimBoLength) break;
+
+                    <div class="movie-item">
+                        <a href="/Movie/Detail/@listPhimBo[i].Id" class="movie-item-body">
+                            <img src="@(listPhimBo[i].Image ?? "~/src/img/UserAvatars/default_avatar.png")"
+                                class="w-100 h-100 img-fit">
+                            <p class="movie-item-name background-blur text-truncate w-100">@listPhimBo[i].TranslateName</p>
+                            <p class="movie-status">@listPhimBo[i].StatusToString</p>
+                        </a>
+                    </div>
+                }
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script type="text/javascript">
+        const myCarousel = document.getElementById('carouselExampleIndicators');
+
+        // event khi slide của bootstrap đã chuyển thì update movie-slide
+        myCarousel.addEventListener('slid.bs.carousel', event => {
+            // lấy position của .carousel-item.active
+            var inx = $('.carousel-item.active').index();
+         
+            $('.movie-slide-item.active').removeClass('active');
+            $(`.movie-slide-item:nth-child(${(inx + 1)})`).addClass('active');
+
+            $('.movie-slide').animate(
+                {
+                    scrollTop: $(".movie-slide-item.active").offset().top
+                },
+                800 //speed
+            );
+        });
+    </script>
+}

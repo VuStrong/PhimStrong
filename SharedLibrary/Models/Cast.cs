@@ -13,8 +13,9 @@ namespace SharedLibrary.Models
         [Required]
         [StringLength(50)]
         public string Name { get; set; }
+		public string? NormalizeName { get; set; }
 
-        [NotMapped]
+		[NotMapped]
         public IFormFile? AvatarFile { get; set; }
         [NotMapped]
         [FileExtensions(Extensions = ".png,.jpg,.jpeg")]
@@ -25,7 +26,7 @@ namespace SharedLibrary.Models
                 if (AvatarFile != null)
                     return AvatarFile.FileName;
                 else
-                    return "";
+                    return null;
             }
         }
 
@@ -43,7 +44,7 @@ namespace SharedLibrary.Models
             } 
         }
 
-        public List<Movie>? Movies { get; set; }
+        public virtual List<Movie>? Movies { get; set; }
 
         public string? About { get; set; }
     }

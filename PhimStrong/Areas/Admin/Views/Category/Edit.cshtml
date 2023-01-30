@@ -5,6 +5,7 @@
 
 <h2 class="text-success">@ViewData["Title"]</h2>
 
+<partial name="/Views/Shared/_ModalConfirm.cshtml"></partial>
 <partial name="_StatusMessage" for="@TempData["status"]" />
 
 <div class="mt-4">
@@ -23,12 +24,23 @@
         <button type="submit" class="btn btn-primary mt-4">Chỉnh sửa</button>
     </form>
 
-    <form method="post" asp-action="Delete" asp-route-cateid="@Model.Id">
-        <button type="submit" class="btn btn-danger mt-4">Xóa thể loại</button>
+    <form id="delete-cate" method="post" asp-action="Delete" asp-route-cateid="@Model.Id">
+        <button id="delete-cate-btn" type="submit" class="btn btn-danger mt-4">Xóa thể loại</button>
     </form>
 </div>
 
 @section Scripts {
     <partial name="/Views/Shared/_ValidationScriptsPartial.cshtml" />
+    <script src="~/js/ModalConfirm.js" asp-append-version="true"></script>
+    <script type="text/javascript">
+        $('#delete-cate-btn').click(function (e) {
+            e.preventDefault();
+            showModal("Xóa ?", "Xác nhận xóa thể loại này ?");
+        });
+
+        modalConfirm(function () {
+            $('#delete-cate').submit();
+        });
+    </script>
 }
 

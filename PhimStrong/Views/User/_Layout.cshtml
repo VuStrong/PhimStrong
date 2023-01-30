@@ -1,0 +1,20 @@
+﻿@{
+    Layout = "/Views/Shared/_Layout.cshtml";
+}
+
+<section class="vh-100">
+    <div class="container py-5 h-100 background-profile" style="background-image: url(/src/img/Logo/PhimStrong_Logo.png);">
+        <div class="row d-flex justify-content-center align-items-center h-100">
+            <div class="col col-lg-6 col-md-10 col-12 ms-md-5 ">
+                <div class="card mb-3" style="border-radius: .5rem;">
+                    @RenderBody()
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    @await RenderSectionAsync("Scripts", required: false)
+}
+

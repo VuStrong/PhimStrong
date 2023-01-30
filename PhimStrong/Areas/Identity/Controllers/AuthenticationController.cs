@@ -8,6 +8,7 @@ using System.Text.Encodings.Web;
 using System.Text;
 using System.Security.Claims;
 using SharedLibrary.Constants;
+using SharedLibrary.Helpers;
 
 #pragma warning disable
 namespace PhimStrong.Areas.Identity.Controllers
@@ -58,8 +59,11 @@ namespace PhimStrong.Areas.Identity.Controllers
                 { 
                     UserName = model.Email,
                     Email = model.Email,
-                    DisplayName = model.Name
+                    DisplayName = model.Name,
+                    RoleName = RoleConstant.MEMBER
                 };
+
+                user.NormalizeDisplayName = user.DisplayName.RemoveMarks();
                 
                 var result = await _userManager.CreateAsync(user, model.Password);
 
@@ -103,7 +107,7 @@ namespace PhimStrong.Areas.Identity.Controllers
 
         [HttpGet]
         [Route("/login")]
-        public async Task<IActionResult> Login()
+        public async Task<IActionResult> Login(string? returnUrl = null)
         {
             if (User.Identity.IsAuthenticated)
             {
@@ -115,7 +119,7 @@ namespace PhimStrong.Areas.Identity.Controllers
 
         [HttpPost]
         [Route("/login")]
-        public async Task<IActionResult> Login([FromForm] LoginModel model, [FromRoute] string? returnUrl = null)
+        public async Task<IActionResult> Login([FromForm] LoginModel model, string? returnUrl = null)
         {
             returnUrl ??= Url.Action("Index", "Home", new { area = "" });
 
@@ -351,6 +355,7 @@ namespace PhimStrong.Areas.Identity.Controllers
                 if (info.Principal.HasClaim(c => c.Type == ClaimTypes.Name))
                 {
                     user.DisplayName = info.Principal.FindFirstValue(ClaimTypes.Name);
+                    user.NormalizeDisplayName = user.DisplayName.RemoveMarks();
                 }
 
                 // get Email address from google account :
@@ -371,6 +376,10 @@ namespace PhimStrong.Areas.Identity.Controllers
                         return LocalRedirect(returnUrl);
                     }
                 }
+                else
+                {
+                    TempData["status"] = "Lỗi, Email đã tồn tại !";
+				}
 
                 return RedirectToAction("Login");
             }

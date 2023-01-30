@@ -9,7 +9,7 @@
 
 
 <div class="d-flex mt-4 mb-2" style="justify-content: space-between">
-    <h2>@ViewData["Title"]</h2>
+    <h2 class="text-success">@ViewData["Title"]</h2>
 
     <div>
         <ul class="d-flex flex-wrap-reverse align-items-center" style="list-style: none">
@@ -34,7 +34,7 @@
                 </div>
             </li>
             <li class="nav-item">
-                <form id="search-name-form" class="d-flex" method="get" asp-route-page="1">
+                <form id="search-name-form" class="d-flex" method="get" asp-area="Admin" asp-controller="User" asp-action="Index" asp-route-page="1">
                     <input name="filter" class="form-control me-sm-2" type="text" placeholder="Nhập tên">
                     <button id="search-name-btn" class="btn btn-secondary my-2 my-sm-0" type="submit">Search</button>
                 </form>
@@ -50,6 +50,7 @@
 
 @if(Model != null && Model.Count > 0)
 {
+    <p class="text-success">@TempData["TotalCount"] kết quả.</p>
     <table class="table table-hover">
         <thead>
             <tr class="table-info">
@@ -63,20 +64,10 @@
         <tbody>
             @foreach (var user in Model)
             {
-                string roleString = "";
-                var roles = await UserManager.GetRolesAsync(user);
-            
+                // thay đổi màu của row tùy theo role :
                 string rowColor = "table-dark";
-
-                // chuyển list các roles thành 1 string :
-                @foreach (var role in roles)
-                {
-                    roleString += role;
-
-                    // thay đổi màu của row tùy theo role :
-                    if (role == "Thủy Tổ") rowColor = "table-warning";
-                    else if (role == "Admin") rowColor = "table-danger";
-                }
+                if (user.RoleName == "Thủy Tổ") rowColor = "table-warning";
+                else if (user.RoleName == "Admin") rowColor = "table-danger";
 
                 <tr class="@rowColor">
                     <th scope="row">
@@ -84,7 +75,7 @@
                     </th>
                     <th class="overflow-hidden">@user.DisplayName</th>
                     <td class="d-md-table-cell d-none overflow-hidden">@user.Email</td>
-                    <td class="overflow-hidden">@roleString</td>
+                    <td class="overflow-hidden">@(user.RoleName ?? "")</td>
                     <td>
                         <a class="btn btn-success" asp-area="Admin" asp-controller="User" asp-action="Edit" asp-route-userid="@user.Id">Chỉnh sửa</a>
                     </td>

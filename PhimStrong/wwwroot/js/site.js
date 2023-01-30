@@ -9,3 +9,19 @@ $(document).ready(function () {
         $(this).find('.dropdown-menu').stop(true, true).delay(100).fadeOut(200);
     });
 });
+
+// scroll to top :
+$('#scroll-top-btn').click(function () {
+    $("html, body").animate({ scrollTop: 0 });
+});
+
+// Event search movie
+$('#search-form').submit(function (e) {
+    e.preventDefault();
+
+    var value = $(this).children('input').val().trim();
+    if (!value) return;
+
+    $(this).attr('action', "/Movie/" + value);
+    this.submit();
+});
