@@ -361,5 +361,30 @@ namespace PhimStrong.Controllers
 				Video = video
 			});
 		}
-    }
+
+		[HttpPost]
+		[Route("/Movie/IncreaseView")]
+		public async Task<JsonResult> IncreaseView(int id)
+		{
+			Movie? movie = await _db.Movies.FirstOrDefaultAsync(m => m.Id == id);
+
+			if (movie == null)
+			{
+				return Json("");
+			}
+
+			movie.View++;
+			try
+			{
+				_db.Movies.Update(movie);
+				await _db.SaveChangesAsync();
+			}
+			catch
+			{
+				return Json("");
+			}
+
+			return Json("");
+		}
+	}
 }

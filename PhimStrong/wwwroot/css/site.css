@@ -17,6 +17,18 @@ body {
     margin-bottom: 60px;
 }
 
+.divider:after,
+.divider:before {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: #eee;
+}
+
+.logo {
+    width: 100px;
+}
+
 .avatar {
     vertical-align: middle;
     width: 20px;

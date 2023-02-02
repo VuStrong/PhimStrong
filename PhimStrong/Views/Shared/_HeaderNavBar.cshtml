@@ -8,9 +8,11 @@
     var user = await UserManager.GetUserAsync(User);
 }
 
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark p-0">
     <div class="container-fluid">
-        <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">PhimStrong</a>
+        <a class="navbar-brand logo" asp-area="" asp-controller="Home" asp-action="Index">
+            <img src="/src/img/Logo/Logo.png" alt="PhimStrong" class="w-100"/>
+        </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarColor02" aria-controls="navbarColor02" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>

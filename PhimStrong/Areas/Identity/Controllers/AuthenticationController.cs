@@ -214,7 +214,7 @@ namespace PhimStrong.Areas.Identity.Controllers
             {
                 var user = await _userManager.FindByEmailAsync(model.Email);
 
-                if (user == null || !(await _userManager.IsEmailConfirmedAsync(user)))
+                if (user == null)
                 {
                     return RedirectToAction("ForgotPasswordConfirmation");
                 }
@@ -231,7 +231,7 @@ namespace PhimStrong.Areas.Identity.Controllers
                 await _emailSender.SendEmailAsync(
                     model.Email,
                     "Reset Password",
-                    $"Please reset your password by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+                    $"<a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>Ấn vào đây</a> để đặt lại mật khẩu của bạn.");
 
                 return RedirectToAction("ForgotPasswordConfirmation");
             }

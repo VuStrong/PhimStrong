@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PhimStrong.Data;
 
@@ -11,9 +12,10 @@ using PhimStrong.Data;
 namespace PhimStrong.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230202100132_UpdateCommentV2")]
+    partial class UpdateCommentV2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -34,7 +36,7 @@ namespace PhimStrong.Migrations
 
                     b.HasIndex("MoviesId");
 
-                    b.ToTable("CastMovie", (string)null);
+                    b.ToTable("CastMovie");
                 });
 
             modelBuilder.Entity("CategoryMovie", b =>
@@ -49,7 +51,7 @@ namespace PhimStrong.Migrations
 
                     b.HasIndex("MoviesId");
 
-                    b.ToTable("CategoryMovie", (string)null);
+                    b.ToTable("CategoryMovie");
                 });
 
             modelBuilder.Entity("DirectorMovie", b =>
@@ -64,7 +66,7 @@ namespace PhimStrong.Migrations
 
                     b.HasIndex("MoviesId");
 
-                    b.ToTable("DirectorMovie", (string)null);
+                    b.ToTable("DirectorMovie");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -212,7 +214,7 @@ namespace PhimStrong.Migrations
 
                     b.HasIndex("LikedUsersId");
 
-                    b.ToTable("MovieUser", (string)null);
+                    b.ToTable("MovieUser");
                 });
 
             modelBuilder.Entity("SharedLibrary.Models.Cast", b =>
@@ -242,7 +244,7 @@ namespace PhimStrong.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Casts", (string)null);
+                    b.ToTable("Casts");
                 });
 
             modelBuilder.Entity("SharedLibrary.Models.Category", b =>
@@ -266,7 +268,7 @@ namespace PhimStrong.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Categories", (string)null);
+                    b.ToTable("Categories");
                 });
 
             modelBuilder.Entity("SharedLibrary.Models.Comment", b =>
@@ -304,7 +306,7 @@ namespace PhimStrong.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Comments", (string)null);
+                    b.ToTable("Comments");
                 });
 
             modelBuilder.Entity("SharedLibrary.Models.Country", b =>
@@ -327,7 +329,7 @@ namespace PhimStrong.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Countries", (string)null);
+                    b.ToTable("Countries");
                 });
 
             modelBuilder.Entity("SharedLibrary.Models.Director", b =>
@@ -357,7 +359,7 @@ namespace PhimStrong.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Directors", (string)null);
+                    b.ToTable("Directors");
                 });
 
             modelBuilder.Entity("SharedLibrary.Models.Movie", b =>
@@ -427,7 +429,7 @@ namespace PhimStrong.Migrations
 
                     b.HasIndex("CountryId");
 
-                    b.ToTable("Movies", (string)null);
+                    b.ToTable("Movies");
                 });
 
             modelBuilder.Entity("SharedLibrary.Models.Tag", b =>
@@ -449,7 +451,7 @@ namespace PhimStrong.Migrations
 
                     b.HasIndex("MovieId");
 
-                    b.ToTable("Tags", (string)null);
+                    b.ToTable("Tags");
                 });
 
             modelBuilder.Entity("SharedLibrary.Models.User", b =>
@@ -559,7 +561,7 @@ namespace PhimStrong.Migrations
 
                     b.HasIndex("MovieId");
 
-                    b.ToTable("Videos", (string)null);
+                    b.ToTable("Videos");
                 });
 
             modelBuilder.Entity("CastMovie", b =>

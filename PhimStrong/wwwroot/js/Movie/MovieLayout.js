@@ -25,6 +25,27 @@
 			);
 		});
 
+		$('.delete-cmt-btn').click(function (e) {
+			e.preventDefault();
+
+			var deleteCmt = $(this);
+			var deleteUrl = deleteCmt.attr('href');
+			if (deleteUrl) {
+				$.post(
+					deleteUrl,
+					{},
+					function (data) {
+						if (data.success) {
+							toastr.success('Đã xóa comment này !');
+							deleteCmt.closest(".cmt-item").fadeOut().remove();
+						} else {
+							toastr.error('Có lỗi khi xóa comment này :((');
+						}
+					}
+				);
+			}
+		});
+
 		// add event to response comment button
 		$('.response-btn').click(function (e) {
 			e.preventDefault();

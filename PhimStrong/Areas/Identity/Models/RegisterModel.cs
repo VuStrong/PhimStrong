@@ -6,15 +6,15 @@ namespace PhimStrong.Areas.Identity.Models
     public class RegisterModel
     {
 #pragma warning disable
-        [Required]
+        [Required(ErrorMessage = "Chưa nhập tên :()")]
         [Display(Name = "Tên người dùng")]
         public string Name { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Chưa nhập Email :()")]
         [EmailAddress]
         public string Email { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Chưa nhập mật khẩu :()")]
         [StringLength(50, ErrorMessage = "{0} phải có độ dài tối thiểu {2} kí tự và tối đa {1} kí tự", MinimumLength = 6)]
         [DataType(DataType.Password)]
         [Display(Name = "Mật khẩu")]

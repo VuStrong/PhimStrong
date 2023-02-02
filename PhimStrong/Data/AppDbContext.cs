@@ -31,6 +31,6 @@ namespace PhimStrong.Data
                     entityType.SetTableName(tableName.Substring(6));
                 }
             }
-        }
+		}
     }
 }

@@ -22,5 +22,5 @@ namespace SharedLibrary.Models
 
         public virtual Comment? ResponseTo { get; set; }
         public virtual List<Comment>? Responses { get; set; }
-    }
+	}
 }

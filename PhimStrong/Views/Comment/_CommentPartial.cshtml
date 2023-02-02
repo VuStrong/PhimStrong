@@ -23,7 +23,11 @@
 					<p class="text-dark">@comment.Content</p>
 					<div>
 						<a href="#" class="me-2 like-btn">Thích</a>
-						<a href="#" class="response-btn">Phản hồi</a>
+						<a href="#" class="me-2 response-btn">Phản hồi</a>
+						@if (Model.IsAdmin) 
+						{
+							<a href="/Comment/DeleteComment?commentid=@comment.Id" class="delete-cmt-btn">Xóa</a>
+						}
 						<p class="text-dark d-inline mx-2 cmt-like-count">
 							<i class="bi bi-hand-thumbs-up-fill text-info"></i>
 							@comment.Like
@@ -56,6 +60,10 @@
 										<p class="text-dark">@resComment.Content</p>
 										<div>
 											<a href="#" class="me-2 like-btn">Thích</a>
+											@if (Model.IsAdmin)
+											{
+												<a href="/Comment/DeleteComment?commentid=@resComment.Id" class="delete-cmt-btn">Xóa</a>
+											}
 											<p class="text-dark d-inline mx-2 cmt-like-count">
 												<i class="bi bi-hand-thumbs-up-fill text-info"></i>
 												@resComment.Like
@@ -116,7 +124,11 @@ else
 					<p class="text-dark">@comment.Content</p>
 					<div>
 						<a href="#" class="me-2 like-btn">Thích</a>
-						<a href="#" class="response-btn">Phản hồi</a>
+						<a href="#" class="me-2 response-btn">Phản hồi</a>
+						@if (Model.IsAdmin)
+						{
+							<a href="/Comment/DeleteComment?commentid=@comment.Id" class="delete-cmt-btn">Xóa</a>
+						}
 						<p class="text-dark d-inline mx-2 cmt-like-count">
 							<i class="bi bi-hand-thumbs-up-fill text-info"></i>
 							@comment.Like
@@ -149,6 +161,10 @@ else
 									<p class="text-dark">@resComment.Content</p>
 									<div>
 										<a href="#" class="me-2 like-btn">Thích</a>
+										@if (Model.IsAdmin)
+										{
+													<a href="/Comment/DeleteComment?commentid=@resComment.Id" class="delete-cmt-btn">Xóa</a>
+										}
 										<p class="text-dark d-inline mx-2 cmt-like-count">
 											<i class="bi bi-hand-thumbs-up-fill text-info"></i>
 											@resComment.Like

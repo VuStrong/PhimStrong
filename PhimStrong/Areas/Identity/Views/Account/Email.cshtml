@@ -4,7 +4,7 @@
     TempData["currentNav"] = "Email";
 }
 
-<h3>@ViewData["Title"]</h3>
+<h3 class="text-success">@ViewData["Title"]</h3>
 <div class="row g-0">
     <div class="col px-5 py-3">
         <partial name="_StatusMessage" for="@TempData["status"]" />
@@ -44,8 +44,10 @@
 
 @section Scripts {
     <script src="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <partial name="/Views/Shared/_ValidationScriptsPartial.cshtml" />
     <script type="text/javascript">
         $('#email-verification').click(function () {
+            $(this).addClass('disabled');
             $('#status-text').text('Đang gửi ...');
 
             $.post(
@@ -53,13 +55,13 @@
                 function(data) {
                     if (data.success) {
                         $('#status-text').text('');
+                        $('#email-verification').removeClass('disabled');
                         toastr.success("Đã gửi mã xác thực !");
                     }
                 }
             );
-        });    
+        });
     </script>
 
-    <partial name="/Views/Shared/_ValidationScriptsPartial.cshtml" />
 }
 

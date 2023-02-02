@@ -6,11 +6,11 @@ namespace PhimStrong.Areas.Identity.Models
     public class LoginModel
     {
 #pragma warning disable
-        [Required]
+        [Required(ErrorMessage = "Chưa nhập Email :()")]
         [EmailAddress]
         public string Email { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Chưa nhập mật khẩu :()")]
         [DataType(DataType.Password)]
         [Display(Name = "Mật khẩu")]
         public string Password { get; set; }

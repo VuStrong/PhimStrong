@@ -4,73 +4,71 @@
     ViewData["Title"] = "Đăng ký";
 }
 
-<h1>@ViewData["Title"]</h1>
+<h1 class="text-success">@ViewData["Title"]</h1>
+<section>
+    <partial name="_StatusMessage" for="@TempData["status"]" />
+    <div class="container py-5 h-100">
+        <div class="row d-flex align-items-center justify-content-center h-100">
+            <div class="col-md-8 col-lg-7 col-xl-6">
+                <img src="/src/img/Logo/PhimStrong_Logo.png"
+                     class="img-fluid" alt="Phone image">
+            </div>
+            <div class="col-md-7 col-lg-5 col-xl-5 offset-xl-1">
+                <form id="account" method="post">
+                    <div asp-validation-summary="All" class="text-danger"></div>
 
-<div class="row">
-    <div class="col-md-4">
-        <form id="registerForm" method="post">
-            <h2>Tạo tài khoản mới.</h2>
-            <hr />
-            <div asp-validation-summary="All" class="text-danger"></div>
-            <div class="form-floating">
-                <input asp-for="Name" class="form-control" autocomplete="username" aria-required="true" />
-                <label asp-for="Name"></label>
-                <span asp-validation-for="Name" class="text-danger"></span>
-            </div>
-            <div class="form-floating">
-                <input asp-for="Email" class="form-control" autocomplete="email" aria-required="true" />
-                <label asp-for="Email"></label>
-                <span asp-validation-for="Email" class="text-danger"></span>
-            </div>
-            <div class="form-floating">
-                <input asp-for="Password" class="form-control" autocomplete="new-password" aria-required="true" />
-                <label asp-for="Password"></label>
-                <span asp-validation-for="Password" class="text-danger"></span>
-            </div>
-            <div class="form-floating">
-                <input asp-for="ConfirmPassword" class="form-control" autocomplete="new-password" aria-required="true" />
-                <label asp-for="ConfirmPassword"></label>
-                <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
-            </div>
-            <button id="registerSubmit" type="submit" class="w-100 btn btn-lg btn-primary">Đăng ký</button>
+                    <div class="form-outline mb-4">
+                        <label asp-for="Name"></label>
+                        <input asp-for="Name" class="form-control" autocomplete="username" aria-required="true" />
+                        <span asp-validation-for="Name" class="text-danger"></span>
+                    </div>
 
-            <div>
-                <p>
-                    <a asp-area="Identity" asp-controller="Authentication" asp-action="Login">
-                        Đã có tài khoản?, ấn đây để đăng nhập.
-                    </a>
-                </p>
+                    <div class="form-outline mb-4">
+                        <label asp-for="Email"></label>
+                        <input asp-for="Email" class="form-control" autocomplete="email" aria-required="true" />
+                        <span asp-validation-for="Email" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-outline mb-4">
+                        <label asp-for="Password"></label>
+                        <input asp-for="Password" class="form-control" autocomplete="new-password" aria-required="true" />
+                        <span asp-validation-for="Password" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-outline mb-4">
+                        <label asp-for="ConfirmPassword"></label>
+                        <input asp-for="ConfirmPassword" class="form-control" autocomplete="new-password" aria-required="true" />
+                        <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-4">
+                        <a asp-area="Identity" asp-controller="Authentication" asp-action="Login">
+                            Đã có tài khoản?, ấn đây để đăng nhập.
+                        </a>
+                    </div>
+
+                    <!-- Submit button -->
+                    <button type="submit" class="btn btn-success w-100 btn-lg btn-block">Đăng ký</button>
+
+                    <div class="divider d-flex align-items-center my-4">
+                        <p class="text-center fw-bold mx-3 mb-0 text-muted">OR</p>
+                    </div>
+
+                </form>
+                <form id="external-account" method="post" asp-action="ExternalLogin">
+                    <button type="submit" class="btn btn-primary btn-lg" name="provider" value="Facebook"
+                            style="background-color: #3b5998" title="Sử dụng tài khoản Facebook của bạn để đăng nhập.">
+                        <i class="bi bi-facebook"></i>Đăng nhập với Facebook
+                    </button>
+                    <button type="submit" class="btn btn-primary btn-lg" name="provider" value="Google"
+                            style="background-color: #55acee" title="Sử dụng tài khoản Google của bạn để đăng nhập.">
+                        <i class="bi bi-google"></i>Đăng nhập với Google
+                    </button>
+                </form>
             </div>
-        </form>
+        </div>
     </div>
-    <div class="col-md-6 col-md-offset-2">
-        <section>
-            <h3>Hoặc đăng nhập bằng :</h3>
-            <hr />
-            @{
-                if ((Model.ExternalLogins?.Count ?? 0) == 0)
-                {
-  
-                }
-                else
-                {
-                    <form id="external-account" method="post" class="form-horizontal" asp-action="ExternalLogin">
-                        <div>
-                            <p>
-                                @foreach (var provider in Model.ExternalLogins)
-                                {
-                                    <button type="submit" class="btn btn-primary" name="provider" value="@provider.Name" title="Sử dụng tài khoản @provider.DisplayName của bạn để đăng nhập.">
-                                        @provider.DisplayName
-                                    </button>
-                                }
-                            </p>
-                        </div>
-                    </form>
-                }
-            }
-        </section>
-    </div>
-</div>
+</section>
 
 @section Scripts {
     <partial name="/Views/Shared/_ValidationScriptsPartial.cshtml" />

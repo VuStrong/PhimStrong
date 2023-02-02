@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -54,7 +55,8 @@ namespace PhimStrong.Controllers
 				CommentCount = movie.Comments != null ? movie.Comments.Count : 0,
 				RenderCommentOnly = false,
 				UserAvatar = user != null ? user.Avatar : null,
-				MovieId = movie.Id
+				MovieId = movie.Id,
+				IsAdmin = user != null && user.RoleName != null && (user.RoleName == "Admin" || user.RoleName == "Thủy Tổ")
 			};
 
 			return this.PartialView("_CommentPartial", model);
@@ -69,7 +71,9 @@ namespace PhimStrong.Controllers
 
 			if (page <= 0) page = 1;
 
-			List<Comment>? comments = movie.Comments != null ?
+            User user = await _userManager.GetUserAsync(User);
+
+            List<Comment>? comments = movie.Comments != null ?
 				movie.Comments.Where(c => c.ResponseTo == null)
 				.OrderByDescending(c => c.CreatedAt)
 				.Skip((page - 1) * CommonConstants.COMMENTS_PER_PAGE)
@@ -80,7 +84,8 @@ namespace PhimStrong.Controllers
 			{
 				Comments = comments,
 				RenderCommentOnly = true,
-			};
+                IsAdmin = user != null && user.RoleName != null && (user.RoleName == "Admin" || user.RoleName == "Thủy Tổ")
+            };
 
 			return this.PartialView("_CommentPartial", model);
 		}
@@ -176,5 +181,38 @@ namespace PhimStrong.Controllers
 
 			return Json(new {success = true});
 		}
-	}
+
+        [HttpPost]
+        [Route("/Comment/DeleteComment")]
+		[Authorize(Roles = $"{RoleConstant.ADMIN}, {RoleConstant.THUY_TO}")]
+		public async Task<JsonResult> DeleteComment(int commentid)
+        {
+            Comment? comment = await _db.Comments.FirstOrDefaultAsync(c => c.Id == commentid);
+
+            if (comment == null)
+            {
+                return Json(new { success = false });
+            }
+
+            try
+            {
+				if (comment.Responses != null && comment.Responses.Count > 0)
+				{
+					foreach (var cmt in comment.Responses)
+					{
+						_db.Comments.Remove(cmt);
+					}
+				}
+
+                _db.Comments.Remove(comment);
+                await _db.SaveChangesAsync();
+            }
+            catch
+            {
+                return Json(new { success = false });
+            }
+
+            return Json(new { success = true });
+        }
+    }
 }

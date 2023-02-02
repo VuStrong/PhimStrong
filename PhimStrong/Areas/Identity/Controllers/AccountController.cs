@@ -51,7 +51,8 @@ namespace PhimStrong.Areas.Identity.Controllers
         }
 
         [HttpPost]
-		public async Task<IActionResult> ChangePassword(ChangePasswordModel model)
+        [Route("/Account/ChangePassword")]
+        public async Task<IActionResult> ChangePassword(ChangePasswordModel model)
 		{
 			var user = await _userManager.GetUserAsync(User);
 			if (user == null)
@@ -117,6 +118,25 @@ namespace PhimStrong.Areas.Identity.Controllers
 
                 if (result.Succeeded)
                 {
+                    string token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                    token = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token));
+
+                    string callbackUrl = Url.Action("ConfirmEmail", "Authentication",
+                            new
+                            {
+                                area = "Identity",
+                                token = token,
+                                userid = user.Id
+                            },
+                            protocol: Request.Scheme
+                        );
+
+                    _emailSender.SendEmailAsync(
+                        user.Email,
+                        "Xác thực Email",
+                        $"Yô người mới !, click vào <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>đây</a> để xác thực Email của bạn nhé :)"
+                    );
+
                     TempData["success"] = "Đã thay đổi Email";
                     TempData["status"] = "Đã thay đổi Email, hãy kiểm tra hòm thư Email để xác thực.";
                 }
@@ -152,7 +172,6 @@ namespace PhimStrong.Areas.Identity.Controllers
                 "Xác thực Email",
                 $"Yô !, click vào <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>đây</a> để xác thực Email của bạn nhé :)"
             );
-
 
             return Json(new { success = true });
         }
