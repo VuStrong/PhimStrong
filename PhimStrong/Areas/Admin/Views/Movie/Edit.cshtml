@@ -37,26 +37,26 @@
     <div id="edit-movie-form">
         <div asp-validation-summary="All" class="text-danger"></div>
         <div class="form-group">
-            <label asp-for="Name">Tên phim</label>
+            <label class="text-success" asp-for="Name">Tên phim</label>
             <input id="movie-name" asp-for="Name" class="form-control" placeholder="Nhập tên phim" />
             <span id="movie-name-valid" class="text-danger"></span>
         </div>
         <div class="form-group mt-3">
-            <label asp-for="TranslateName">Tên phim dịch sang Tiếng Việt</label>
+            <label class="text-success" asp-for="TranslateName">Tên phim dịch sang Tiếng Việt</label>
             <input id="movie-translate-name" asp-for="TranslateName" class="form-control" placeholder="Nhập tên" />
             <span id="movie-translate-name-valid" class="text-danger"></span>
         </div>
         <div class="form-group mt-3">
-            <label asp-for="Description">Nội dung</label>
+            <label class="text-success" asp-for="Description">Nội dung</label>
             <textarea id="movie-desc" asp-for="Description" class="form-control" placeholder="Nhập nội dung"></textarea>
             <span asp-validation-for="Description" class="text-danger"></span>
         </div>
         <div class="form-group mt-3">
-            <label asp-for="Length">Thời lượng phim(phút)</label>
+            <label class="text-success" asp-for="Length">Thời lượng phim(phút)</label>
             <input id="movie-length" type="number" asp-for="Length" class="form-control" />
         </div>
         <div class="form-group mt-3">
-            <label asp-for="Rating">Điểm Rating</label>
+            <label class="text-success" asp-for="Rating">Điểm Rating</label>
             <input id="movie-rating" type="text" asp-for="Rating" class="form-control" />
             <span id="movie-rating-valid" class="text-danger"></span>
         </div>
@@ -66,47 +66,51 @@
                 style="width: 200px; height:200px;" />
         </div>
         <div class="form-group mt-3">
-            <label asp-for="ImageFile">Thay ảnh</label>
+            <label class="text-success" asp-for="ImageFile">Thay ảnh</label> <span class="text-decoration-underline">( chọn ảnh đừng quá 200KB nhé :(( )</span>
             <input id="movie-img" asp-for="ImageFile" type="file" class="form-control">
             <span id="movie-image-valid" class="text-danger"></span>
         </div>
         <div class="form-group mt-5 pb-2 border-bottom">
-            <label asp-for="ReleaseDate">Nhập ngày ra mắt</label>
+            <label class="text-success" asp-for="ReleaseDate">Nhập ngày ra mắt</label>
             <input id="movie-date" asp-for="ReleaseDate"/>
         </div>
         <div class="d-flex align-items-center form-group mt-3 pb-2 border-bottom">
-            <label class="me-3 mt-3 mb-3">Thể loại : </label>
+            <label class="me-3 mt-3 mb-3 text-success">Thể loại : </label>
             <textarea id="select-category" asp-for="CategoryToString" disabled></textarea>
             <button onclick="showModalCategory()" class="btn btn-primary ms-2">Chọn</button>
         </div>
         <div class="d-flex align-items-center form-group mt-3 pb-2 border-bottom">
-            <label class="me-3 mt-3 mb-3">Diễn viên : </label>
+            <label class="me-3 mt-3 mb-3 text-success">Diễn viên : </label>
             <textarea id="select-cast" asp-for="CastToString" disabled></textarea>
             <button onclick="showModalCast()" class="btn btn-primary ms-2">Chọn</button>
         </div>
         <div class="d-flex align-items-center form-group mt-3 pb-2 border-bottom">
-            <label class="me-3 mt-3 mb-3">Đạo diễn : </label>
+            <label class="me-3 mt-3 mb-3 text-success">Đạo diễn : </label>
             <textarea id="select-director" asp-for="DirectorToString" disabled></textarea>
             <button onclick="showModalDirector()" class="btn btn-primary ms-2">Chọn</button>
         </div>
         <div class="form-group mt-3 pb-2 border-bottom">
-            <label class="me-3 mt-3 mb-3">Quốc gia : </label>
+            <label class="me-3 mt-3 mb-3 text-success">Quốc gia : </label>
             <select id="select-country" asp-items="@countries" asp-for="Country"></select>
         </div>
         <div class="form-group mt-3 pb-2 border-bottom">
-            <label class="me-3 mt-3 mb-3">Trailer : (chỉ dán url video từ youtube)</label>
+            <label class="me-3 mt-3 mb-3 text-success">Trailer : (chỉ dán url video từ youtube)</label>
+            <p>Link phải có dạng https://www.youtube.com/embed/(video-id), trong đó video-id lấy từ Url của video trên youtube.</p>
             <input id="movie-trailer" type="text" placeholder="Dán trailer url vào đây." asp-for="Trailer" />
         </div>
         <div class="form-group mt-3 pb-2 border-bottom">
-            <label class="me-3 mt-3 mb-3">Trạng thái : </label>
+            <label class="me-3 mt-3 mb-3 text-success">Trạng thái : </label>
             <select id="status-list" asp-items="@statusList" asp-for="Status"></select>
             <span id="status-list-valid" class="text-danger"></span>
         </div>
         <div class="d-flex flex-wrap align-items-center form-group mt-3 pb-2 border-bottom">
-            <label asp-for="Tags" class="me-3 mt-3 mb-3">Nhập tags : (các Tag cách nhau bằng dấu , nhé :^)</label>
+            <label asp-for="Tags" class="me-3 mt-3 mb-3 text-success">Nhập tags : (các Tag cách nhau bằng dấu , nhé :^)</label>
             <textarea id="select-tag" asp-for="Tags"></textarea>
         </div>
         <div class="form-group mt-3">
+            <p class="text-success">Link video phải có dạng :</p>
+            <p> https://www.googleapis.com/drive/v3/files/(video-id)? alt=media&key= AIzaSyALAnovaVGD6gFejFLClsUB8Ho68ztlTPM</p>
+            <p>Trong đó video-id là id của video lấy từ gg drive, nhớ xóa dấu cách :((</p>
             <label class="me-3 mt-3 mb-3">Loại : </label>
             <select id="type-list" asp-items="@typeList" asp-for="Type"></select>
             <span id="type-list-valid" class="text-danger"></span>

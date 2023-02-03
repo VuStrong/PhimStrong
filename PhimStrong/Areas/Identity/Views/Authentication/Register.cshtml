@@ -41,14 +41,14 @@
                         <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
                     </div>
 
-                    <div class="mb-4">
+                    <!-- Submit button -->
+                    <button type="submit" class="btn btn-success w-100 btn-lg btn-block mb-4">Đăng ký</button>
+
+                    <div>
                         <a asp-area="Identity" asp-controller="Authentication" asp-action="Login">
                             Đã có tài khoản?, ấn đây để đăng nhập.
                         </a>
                     </div>
-
-                    <!-- Submit button -->
-                    <button type="submit" class="btn btn-success w-100 btn-lg btn-block">Đăng ký</button>
 
                     <div class="divider d-flex align-items-center my-4">
                         <p class="text-center fw-bold mx-3 mb-0 text-muted">OR</p>

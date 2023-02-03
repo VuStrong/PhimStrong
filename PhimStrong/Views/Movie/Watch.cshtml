@@ -1,6 +1,7 @@
 ﻿@model WatchMovieModel
 @{
 	Layout = "/Views/Movie/_Layout.cshtml";
+	ViewData["MovieId"] = Model.Movie.Id;
 
 	int currentVideoEpi = (int)(TempData["episode"] ?? "1");
 	

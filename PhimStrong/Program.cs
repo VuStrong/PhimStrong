@@ -40,21 +40,10 @@ builder.Services.ConfigureApplicationCookie(options =>
 
 // Authentication services :
 builder.Services.AddAuthentication()
-    .AddGoogle(googleOptions => 
-    { 
-        // Thiết lập ClientID và ClientSecret để truy cập API google
-        googleOptions.ClientId = builder.Configuration["Authentication:Google:ClientId"];
-        googleOptions.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
-        // Cấu hình Url callback lại từ Google (không thiết lập thì mặc định là /signin-google)
-        googleOptions.CallbackPath = "/login-google";
-
-        // Map the external picture claim to the internally used image claim
-        googleOptions.ClaimActions.MapJsonKey("image", "picture");
-    })     
     .AddFacebook(facebookOptions => {
-        facebookOptions.AppId = builder.Configuration["Authentication:Facebook:AppId"];                                 
+        facebookOptions.AppId = builder.Configuration["Authentication:Facebook:AppId"];
         facebookOptions.AppSecret = builder.Configuration["Authentication:Facebook:AppSecret"];
-		facebookOptions.CallbackPath = "/dang-nhap-facebook";
+        facebookOptions.CallbackPath = "/dang-nhap-facebook";
 
         facebookOptions.Fields.Add("picture");
         facebookOptions.Events = new OAuthEvents
@@ -63,11 +52,22 @@ builder.Services.AddAuthentication()
             {
                 ClaimsIdentity? identity = context.Principal != null ? (ClaimsIdentity?)context.Principal.Identity : null;
                 string profileImg = context.User.GetProperty("picture").GetProperty("data").GetProperty("url").ToString();
-                if(identity != null) identity.AddClaim(new Claim("image", profileImg));
+                if (identity != null) identity.AddClaim(new Claim("image", profileImg));
                 return Task.CompletedTask;
             }
         };
-    });  
+    })
+    .AddGoogle(googleOptions =>
+    {
+        // Thiết lập ClientID và ClientSecret để truy cập API google
+        googleOptions.ClientId = builder.Configuration["Authentication:Google:ClientId"];
+        googleOptions.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
+        // Cấu hình Url callback lại từ Google (không thiết lập thì mặc định là /signin-google)
+        googleOptions.CallbackPath = "/login-google";
+
+        // Map the external picture claim to the internally used image claim
+        googleOptions.ClaimActions.MapJsonKey("image", "picture");
+    }); 
 
 // Truy cập IdentityOptions
 builder.Services.Configure<IdentityOptions>(options =>

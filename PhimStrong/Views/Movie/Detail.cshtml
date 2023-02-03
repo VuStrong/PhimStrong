@@ -3,6 +3,7 @@
 	Layout = "/Views/Movie/_Layout.cshtml";
 	ViewData["Title"] = Model.TranslateName;
 	ViewData["MovieName"] = Model.TranslateName;
+	ViewData["MovieId"] = Model.Id;
 
 	int movieYear = Model.ReleaseDate != null ? Model.ReleaseDate.Value.Year : 0;
 	string movieCountry = Model.Country != null ? Model.Country.Name : "";

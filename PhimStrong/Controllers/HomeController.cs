@@ -23,16 +23,19 @@ namespace PhimStrong.Controllers
 
             Random random = new();
             int randomNum;
-            for (int i = 0; i < 10; i++)
+            if (count > 0)
             {
-                randomNum = random.Next(0, count);
-
-                while (randomMovies.Contains(movies[randomNum]))
+                for (int i = 0; i < 10; i++)
                 {
-					randomNum = random.Next(0, count);
-				}
+                    randomNum = random.Next(0, count);
 
-                randomMovies.Add(movies[randomNum]);
+                    while (randomMovies.Contains(movies[randomNum]))
+                    {
+                        randomNum = random.Next(0, count);
+                    }
+
+                    randomMovies.Add(movies[randomNum]);
+                }
             }
 
             ViewData["MoviesSlide"] = randomMovies;
