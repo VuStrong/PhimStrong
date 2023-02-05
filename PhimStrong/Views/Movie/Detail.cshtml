@@ -13,32 +13,37 @@
 
 <div style="background-image: url(@(Model.Image ?? "/src/img/UserAvatars/default_avatar.png"))"
 	 class="movie-detail-bg mb-2">
-	<a asp-area="" asp-controller="Movie" asp-action="Watch" asp-route-id="@Model.Id" asp-route-episode="1" 
-		class="d-block position-absolute play-btn">
-		<i class="bi bi-play-circle-fill"></i>
-	</a>
+	 @if (Model.Status != "Trailer")
+	 {
+		<a asp-area="" asp-controller="Movie" asp-action="Watch" asp-route-id="@Model.Id" asp-route-episode="1" 
+			class="d-block position-absolute play-btn">
+			<i class="bi bi-play-circle-fill"></i>
+		</a>
+	 }
 	<div class="position-absolute p-3 w-100 background-blur" style="bottom: 0;">
 		<h3 class="mb-3 d-block text-truncate text-success">@Model.TranslateName</h3>
 		<h5 class="mb-3 d-block text-truncate">@Model.Name</h5>
 		<div>
-			<a asp-area="" asp-controller="Movie" asp-action="Watch" asp-route-id="@Model.Id" asp-route-episode="1"
-				title="Xem phim" class="btn btn-success @(Model.Status == "Trailer" ? "disabled" : "")">
-				<i class="bi bi-play-circle-fill"></i>
-				Xem phim
-			</a>
+			@if (Model.Status != "Trailer")
+			{
+				<a asp-area="" asp-controller="Movie" asp-action="Watch" asp-route-id="@Model.Id" asp-route-episode="1"
+					title="Xem phim" class="btn btn-success">
+					<i class="bi bi-play-circle-fill"></i> Xem phim
+				</a>
+			}
+			else
+			{
+				<a title="Xem phim" class="btn btn-danger disabled">
+					<i class="bi bi-play-circle-fill"></i> Chưa có
+				</a>
+			}
 		</div>
 	</div>
 </div>
 
 <!-- Movie Info -->
 <div class="mb-3 py-3 px-3" style="background-color: #282828">
-	<div class="d-flex mb-3 like-movie">
-		@*			<a id="like-movie-btn" href="#" title="thích" class="btn btn-success movie-detail-btn">
-		<i class="bi bi-hand-thumbs-up-fill"></i>
-		<strong>Thích</strong>
-		<span class="ms-1">@(Model.LikedUsers != null ? Model.LikedUsers.Count : 0)</span>
-		</a>*@
-	</div>
+	<div class="d-flex mb-3 like-movie"></div>
 	<div class="row mb-3">
 		<div class="col-lg-4">
 			<div class="mb-2">
@@ -151,7 +156,7 @@
 @section Scripts{
 	<script src="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 	<script type="text/javascript">
-		var movieid = @Model.Id;
+		var movieid = '@Model.Id';
 	</script>
 	<script src="/js/Movie/MovieDetail.js"></script>
 }

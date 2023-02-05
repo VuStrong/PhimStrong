@@ -8,9 +8,9 @@ namespace SharedLibrary.Models
     public class Movie
     {
 #pragma warning disable
-        [Required]
-        [Key]
-        public int Id { get; set; }
+        public string Id { get; set; }
+        
+        public int IdNumber { get; set; }
 
         [Required(ErrorMessage = "Chưa nhập tên phim :()")]
         public string Name { get; set; }

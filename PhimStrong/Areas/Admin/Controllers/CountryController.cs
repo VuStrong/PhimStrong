@@ -1,10 +1,12 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using PhimStrong.Data;
 using SharedLibrary.Constants;
 using SharedLibrary.Helpers;
 using SharedLibrary.Models;
 using System.Data;
+using System.IO;
 using System.Text.RegularExpressions;
 
 namespace PhimStrong.Areas.Admin.Controllers
@@ -60,7 +62,7 @@ namespace PhimStrong.Areas.Admin.Controllers
                             TempData["FilterMessage"] = "tên là " + filterValue;
                             filterValue = filterValue.RemoveMarks();
 
-                            countries = _db.Countries.Where(m =>
+                            countries = _db.Countries.ToList().Where(m =>
                                 (m.NormalizeName ?? "").Contains(filterValue)
                             ).ToList();
 
@@ -108,6 +110,9 @@ namespace PhimStrong.Areas.Admin.Controllers
                 return View();
             }
 
+            country.IdNumber = _db.Countries.Any() ? _db.Countries.Max(x => x.IdNumber) + 1 : 1;
+            country.Id = "country" + country.IdNumber.ToString();
+
             // chỉnh lại format tên :
             country.Name = Regex.Replace(country.Name.ToLower().Trim(), @"(^\w)|(\s\w)", m => m.Value.ToUpper());
             country.NormalizeName = country.Name.RemoveMarks();
@@ -128,7 +133,7 @@ namespace PhimStrong.Areas.Admin.Controllers
         }
 
         [HttpGet]
-        public IActionResult Edit(int countryid)
+        public IActionResult Edit(string countryid)
         {
             var country = _db.Countries.FirstOrDefault(c => c.Id == countryid);
 
@@ -141,7 +146,7 @@ namespace PhimStrong.Areas.Admin.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Edit(int countryid, Country country)
+        public async Task<IActionResult> Edit(string countryid, Country country)
         {
             if (country == null)
             {
@@ -185,7 +190,7 @@ namespace PhimStrong.Areas.Admin.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Delete(int countryid)
+        public async Task<IActionResult> Delete(string countryid)
         {
             var country = _db.Countries.FirstOrDefault(c => c.Id == countryid);
 

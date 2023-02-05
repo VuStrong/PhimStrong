@@ -31,8 +31,8 @@ body {
 
 .avatar {
     vertical-align: middle;
-    width: 20px;
-    height: 20px;
+    width: 30px;
+    height: 30px;
     border-radius: 50%;
 }
 
@@ -246,6 +246,13 @@ body {
     height: 200px;
 }
 
+#movie-player p {
+    font-size: 20px;
+    top: 50%;
+    left: 50%;
+    transform: translateX(-50%) translateY(-50%);
+}
+
 /* Comment */
 .cmt-user-name strong:hover {
     text-decoration: underline !important;
@@ -275,6 +282,11 @@ body {
 @media (min-width: 992px) {
     .movie-container .movie-item-large {
         width: 40%;
+    }
+
+    .avatar {
+        width: 20px;
+        height: 20px;
     }
 
     .movie-row-6 {

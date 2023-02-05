@@ -38,7 +38,6 @@
   <ItemGroup>
     <Folder Include="Areas\Admin\Views\Shared\" />
     <Folder Include="mailssave\" />
-    <Folder Include="Migrations\" />
     <Folder Include="wwwroot\src\img\CastAvatars\" />
     <Folder Include="wwwroot\src\img\DirectorAvatars\" />
     <Folder Include="wwwroot\src\img\MovieImages\" />

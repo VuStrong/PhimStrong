@@ -1,10 +1,12 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using PhimStrong.Data;
 using SharedLibrary.Constants;
 using SharedLibrary.Helpers;
 using SharedLibrary.Models;
 using System.Data;
+using System.IO;
 using System.Text.RegularExpressions;
 
 namespace PhimStrong.Areas.Admin.Controllers
@@ -90,7 +92,7 @@ namespace PhimStrong.Areas.Admin.Controllers
         }
 
         [HttpPost]
-        public IActionResult Create(Category category)
+        public async Task<IActionResult> Create(Category category)
         {
             if (category == null)
             {
@@ -104,6 +106,9 @@ namespace PhimStrong.Areas.Admin.Controllers
                 return View();
             }
 
+            category.IdNumber = _db.Categories.Any() ? _db.Categories.Max(x => x.IdNumber) + 1 : 1;
+            category.Id = "cate" + category.IdNumber.ToString();
+
             // chỉnh lại format tên :
             category.Name = category.Name[0].ToString().ToUpper() + category.Name.Substring(1).ToLower();
             category.NormalizeName = category.Name.RemoveMarks();
@@ -111,7 +116,7 @@ namespace PhimStrong.Areas.Admin.Controllers
             try
             {
                 _db.Categories.Add(category);
-                _db.SaveChanges();
+                await _db.SaveChangesAsync();
             }
             catch (Exception e)
             {
@@ -124,7 +129,7 @@ namespace PhimStrong.Areas.Admin.Controllers
         }
 
         [HttpGet]
-        public IActionResult Edit(int cateid)
+        public IActionResult Edit(string cateid)
         {
             var category = _db.Categories.FirstOrDefault(c => c.Id == cateid);
 
@@ -137,7 +142,7 @@ namespace PhimStrong.Areas.Admin.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Edit(int cateid, Category category)
+        public async Task<IActionResult> Edit(string cateid, Category category)
         {
             if (category == null)
             {
@@ -178,7 +183,7 @@ namespace PhimStrong.Areas.Admin.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Delete(int cateid)
+        public async Task<IActionResult> Delete(string cateid)
         {
             var category = _db.Categories.FirstOrDefault(c => c.Id == cateid);
 

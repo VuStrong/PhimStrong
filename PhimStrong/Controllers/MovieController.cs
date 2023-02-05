@@ -221,7 +221,7 @@ namespace PhimStrong.Controllers
         }
 
         [HttpGet]
-		public async Task<IActionResult> Detail(int id)
+		public async Task<IActionResult> Detail(string id)
 		{
 			Movie? movie = await _db.Movies.FirstOrDefaultAsync(m => m.Id == id);
 
@@ -235,7 +235,7 @@ namespace PhimStrong.Controllers
 
 		[HttpGet]
 		[Route("/Movie/GetRelateMovies")]
-		public async Task<IActionResult> GetRelateMovies(int movieid)
+		public async Task<IActionResult> GetRelateMovies(string movieid)
 		{
 			Movie? movie = await _db.Movies.FirstOrDefaultAsync(m => m.Id == movieid);
 
@@ -260,9 +260,12 @@ namespace PhimStrong.Controllers
 			// if less than 10 movies, add more
 			Random random = new();
 			int ran;
+			int count = movieList.Count;
 			while (movies.Count < 10)
 			{
-				ran = random.Next(0, movieList.Count);
+				if (movies.Count >= count) break;
+
+				ran = random.Next(0, count);
 				if (!movies.Contains(movieList[ran]))
 				{
 					movies.Add(movieList[ran]);
@@ -274,7 +277,7 @@ namespace PhimStrong.Controllers
 
 		[HttpGet]
 		[Route("/Movie/GetLikeButton")]
-		public async Task<string> GetLikeButton(int movieid)
+		public async Task<string> GetLikeButton(string movieid)
 		{
 			Movie? movie = await _db.Movies.FirstOrDefaultAsync(m => m.Id == movieid);
 
@@ -298,7 +301,7 @@ namespace PhimStrong.Controllers
 
 		[HttpPost]
 		[Route("/Movie/LikeMovie")]
-		public async Task<JsonResult> LikeMovie(int movieid)
+		public async Task<JsonResult> LikeMovie(string movieid)
 		{
 			Movie? movie = await _db.Movies.FirstOrDefaultAsync(m => m.Id == movieid);
 
@@ -341,7 +344,7 @@ namespace PhimStrong.Controllers
 
 		[HttpGet]
 		[Route("/Movie/Watch/{id}/{episode?}")]
-		public async Task<IActionResult> Watch(int id, int episode)
+		public async Task<IActionResult> Watch(string id, int episode)
 		{
 			Movie? movie = await _db.Movies.FirstOrDefaultAsync(m => m.Id == id);
 
@@ -364,7 +367,7 @@ namespace PhimStrong.Controllers
 
 		[HttpPost]
 		[Route("/Movie/IncreaseView")]
-		public async Task<JsonResult> IncreaseView(int id)
+		public async Task<JsonResult> IncreaseView(string id)
 		{
 			Movie? movie = await _db.Movies.FirstOrDefaultAsync(m => m.Id == id);
 

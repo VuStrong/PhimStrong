@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using PhimStrong.Data;
 using PhimStrong.Models;
 using SharedLibrary.Models;
@@ -27,6 +28,7 @@ namespace PhimStrong.Controllers
             {
                 for (int i = 0; i < 10; i++)
                 {
+                    if (i >= count) break;
                     randomNum = random.Next(0, count);
 
                     while (randomMovies.Contains(movies[randomNum]))

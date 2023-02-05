@@ -11,6 +11,7 @@
 <div class="mt-4">
     <form method="post">
         <div asp-validation-summary="All" class="text-danger"></div>
+        <input asp-for="Id" hidden/>
         <div class="form-group">
             <label asp-for="Name">Tên thể loại</label>
             <input asp-for="Name" class="form-control" placeholder="Nhập tên thể loại">

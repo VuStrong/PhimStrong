@@ -5,7 +5,8 @@ namespace PhimStrong.Areas.Admin.Models
 {
     public class MovieModel
     {
-        public int Id { get; set; }
+#nullable disable
+        public string Id { get; set; }
 
 #pragma warning disable
         [Required(ErrorMessage = "Chưa nhập tên phim :()")]

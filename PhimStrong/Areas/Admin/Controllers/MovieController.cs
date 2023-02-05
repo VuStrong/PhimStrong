@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using PhimStrong.Areas.Admin.Models;
 using PhimStrong.Data;
 using SharedLibrary.Constants;
@@ -61,7 +62,7 @@ namespace PhimStrong.Areas.Admin.Controllers
                             TempData["FilterMessage"] = "tên là " + filterValue;
                             filterValue = filterValue.RemoveMarks();
 
-                            movies = _db.Movies.Where(m =>
+                            movies = _db.Movies.ToList().Where(m =>
                                 (m.NormalizeTranslateName ?? "").Contains(filterValue) ||
                                 (m.NormalizeName ?? "").Contains(filterValue)
                             ).OrderByDescending(m => m.CreatedDate).ToList();
@@ -103,8 +104,11 @@ namespace PhimStrong.Areas.Admin.Controllers
                 return Json(new { success = false, error = "Lỗi, không tìm thấy model :(" });
             }
 
+            int idToCreate = _db.Movies.Any() ? _db.Movies.Max(x => x.IdNumber) + 1 : 1;
             Movie movie = new()
             {
+                IdNumber = idToCreate,
+                Id = "ps" + idToCreate.ToString(),
                 Name = model.Name.NormalizeString(),
                 TranslateName = model.TranslateName.NormalizeString(),
 				Description = model.Description,
@@ -235,8 +239,8 @@ namespace PhimStrong.Areas.Admin.Controllers
                 // tạo movie image nếu có
                 if (model.ImageFile != null)
                 {
-                    if (movie.Image != "/src/img/MovieImages/" + movie.Id.ToString() + ".jpg")
-                        movie.Image = "/src/img/MovieImages/" + movie.Id.ToString() + ".jpg";
+                    if (movie.Image != "/src/img/MovieImages/" + movie.Id + ".jpg")
+                        movie.Image = "/src/img/MovieImages/" + movie.Id + ".jpg";
                 }
 
                 await _db.SaveChangesAsync();
@@ -244,7 +248,7 @@ namespace PhimStrong.Areas.Admin.Controllers
                 // nếu đến đc đây thì lưu ảnh vào file
                 if (model.ImageFile != null)
                 {
-                    var file = Path.Combine(_environment.ContentRootPath, "wwwroot/src/img/MovieImages", movie.Id.ToString() + ".jpg");
+                    var file = Path.Combine(_environment.ContentRootPath, "wwwroot/src/img/MovieImages", movie.Id + ".jpg");
                     using (FileStream fileStream = new(file, FileMode.Create))
                     {
                         await model.ImageFile.CopyToAsync(fileStream);
@@ -266,7 +270,7 @@ namespace PhimStrong.Areas.Admin.Controllers
         }
 
         [HttpGet]
-        public IActionResult Edit(int movieid)
+        public IActionResult Edit(string movieid)
         {
             var movie = _db.Movies.FirstOrDefault(m => m.Id == movieid);
 
@@ -279,13 +283,14 @@ namespace PhimStrong.Areas.Admin.Controllers
         }
 
         [HttpPost]
-        public async Task<JsonResult> Edit(int movieid, MovieModel model)
+        public async Task<JsonResult> Edit(string movieid, MovieModel model)
         {
             if (model == null)
             {
                 return Json(new { success = false, error = "Lỗi, không tìm thấy model :(" });
             }
 
+            Console.WriteLine(movieid);
             var movieToEdit = _db.Movies.FirstOrDefault(c => c.Id == movieid);
 
             if (movieToEdit == null)
@@ -463,15 +468,15 @@ namespace PhimStrong.Areas.Admin.Controllers
             // Edit Image
             if (model.ImageFile != null)
             {
-                var file = Path.Combine(_environment.ContentRootPath, "wwwroot/src/img/MovieImages", movieToEdit.Id.ToString() + ".jpg");
+                var file = Path.Combine(_environment.ContentRootPath, "wwwroot/src/img/MovieImages", movieToEdit.Id + ".jpg");
 
                 using (var fileStream = new FileStream(file, FileMode.Create))
                 {
                     await model.ImageFile.CopyToAsync(fileStream);
                 }
 
-                if (movieToEdit.Image != "/src/img/MovieImages/" + movieToEdit.Id.ToString() + ".jpg")
-                    movieToEdit.Image = "/src/img/MovieImages/" + movieToEdit.Id.ToString() + ".jpg";
+                if (movieToEdit.Image != "/src/img/MovieImages/" + movieToEdit.Id + ".jpg")
+                    movieToEdit.Image = "/src/img/MovieImages/" + movieToEdit.Id + ".jpg";
             }
 
             // Update edit date
@@ -492,7 +497,7 @@ namespace PhimStrong.Areas.Admin.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Delete(int movieid)
+        public async Task<IActionResult> Delete(string movieid)
         {
             var movie = _db.Movies.FirstOrDefault(m => m.Id == movieid);
 
@@ -503,7 +508,7 @@ namespace PhimStrong.Areas.Admin.Controllers
 
             try
             {
-                var file = Path.Combine(_environment.ContentRootPath, "wwwroot/src/img/MovieImages", movie.Id.ToString() + ".jpg");
+                var file = Path.Combine(_environment.ContentRootPath, "wwwroot/src/img/MovieImages", movie.Id + ".jpg");
 
                 FileInfo fileInfo = new(file);
                 fileInfo.Delete();
@@ -592,7 +597,6 @@ namespace PhimStrong.Areas.Admin.Controllers
 
             if (movie.Videos != null)
             {
-                List<string> videoList = new();
                 model.Videos = new string[movie.EpisodeCount];
 
                 for (int i = 0; i < movie.EpisodeCount; i++)

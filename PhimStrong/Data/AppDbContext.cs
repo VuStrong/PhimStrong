@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using SharedLibrary.Models;
+using System.Reflection.Emit;
 
 namespace PhimStrong.Data
 {
@@ -31,6 +32,12 @@ namespace PhimStrong.Data
                     entityType.SetTableName(tableName.Substring(6));
                 }
             }
-		}
+
+            builder.Entity<Movie>().Property(m => m.Id).ValueGeneratedNever();
+            builder.Entity<Category>().Property(m => m.Id).ValueGeneratedNever();
+            builder.Entity<Cast>().Property(m => m.Id).ValueGeneratedNever();
+            builder.Entity<Director>().Property(m => m.Id).ValueGeneratedNever();
+            builder.Entity<Country>().Property(m => m.Id).ValueGeneratedNever();
+        }
     }
 }

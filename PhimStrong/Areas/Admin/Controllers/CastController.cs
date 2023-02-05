@@ -60,7 +60,7 @@ namespace PhimStrong.Areas.Admin.Controllers
                             TempData["FilterMessage"] = "tên là " + filterValue;
                             filterValue = filterValue.RemoveMarks();
 
-                            casts = _db.Casts.Where(m =>
+                            casts = _db.Casts.ToList().Where(m =>
                                 (m.NormalizeName ?? "").Contains(filterValue)
                             ).ToList();
 
@@ -108,10 +108,14 @@ namespace PhimStrong.Areas.Admin.Controllers
                 return View();
             }
 
+            cast.IdNumber = _db.Casts.Any() ? _db.Casts.Max(x => x.IdNumber) + 1 : 1;
+            cast.Id = "cast" + cast.IdNumber.ToString();
+
             // chỉnh lại format tên :
             cast.Name = Regex.Replace(cast.Name.ToLower().Trim(), @"(^\w)|(\s\w)", m => m.Value.ToUpper());
             cast.NormalizeName = cast.Name.RemoveMarks();
 
+            using var transaction = await _db.Database.BeginTransactionAsync();
             try
             {
                 _db.Casts.Add(cast);
@@ -119,20 +123,22 @@ namespace PhimStrong.Areas.Admin.Controllers
 
                 if (cast.AvatarFile != null)
                 {
-                    var file = Path.Combine(_environment.WebRootPath, "src/img/CastAvatars", cast.Id.ToString() + ".jpg");
+                    var file = Path.Combine(_environment.WebRootPath, "src/img/CastAvatars", cast.Id + ".jpg");
 
                     using (var fileStream = new FileStream(file, FileMode.Create))
                     {
                         await cast.AvatarFile.CopyToAsync(fileStream);
                     }
 
-                    cast.Avatar = "/src/img/CastAvatars/" + cast.Id.ToString() + ".jpg";
+                    cast.Avatar = "/src/img/CastAvatars/" + cast.Id + ".jpg";
                     await _db.SaveChangesAsync();
                 }
 
+                await transaction.CommitAsync();
             }
             catch (Exception e)
             {
+                await transaction.RollbackAsync();
                 TempData["status"] = "Lỗi, " + e.Message;
                 return View(cast);
             }
@@ -142,7 +148,7 @@ namespace PhimStrong.Areas.Admin.Controllers
         }
 
         [HttpGet]
-        public IActionResult Edit(int castid)
+        public IActionResult Edit(string castid)
         {
             var cast = _db.Casts.FirstOrDefault(c => c.Id == castid);
 
@@ -155,7 +161,7 @@ namespace PhimStrong.Areas.Admin.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Edit(int castid, Cast cast)
+        public async Task<IActionResult> Edit(string castid, Cast cast)
         {
             if (cast == null)
             {
@@ -184,15 +190,15 @@ namespace PhimStrong.Areas.Admin.Controllers
             if(cast.DateOfBirth != castToEdit.DateOfBirth) castToEdit.DateOfBirth = cast.DateOfBirth;
             if (cast.AvatarFile != null)
             {
-                var file = Path.Combine(_environment.WebRootPath, "src/img/CastAvatars", castToEdit.Id.ToString() + ".jpg");
+                var file = Path.Combine(_environment.WebRootPath, "src/img/CastAvatars", castToEdit.Id + ".jpg");
 
                 using (var fileStream = new FileStream(file, FileMode.Create))
                 {
                     await cast.AvatarFile.CopyToAsync(fileStream);
                 }
 
-                if(castToEdit.Avatar != "/src/img/CastAvatars/" + castToEdit.Id.ToString() + ".jpg")
-                    castToEdit.Avatar = "/src/img/CastAvatars/" + castToEdit.Id.ToString() + ".jpg";
+                if(castToEdit.Avatar != "/src/img/CastAvatars/" + castToEdit.Id + ".jpg")
+                    castToEdit.Avatar = "/src/img/CastAvatars/" + castToEdit.Id + ".jpg";
             }
 
             try
@@ -211,7 +217,7 @@ namespace PhimStrong.Areas.Admin.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Delete(int castid)
+        public async Task<IActionResult> Delete(string castid)
         {
             var cast = _db.Casts.FirstOrDefault(c => c.Id == castid);
 
@@ -222,7 +228,7 @@ namespace PhimStrong.Areas.Admin.Controllers
 
             try
             {
-                var file = Path.Combine(_environment.WebRootPath, "src\\img\\CastAvatars", cast.Id.ToString() + ".jpg");
+                var file = Path.Combine(_environment.WebRootPath, "src\\img\\CastAvatars", cast.Id + ".jpg");
                 
                 if (System.IO.File.Exists(file)) System.IO.File.Delete(file);
 

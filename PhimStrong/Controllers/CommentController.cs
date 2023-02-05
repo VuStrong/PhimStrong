@@ -32,7 +32,7 @@ namespace PhimStrong.Controllers
 
 		[HttpGet]
 		[Route("/Comment/GetCommentsPartial")]
-		public async Task<IActionResult> GetCommentsPartial(int page, int movieid)
+		public async Task<IActionResult> GetCommentsPartial(int page, string movieid)
 		{
 			Movie? movie = await _db.Movies.FirstOrDefaultAsync(m => m.Id == movieid);
 			if (movie == null) return Json("null");
@@ -64,7 +64,7 @@ namespace PhimStrong.Controllers
 
 		[HttpGet]
 		[Route("/Comment/LoadMoreComments")]
-		public async Task<IActionResult> LoadMoreComments(int page, int movieid)
+		public async Task<IActionResult> LoadMoreComments(int page, string movieid)
 		{
 			Movie? movie = await _db.Movies.FirstOrDefaultAsync(m => m.Id == movieid);
 			if (movie == null) return Json("null");

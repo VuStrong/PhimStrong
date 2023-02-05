@@ -76,7 +76,7 @@ namespace PhimStrong.Areas.Admin.Controllers
 							TempData["FilterMessage"] = "tên là " + filterValue;
 						 	filterValue = filterValue.RemoveMarks();
 
-                            users = _db.Users.Where(u => 
+                            users = _db.Users.ToList().Where(u => 
                                 (u.NormalizeDisplayName ?? "").Contains(filterValue)
                             ).ToList();
 

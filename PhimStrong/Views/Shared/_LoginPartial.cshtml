@@ -7,16 +7,15 @@
 <ul class="navbar-nav ms-md-3">
 @if (SignInManager.IsSignedIn(User))
 {
-    <li class="nav-item dropdown">
+    <li class="nav-item dropdown mt-3 mt-lg-0">
         <a class="nav-link dropdown-toggle"
             data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
             @{
                 var user = await UserManager.GetUserAsync(User);
             }
-            <div class="text-truncate d-inline-block" style="max-width: 100px">
-                <img src="@(user != null ? user.Avatar ?? "/src/img/UserAvatars/default_avatar.png" : "/src/img/UserAvatars/default_avatar.png")" class="avatar">
-                <span>@(user != null ? user.DisplayName : "null")</span>
-            </div>
+            <img src="@(user != null ? user.Avatar ?? "/src/img/UserAvatars/default_avatar.png" : "/src/img/UserAvatars/default_avatar.png")"
+                class="avatar">
+            <span class="text-truncate d-inline-flex" style="max-width: 100px">@(user != null ? user.DisplayName : "null")</span>
         </a>
         <div class="dropdown-menu dropdown-menu-end">
             <a class="dropdown-item" asp-area="Identity" asp-controller="Account" asp-action="Index">Profile</a>

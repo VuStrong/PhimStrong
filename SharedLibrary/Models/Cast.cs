@@ -7,8 +7,8 @@ namespace SharedLibrary.Models
     public class Cast
     {
 #pragma warning disable
-        [Key]
-        public int Id { get; set; }
+        public string Id { get; set; }
+        public int IdNumber { get; set; }
 
         [Required]
         [StringLength(50)]

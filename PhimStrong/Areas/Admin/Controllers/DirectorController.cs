@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using PhimStrong.Data;
 using SharedLibrary.Constants;
 using SharedLibrary.Helpers;
@@ -60,7 +61,7 @@ namespace PhimStrong.Areas.Admin.Controllers
                             TempData["FilterMessage"] = "tên là " + filterValue;
                             filterValue = filterValue.RemoveMarks();
 
-                            directors = _db.Directors.Where(m =>
+                            directors = _db.Directors.ToList().Where(m =>
                                 (m.NormalizeName ?? "").Contains(filterValue)
                             ).ToList();
 
@@ -108,10 +109,14 @@ namespace PhimStrong.Areas.Admin.Controllers
                 return View();
             }
 
+            director.IdNumber = _db.Directors.Any() ? _db.Directors.Max(x => x.IdNumber) + 1 : 1;
+            director.Id = "director" + director.IdNumber.ToString();
+
             // chỉnh lại format tên :
             director.Name = Regex.Replace(director.Name.ToLower().Trim(), @"(^\w)|(\s\w)", m => m.Value.ToUpper());
             director.NormalizeName = director.Name.RemoveMarks();
 
+            using var transaction = await _db.Database.BeginTransactionAsync();
             try
             {
                 _db.Directors.Add(director);
@@ -119,20 +124,23 @@ namespace PhimStrong.Areas.Admin.Controllers
 
                 if (director.AvatarFile != null)
                 {
-                    var file = Path.Combine(_environment.ContentRootPath, "wwwroot/src/img/DirectorAvatars", director.Id.ToString() + ".jpg");
+                    var file = Path.Combine(_environment.ContentRootPath, "wwwroot/src/img/DirectorAvatars", director.Id + ".jpg");
 
                     using (var fileStream = new FileStream(file, FileMode.Create))
                     {
                         await director.AvatarFile.CopyToAsync(fileStream);
                     }
 
-                    director.Avatar = "/src/img/DirectorAvatars/" + director.Id.ToString() + ".jpg";
+                    director.Avatar = "/src/img/DirectorAvatars/" + director.Id + ".jpg";
 
                     await _db.SaveChangesAsync();
                 }
+
+                await transaction.CommitAsync();
             }
             catch (Exception e)
             {
+                await transaction.RollbackAsync();
                 TempData["status"] = "Lỗi, " + e.Message;
                 return View(director);
             }
@@ -142,7 +150,7 @@ namespace PhimStrong.Areas.Admin.Controllers
         }
 
         [HttpGet]
-        public IActionResult Edit(int directorid)
+        public IActionResult Edit(string directorid)
         {
             var director = _db.Directors.FirstOrDefault(c => c.Id == directorid);
 
@@ -155,7 +163,7 @@ namespace PhimStrong.Areas.Admin.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Edit(int directorid, Director director)
+        public async Task<IActionResult> Edit(string directorid, Director director)
         {
             if (director == null)
             {
@@ -185,15 +193,15 @@ namespace PhimStrong.Areas.Admin.Controllers
             if(director.DateOfBirth != directorToEdit.DateOfBirth) directorToEdit.DateOfBirth = director.DateOfBirth;
             if (director.AvatarFile != null)
             {
-                var file = Path.Combine(_environment.ContentRootPath, "wwwroot/src/img/DirectorAvatars", directorToEdit.Id.ToString() + ".jpg");
+                var file = Path.Combine(_environment.ContentRootPath, "wwwroot/src/img/DirectorAvatars", directorToEdit.Id + ".jpg");
 
                 using (var fileStream = new FileStream(file, FileMode.Create))
                 {
                     await director.AvatarFile.CopyToAsync(fileStream);
                 }
 
-                if(directorToEdit.Avatar != "/src/img/DirectorAvatars/" + directorToEdit.Id.ToString() + ".jpg")
-                    directorToEdit.Avatar = "/src/img/DirectorAvatars/" + directorToEdit.Id.ToString() + ".jpg";
+                if(directorToEdit.Avatar != "/src/img/DirectorAvatars/" + directorToEdit.Id + ".jpg")
+                    directorToEdit.Avatar = "/src/img/DirectorAvatars/" + directorToEdit.Id + ".jpg";
             }
 
             try
@@ -212,7 +220,7 @@ namespace PhimStrong.Areas.Admin.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Delete(int directorid)
+        public async Task<IActionResult> Delete(string directorid)
         {
             var director = _db.Directors.FirstOrDefault(c => c.Id == directorid);
 
@@ -223,9 +231,9 @@ namespace PhimStrong.Areas.Admin.Controllers
 
             try
             {
-                var file = Path.Combine(_environment.ContentRootPath, "wwwroot/src/img/DirectorAvatars", director.Id.ToString() + ".jpg");
+                var file = Path.Combine(_environment.ContentRootPath, "wwwroot/src/img/DirectorAvatars", director.Id + ".jpg");
 
-                FileInfo fileInfo = new FileInfo(file);
+                FileInfo fileInfo = new(file);
                 fileInfo.Delete();
 
                 _db.Directors.Remove(director);

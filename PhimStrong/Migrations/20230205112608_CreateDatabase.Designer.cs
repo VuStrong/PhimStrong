@@ -12,8 +12,8 @@ using PhimStrong.Data;
 namespace PhimStrong.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20230126104255_UpdateMovieV4")]
-    partial class UpdateMovieV4
+    [Migration("20230205112608_CreateDatabase")]
+    partial class CreateDatabase
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -26,11 +26,11 @@ namespace PhimStrong.Migrations
 
             modelBuilder.Entity("CastMovie", b =>
                 {
-                    b.Property<int>("CastsId")
-                        .HasColumnType("int");
+                    b.Property<string>("CastsId")
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Property<int>("MoviesId")
-                        .HasColumnType("int");
+                    b.Property<string>("MoviesId")
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("CastsId", "MoviesId");
 
@@ -41,11 +41,11 @@ namespace PhimStrong.Migrations
 
             modelBuilder.Entity("CategoryMovie", b =>
                 {
-                    b.Property<int>("CategoriesId")
-                        .HasColumnType("int");
+                    b.Property<string>("CategoriesId")
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Property<int>("MoviesId")
-                        .HasColumnType("int");
+                    b.Property<string>("MoviesId")
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("CategoriesId", "MoviesId");
 
@@ -56,11 +56,11 @@ namespace PhimStrong.Migrations
 
             modelBuilder.Entity("DirectorMovie", b =>
                 {
-                    b.Property<int>("DirectorsId")
-                        .HasColumnType("int");
+                    b.Property<string>("DirectorsId")
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Property<int>("MoviesId")
-                        .HasColumnType("int");
+                    b.Property<string>("MoviesId")
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("DirectorsId", "MoviesId");
 
@@ -204,8 +204,8 @@ namespace PhimStrong.Migrations
 
             modelBuilder.Entity("MovieUser", b =>
                 {
-                    b.Property<int>("LikedMoviesId")
-                        .HasColumnType("int");
+                    b.Property<string>("LikedMoviesId")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("LikedUsersId")
                         .HasColumnType("nvarchar(450)");
@@ -219,11 +219,8 @@ namespace PhimStrong.Migrations
 
             modelBuilder.Entity("SharedLibrary.Models.Cast", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("About")
                         .HasColumnType("nvarchar(max)");
@@ -233,6 +230,9 @@ namespace PhimStrong.Migrations
 
                     b.Property<DateTime?>("DateOfBirth")
                         .HasColumnType("datetime2");
+
+                    b.Property<int>("IdNumber")
+                        .HasColumnType("int");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -249,14 +249,14 @@ namespace PhimStrong.Migrations
 
             modelBuilder.Entity("SharedLibrary.Models.Category", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("IdNumber")
+                        .HasColumnType("int");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -288,8 +288,9 @@ namespace PhimStrong.Migrations
                     b.Property<int>("Like")
                         .HasColumnType("int");
 
-                    b.Property<int>("MovieId")
-                        .HasColumnType("int");
+                    b.Property<string>("MovieId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<int?>("ResponseToId")
                         .HasColumnType("int");
@@ -311,14 +312,14 @@ namespace PhimStrong.Migrations
 
             modelBuilder.Entity("SharedLibrary.Models.Country", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("About")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("IdNumber")
+                        .HasColumnType("int");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -334,11 +335,8 @@ namespace PhimStrong.Migrations
 
             modelBuilder.Entity("SharedLibrary.Models.Director", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("About")
                         .HasColumnType("nvarchar(max)");
@@ -348,6 +346,9 @@ namespace PhimStrong.Migrations
 
                     b.Property<DateTime?>("DateOfBirth")
                         .HasColumnType("datetime2");
+
+                    b.Property<int>("IdNumber")
+                        .HasColumnType("int");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -364,14 +365,11 @@ namespace PhimStrong.Migrations
 
             modelBuilder.Entity("SharedLibrary.Models.Movie", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<int?>("CountryId")
-                        .HasColumnType("int");
+                    b.Property<string>("CountryId")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime?>("CreatedDate")
                         .HasColumnType("datetime2");
@@ -380,6 +378,9 @@ namespace PhimStrong.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("EpisodeCount")
+                        .HasColumnType("int");
+
+                    b.Property<int>("IdNumber")
                         .HasColumnType("int");
 
                     b.Property<string>("Image")
@@ -393,6 +394,9 @@ namespace PhimStrong.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("NormalizeName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NormalizeTranslateName")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<float>("Rating")
@@ -437,8 +441,9 @@ namespace PhimStrong.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<int>("MovieId")
-                        .HasColumnType("int");
+                    b.Property<string>("MovieId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("TagName")
                         .IsRequired()
@@ -548,8 +553,9 @@ namespace PhimStrong.Migrations
                     b.Property<int?>("Length")
                         .HasColumnType("int");
 
-                    b.Property<int>("MovieId")
-                        .HasColumnType("int");
+                    b.Property<string>("MovieId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("VideoUrl")
                         .HasColumnType("nvarchar(max)");

@@ -13,11 +13,15 @@
 
 }
 
-<div id="movie-player" class="w-100 mb-4 mt-3">
-	<video controls autoplay name="media">
+<div id="movie-player" class="w-100 mb-4 mt-3 position-relative">
+	<video id="movie-video" controls autoplay name="media">
 		@*<source src="https://www.googleapis.com/drive/v3/files/1i328m4OfLLjHHEV-yenYjJgocj8_AO_z?alt=media&key=AIzaSyALAnovaVGD6gFejFLClsUB8Ho68ztlTPM" type='video/mp4'>*@
 		<source src="@(Model.Video != null ? Model.Video.VideoUrl : "")" type='video/mp4' />
 	</video>
+	@if (Model.Video == null || String.IsNullOrEmpty(Model.Video.VideoUrl))
+	{
+		<p class="text-danger position-absolute">Video không thể tải được <i class="bi bi-emoji-frown-fill"></i></p>
+	}
 </div>
 @if (Model.Movie.Type == "Phim bộ")
 {
@@ -36,7 +40,7 @@
 @section Scripts{
 	<script src="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 	<script type="text/javascript">
-		var movieid = @Model.Movie.Id;
+		var movieid = '@Model.Movie.Id';
 	</script>
 	<script src="/js/Movie/MovieWatch.js"></script>
 }

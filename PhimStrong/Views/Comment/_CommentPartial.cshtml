@@ -6,7 +6,7 @@
 	{
 		foreach (var comment in Model.Comments)
 		{
-			<div class="row flex-nowrap mb-2 border-bottom cmt-item" cmt-id="@comment.Id">
+			<div class="row flex-nowrap mb-2 border-bottom cmt-item border-2 border" cmt-id="@comment.Id">
 				<a href="/User/@comment.User.Id" style="width: 80px; height: 80px;">
 					<img src="@(comment.User.Avatar ?? "/src/img/UserAvatars/default_avatar.png")" class="w-100" />
 				</a>
@@ -43,7 +43,7 @@
 						{
 							foreach (var resComment in comment.Responses)
 							{
-								<div class="row flex-nowrap mb-2 cmt-item" cmt-id="@resComment.Id">
+								<div class="row flex-nowrap mb-2 cmt-item border" cmt-id="@resComment.Id">
 									<a href="/User/@resComment.User.Id" style="width: 80px; height: 80px;">
 										<img src="@(resComment.User.Avatar ?? "/src/img/UserAvatars/default_avatar.png")" class="w-100" />
 									</a>
@@ -107,7 +107,7 @@ else
 	{
 		@foreach (var comment in Model.Comments)
 		{
-			<div class="row flex-nowrap mb-2 border-bottom cmt-item" cmt-id="@comment.Id">
+			<div class="row flex-nowrap mb-2 border-bottom cmt-item border-2 border" cmt-id="@comment.Id">
 				<a href="/User/@comment.User.Id" style="width: 80px; height: 80px;">
 					<img src="@(comment.User.Avatar ?? "/src/img/UserAvatars/default_avatar.png")" class="w-100" />
 				</a>
@@ -144,7 +144,7 @@ else
 						{
 							foreach (var resComment in comment.Responses)
 							{
-							<div class="row flex-nowrap mb-2 cmt-item" cmt-id="@resComment.Id">
+								<div class="row flex-nowrap mb-2 cmt-item border" cmt-id="@resComment.Id">
 								<a href="/User/@resComment.User.Id" style="width: 80px; height: 80px;">
 										<img src="@(resComment.User.Avatar ?? "/src/img/UserAvatars/default_avatar.png")" class="w-100" />
 								</a>

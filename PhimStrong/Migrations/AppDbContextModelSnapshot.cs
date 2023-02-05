@@ -24,47 +24,47 @@ namespace PhimStrong.Migrations
 
             modelBuilder.Entity("CastMovie", b =>
                 {
-                    b.Property<int>("CastsId")
-                        .HasColumnType("int");
+                    b.Property<string>("CastsId")
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Property<int>("MoviesId")
-                        .HasColumnType("int");
+                    b.Property<string>("MoviesId")
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("CastsId", "MoviesId");
 
                     b.HasIndex("MoviesId");
 
-                    b.ToTable("CastMovie", (string)null);
+                    b.ToTable("CastMovie");
                 });
 
             modelBuilder.Entity("CategoryMovie", b =>
                 {
-                    b.Property<int>("CategoriesId")
-                        .HasColumnType("int");
+                    b.Property<string>("CategoriesId")
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Property<int>("MoviesId")
-                        .HasColumnType("int");
+                    b.Property<string>("MoviesId")
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("CategoriesId", "MoviesId");
 
                     b.HasIndex("MoviesId");
 
-                    b.ToTable("CategoryMovie", (string)null);
+                    b.ToTable("CategoryMovie");
                 });
 
             modelBuilder.Entity("DirectorMovie", b =>
                 {
-                    b.Property<int>("DirectorsId")
-                        .HasColumnType("int");
+                    b.Property<string>("DirectorsId")
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Property<int>("MoviesId")
-                        .HasColumnType("int");
+                    b.Property<string>("MoviesId")
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("DirectorsId", "MoviesId");
 
                     b.HasIndex("MoviesId");
 
-                    b.ToTable("DirectorMovie", (string)null);
+                    b.ToTable("DirectorMovie");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -202,8 +202,8 @@ namespace PhimStrong.Migrations
 
             modelBuilder.Entity("MovieUser", b =>
                 {
-                    b.Property<int>("LikedMoviesId")
-                        .HasColumnType("int");
+                    b.Property<string>("LikedMoviesId")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("LikedUsersId")
                         .HasColumnType("nvarchar(450)");
@@ -212,16 +212,13 @@ namespace PhimStrong.Migrations
 
                     b.HasIndex("LikedUsersId");
 
-                    b.ToTable("MovieUser", (string)null);
+                    b.ToTable("MovieUser");
                 });
 
             modelBuilder.Entity("SharedLibrary.Models.Cast", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("About")
                         .HasColumnType("nvarchar(max)");
@@ -232,6 +229,9 @@ namespace PhimStrong.Migrations
                     b.Property<DateTime?>("DateOfBirth")
                         .HasColumnType("datetime2");
 
+                    b.Property<int>("IdNumber")
+                        .HasColumnType("int");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(50)
@@ -242,19 +242,19 @@ namespace PhimStrong.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Casts", (string)null);
+                    b.ToTable("Casts");
                 });
 
             modelBuilder.Entity("SharedLibrary.Models.Category", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("IdNumber")
+                        .HasColumnType("int");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -266,7 +266,7 @@ namespace PhimStrong.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Categories", (string)null);
+                    b.ToTable("Categories");
                 });
 
             modelBuilder.Entity("SharedLibrary.Models.Comment", b =>
@@ -286,8 +286,9 @@ namespace PhimStrong.Migrations
                     b.Property<int>("Like")
                         .HasColumnType("int");
 
-                    b.Property<int>("MovieId")
-                        .HasColumnType("int");
+                    b.Property<string>("MovieId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<int?>("ResponseToId")
                         .HasColumnType("int");
@@ -304,19 +305,19 @@ namespace PhimStrong.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Comments", (string)null);
+                    b.ToTable("Comments");
                 });
 
             modelBuilder.Entity("SharedLibrary.Models.Country", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("About")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("IdNumber")
+                        .HasColumnType("int");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -327,16 +328,13 @@ namespace PhimStrong.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Countries", (string)null);
+                    b.ToTable("Countries");
                 });
 
             modelBuilder.Entity("SharedLibrary.Models.Director", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("About")
                         .HasColumnType("nvarchar(max)");
@@ -346,6 +344,9 @@ namespace PhimStrong.Migrations
 
                     b.Property<DateTime?>("DateOfBirth")
                         .HasColumnType("datetime2");
+
+                    b.Property<int>("IdNumber")
+                        .HasColumnType("int");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -357,19 +358,16 @@ namespace PhimStrong.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Directors", (string)null);
+                    b.ToTable("Directors");
                 });
 
             modelBuilder.Entity("SharedLibrary.Models.Movie", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<int?>("CountryId")
-                        .HasColumnType("int");
+                    b.Property<string>("CountryId")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime?>("CreatedDate")
                         .HasColumnType("datetime2");
@@ -378,6 +376,9 @@ namespace PhimStrong.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("EpisodeCount")
+                        .HasColumnType("int");
+
+                    b.Property<int>("IdNumber")
                         .HasColumnType("int");
 
                     b.Property<string>("Image")
@@ -427,7 +428,7 @@ namespace PhimStrong.Migrations
 
                     b.HasIndex("CountryId");
 
-                    b.ToTable("Movies", (string)null);
+                    b.ToTable("Movies");
                 });
 
             modelBuilder.Entity("SharedLibrary.Models.Tag", b =>
@@ -438,8 +439,9 @@ namespace PhimStrong.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<int>("MovieId")
-                        .HasColumnType("int");
+                    b.Property<string>("MovieId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("TagName")
                         .IsRequired()
@@ -449,7 +451,7 @@ namespace PhimStrong.Migrations
 
                     b.HasIndex("MovieId");
 
-                    b.ToTable("Tags", (string)null);
+                    b.ToTable("Tags");
                 });
 
             modelBuilder.Entity("SharedLibrary.Models.User", b =>
@@ -549,8 +551,9 @@ namespace PhimStrong.Migrations
                     b.Property<int?>("Length")
                         .HasColumnType("int");
 
-                    b.Property<int>("MovieId")
-                        .HasColumnType("int");
+                    b.Property<string>("MovieId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("VideoUrl")
                         .HasColumnType("nvarchar(max)");
@@ -559,7 +562,7 @@ namespace PhimStrong.Migrations
 
                     b.HasIndex("MovieId");
 
-                    b.ToTable("Videos", (string)null);
+                    b.ToTable("Videos");
                 });
 
             modelBuilder.Entity("CastMovie", b =>

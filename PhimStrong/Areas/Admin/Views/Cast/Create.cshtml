@@ -10,6 +10,7 @@
 <div class="mt-4">
     <form method="post" enctype="multipart/form-data">
         <div asp-validation-summary="All" class="text-danger"></div>
+        <input asp-for="Id" value="cast" hidden />
         <div class="form-group">
             <label asp-for="Name">Tên</label>
             <input asp-for="Name" class="form-control" placeholder="Nhập tên diễn viên">
@@ -30,7 +31,7 @@
             <input asp-for="DateOfBirth" class="form-control" placeholder="Ngày sinh">
             <span asp-validation-for="DateOfBirth" class="text-danger"></span>
         </div>
-        <button type="submit" class="btn btn-primary mt-4">Thêm</button>
+        <button id="create-cast-btn" type="submit" class="btn btn-primary mt-4">Thêm</button>
     </form>
 </div>
 

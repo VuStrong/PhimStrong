@@ -10,7 +10,7 @@ namespace PhimStrong.Models
 		public string? UserAvatar { get; set; }
 		public bool UserLogin { get; set; }
 		public bool IsAdmin { get; set; }
-        public int MovieId { get; set; }
+        public string MovieId { get; set; }
 
 		public List<Comment>? Comments { get; set; }
 	}
