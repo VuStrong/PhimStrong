@@ -21,8 +21,7 @@
     int listPhimBoLength = listPhimBo != null ? listPhimBo.Length : 0;
 }
 
-<div class="row mb-5 mt-5" style="height: 500px;">
-    <h3 class="text-success text-uppercase">Phim đề cử</h3>
+<div class="row mb-5 mt-5 random-movies">
     <div id="carouselExampleIndicators" class="carousel slide col-lg-9 col-12 h-100" data-bs-ride="true">
         <div class="carousel-indicators">
             @for (int i = 0; i < listMovieSlideLength; i++)
@@ -91,7 +90,7 @@
 </div>
 
 <!-- New Movies -->
-<div class="movie-container mb-5 pt-5">
+<div class="movie-container mb-5">
     <div class="mb-4 position-relative">
         <h3 class="text-success text-uppercase">phim mới cập nhật</h3>
         <a class="btn btn-success position-absolute end-0 top-0" asp-area="" asp-controller="Movie" asp-action="Index">Xem tất cả</a>

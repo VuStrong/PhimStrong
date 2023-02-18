@@ -290,7 +290,6 @@ namespace PhimStrong.Areas.Admin.Controllers
                 return Json(new { success = false, error = "Lỗi, không tìm thấy model :(" });
             }
 
-            Console.WriteLine(movieid);
             var movieToEdit = _db.Movies.FirstOrDefault(c => c.Id == movieid);
 
             if (movieToEdit == null)

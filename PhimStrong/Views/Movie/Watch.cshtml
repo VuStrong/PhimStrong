@@ -13,15 +13,30 @@
 
 }
 
+<partial name="_ReportModal"></partial>
+
 <div id="movie-player" class="w-100 mb-4 mt-3 position-relative">
-	<video id="movie-video" controls autoplay name="media">
+	<video id="movie-video" controls name="media" poster="@Model.Movie.Image">
 		@*<source src="https://www.googleapis.com/drive/v3/files/1i328m4OfLLjHHEV-yenYjJgocj8_AO_z?alt=media&key=AIzaSyALAnovaVGD6gFejFLClsUB8Ho68ztlTPM" type='video/mp4'>*@
 		<source src="@(Model.Video != null ? Model.Video.VideoUrl : "")" type='video/mp4' />
 	</video>
 	@if (Model.Video == null || String.IsNullOrEmpty(Model.Video.VideoUrl))
 	{
-		<p class="text-danger position-absolute">Video không thể tải được <i class="bi bi-emoji-frown-fill"></i></p>
+		<p class="text-danger position-absolute p-3">Video không thể tải được <i class="bi bi-emoji-frown-fill"></i></p>
 	}
+</div>
+<div class="p-3 mb-4" style="background-color: #423e3e">
+	<p>
+		 - Nếu phim không xem được hoặc bị mất tiếng thì hãy thử tải 
+		<a href="https://www.microsoft.com/vi-vn/edge/business/download?form=MA13FJ" target="_blank">Microsoft Edge</a>
+		trên PC hoặc 
+		<a href="https://play.google.com/store/apps/details?id=com.UCMobile.intl&hl=vi&gl=US&pli=1" target="_blank">UC Browser</a>
+		trên điện thoại để xem nhé <i class="bi bi-emoji-smile-upside-down-fill text-success"></i>.
+	</p>
+	<div>
+		 - Nếu vẫn bị lỗi thì hãy báo lỗi cho PhimStrong.
+		<button id="report-btn" class="btn btn-success d-inline ms-3">Báo lỗi</button>
+	</div> 
 </div>
 @if (Model.Movie.Type == "Phim bộ")
 {
@@ -42,5 +57,6 @@
 	<script type="text/javascript">
 		var movieid = '@Model.Movie.Id';
 	</script>
+	<script src="/js/ModalReport.js"></script>
 	<script src="/js/Movie/MovieWatch.js"></script>
 }

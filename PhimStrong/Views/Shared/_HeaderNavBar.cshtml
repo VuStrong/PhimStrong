@@ -6,6 +6,7 @@
 
 @{
     var user = await UserManager.GetUserAsync(User);
+    int currentYear = DateTime.Now.Year;
 }
 
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark p-0">
@@ -50,7 +51,8 @@
                     <a class="nav-link dropdown-toggle text-uppercase" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">năm phát hành</a>
                     <div class="dropdown-menu row" style="width:400px">
                         <div class="row">
-                            @for (int i = 2000; i <= 2023; i++)
+                            <a class="dropdown-item" style="width:50%;" href="/movie/before-year/@(currentYear - 23)">Trước @(currentYear - 23)</a>
+                            @for (int i = currentYear - 22; i <= currentYear; i++)
                             {
                                 <a class="dropdown-item" style="width:50%;" href="/movie/year/@i">@i</a>
                             }

@@ -7,6 +7,7 @@ using PhimStrong.Models;
 using Microsoft.AspNetCore.Identity;
 using SharedLibrary.Helpers;
 using NuGet.Packaging;
+using Newtonsoft.Json.Linq;
 
 namespace PhimStrong.Controllers
 {
@@ -127,7 +128,7 @@ namespace PhimStrong.Controllers
         public async Task<IActionResult> GetMovieByReleaseYear(int year, int page)
         {
             List<Movie> movies = await _db.Movies.Where(m =>
-					m.ReleaseDate != null ? m.ReleaseDate.Value.Year == year : false
+					m.ReleaseDate != null && m.ReleaseDate.Value.Year == year
 				)
                 .OrderByDescending(m => m.ReleaseDate).ToListAsync();
 
@@ -148,6 +149,32 @@ namespace PhimStrong.Controllers
             return View("Index", movies);
         }
 
+		[HttpGet]
+		[Route("/Movie/before-year/{year}")]
+		public async Task<IActionResult> GetMovieBeforeYear(int year, int page)
+		{
+			List<Movie> movies = await _db.Movies.Where(m =>
+					m.ReleaseDate != null && m.ReleaseDate.Value.Year <= year
+				)
+				.OrderByDescending(m => m.ReleaseDate).ToListAsync();
+
+			int numberOfPages = (int)Math.Ceiling((double)movies.Count / CommonConstants.MOVIES_PER_PAGE);
+			if (page > numberOfPages) page = numberOfPages;
+			if (page <= 0) page = 1;
+
+			movies = movies.Skip((page - 1) * CommonConstants.MOVIES_PER_PAGE)
+				.Take(CommonConstants.MOVIES_PER_PAGE).ToList();
+
+			TempData["NumberOfPages"] = numberOfPages;
+			TempData["CurrentPage"] = page;
+			TempData["Action"] = "GetMovieBeforeYear";
+
+			TempData["Title"] = year.ToString();
+			ViewData["Filter"] = "Phim ra mắt trước năm";
+
+			return View("Index", movies);
+		}
+
 		[Route("/Movie/tag/{value}")]
 		public async Task<IActionResult> GetMovieByTag(string? value, int page)
 		{
@@ -158,7 +185,7 @@ namespace PhimStrong.Controllers
 			List<Tag> tags = await _db.Tags.Where(t => t.TagName.ToLower() == value).ToListAsync();
 			List<Movie> movies = tags.Select(t => t.Movie).ToList();
 
-			int numberOfPages = (int)Math.Ceiling((double)movies.Count / CommonConstants.MOVIES_PER_PAGE);
+            int numberOfPages = (int)Math.Ceiling((double)movies.Count / CommonConstants.MOVIES_PER_PAGE);
 			if (page > numberOfPages) page = numberOfPages;
 			if (page <= 0) page = 1;
 
@@ -247,30 +274,47 @@ namespace PhimStrong.Controllers
 			List<Movie> movieList = _db.Movies.ToList();
 			List<Movie> movies = new();
 
-			// find movie with similar cast
-			movies.AddRange(movie.Casts != null ?
-				movieList.Where(m => !movies.Contains(m) && m.Casts != null && m.Casts.Any(c => movie.Casts.Contains(c)))
-				.Take(5).ToList() : new List<Movie>());
+			// find movie with similar tag
+			if (movie.Tags != null && movie.Tags.Any())
+			{
+				string tagToFind = movie.Tags[0].TagName.ToLower();
+               
+                movies.AddRange(
+					_db.Tags.Where(t => t.TagName.ToLower() == tagToFind)
+					.Select(t => t.Movie).ToList());
 
-			// find movie with similar category
-			movies.AddRange(movie.Categories!= null ?
-				movieList.Where(m => !movies.Contains(m) && m.Categories != null && m.Categories.Any(m1 => movie.Categories.Contains(m1)))
-				.Take(5).ToList() : new List<Movie>());
+				if (movies.Contains(movie)) movies.Remove(movie);
+            }
+
+            // find movie with similar category
+            if (movies.Count < 10 && movie.Categories != null && movie.Categories.Any())
+			{
+				Category? cateToFind = movie.Categories[0];
+				movies.AddRange(
+					movieList.Where(m => !movies.Contains(m) &&
+						!m.Equals(movie) &&
+						m.Categories != null && 
+						m.Categories.Any(c => c.Equals(cateToFind)))
+					.Take(10 - movies.Count).ToList());
+			}
 
 			// if less than 10 movies, add more
-			Random random = new();
-			int ran;
-			int count = movieList.Count;
-			while (movies.Count < 10)
+			if (movies.Count < 10) 
 			{
-				if (movies.Count >= count) break;
+                Random random = new();
+                int ran;
+                int count = movieList.Count;
+                while (movies.Count < 10)
+                {
+                    if (movies.Count >= count) break;
 
-				ran = random.Next(0, count);
-				if (!movies.Contains(movieList[ran]))
-				{
-					movies.Add(movieList[ran]);
-				}
-			}
+                    ran = random.Next(0, count);
+                    if (!movies.Contains(movieList[ran]) && !movieList[ran].Equals(movie))
+                    {
+                        movies.Add(movieList[ran]);
+                    }
+                }
+            }
 
 			return this.PartialView("_RelatedMoviePartial", movies);
 		}

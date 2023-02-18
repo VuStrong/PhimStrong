@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using PhimStrong.Data;
 using SharedLibrary.Constants;
+using SharedLibrary.Helpers;
 using SharedLibrary.Models;
 
 namespace PhimStrong.Controllers
@@ -20,7 +21,7 @@ namespace PhimStrong.Controllers
 		{
 			if (value == null) value = "";
 
-			value = value.ToLower().Trim();
+			value = value.RemoveMarks();
 
 			Director? director = _db.Directors.FirstOrDefault(d => d.NormalizeName == value);
 

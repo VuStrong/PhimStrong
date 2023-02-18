@@ -11,6 +11,7 @@ using System.Text.Encodings.Web;
 
 namespace PhimStrong.Controllers
 {
+#pragma warning disable
 	public class CommentController : Controller
 	{
 		private readonly AppDbContext _db;
@@ -56,7 +57,7 @@ namespace PhimStrong.Controllers
 				RenderCommentOnly = false,
 				UserAvatar = user != null ? user.Avatar : null,
 				MovieId = movie.Id,
-				IsAdmin = user != null && user.RoleName != null && (user.RoleName == "Admin" || user.RoleName == "Thủy Tổ")
+				IsAdmin = user != null && user.RoleName != null && (user.RoleName == RoleConstant.ADMIN || user.RoleName == RoleConstant.THUY_TO)
 			};
 
 			return this.PartialView("_CommentPartial", model);
@@ -84,7 +85,7 @@ namespace PhimStrong.Controllers
 			{
 				Comments = comments,
 				RenderCommentOnly = true,
-                IsAdmin = user != null && user.RoleName != null && (user.RoleName == "Admin" || user.RoleName == "Thủy Tổ")
+                IsAdmin = user != null && user.RoleName != null && (user.RoleName == RoleConstant.ADMIN || user.RoleName == RoleConstant.THUY_TO)
             };
 
 			return this.PartialView("_CommentPartial", model);
@@ -139,7 +140,7 @@ namespace PhimStrong.Controllers
 					values: new { area = "", id = movie.Id },
 					protocol: Request.Scheme);
 
-				await _emailSender.SendEmailAsync(
+				_emailSender.SendEmailAsync(
 					responseToComment.User.Email,
 					"Thông báo",
 					$"Ai đó vừa phản hồi Comment của bạn về bộ phim {movie.Name}. " +

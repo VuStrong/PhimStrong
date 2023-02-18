@@ -15,8 +15,8 @@
 						<strong>@comment.User.DisplayName</strong>
 						@{
 							string rowColor = "gray";
-							if (comment.User.RoleName == "Thủy Tổ") rowColor = "yellowgreen";
-							else if (comment.User.RoleName == "Admin") rowColor = "red";
+							if (comment.User.RoleName == RoleConstant.THUY_TO) rowColor = "yellowgreen";
+							else if (comment.User.RoleName == RoleConstant.ADMIN) rowColor = "red";
 						}
 						<span class="ms-2" style="color: @rowColor; font-size: 13px;">(@(comment.User.RoleName ?? ""))</span>
 					</a>
@@ -52,8 +52,8 @@
 											<strong>@resComment.User.DisplayName</strong>
 											@{
 												string resRowColor = "gray";
-												if (resComment.User.RoleName == "Thủy Tổ") resRowColor = "yellowgreen";
-												else if (resComment.User.RoleName == "Admin") resRowColor = "red";
+												if (resComment.User.RoleName == RoleConstant.THUY_TO) resRowColor = "yellowgreen";
+												else if (resComment.User.RoleName == RoleConstant.ADMIN) resRowColor = "red";
 											}
 											<span class="ms-2" style="color: @resRowColor; font-size: 13px;">(@(resComment.User.RoleName ?? ""))</span>
 										</a>
@@ -116,8 +116,8 @@ else
 						<strong>@comment.User.DisplayName</strong>
 						@{
 							string rowColor = "gray";
-							if (comment.User.RoleName == "Thủy Tổ") rowColor = "yellowgreen";
-							else if (comment.User.RoleName == "Admin") rowColor = "red";
+							if (comment.User.RoleName == RoleConstant.THUY_TO) rowColor = "yellowgreen";
+							else if (comment.User.RoleName == RoleConstant.ADMIN) rowColor = "red";
 						}
 						<span class="ms-2" style="color: @rowColor; font-size: 13px;">(@(comment.User.RoleName ?? ""))</span>
 					</a>
@@ -153,8 +153,8 @@ else
 										<strong>@resComment.User.DisplayName</strong>
 										@{
 										string resRowColor = "gray";
-										if (resComment.User.RoleName == "Thủy Tổ") resRowColor = "yellowgreen";
-										else if (resComment.User.RoleName == "Admin") resRowColor = "red";
+										if (resComment.User.RoleName == RoleConstant.THUY_TO) resRowColor = "yellowgreen";
+										else if (resComment.User.RoleName == RoleConstant.ADMIN) resRowColor = "red";
 										}
 										<span class="ms-2" style="color: @resRowColor; font-size: 13px;">(@(resComment.User.RoleName ?? ""))</span>
 									</a>
@@ -163,7 +163,7 @@ else
 										<a href="#" class="me-2 like-btn">Thích</a>
 										@if (Model.IsAdmin)
 										{
-													<a href="/Comment/DeleteComment?commentid=@resComment.Id" class="delete-cmt-btn">Xóa</a>
+											<a href="/Comment/DeleteComment?commentid=@resComment.Id" class="delete-cmt-btn">Xóa</a>
 										}
 										<p class="text-dark d-inline mx-2 cmt-like-count">
 											<i class="bi bi-hand-thumbs-up-fill text-info"></i>

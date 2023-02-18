@@ -43,4 +43,11 @@
     <Folder Include="wwwroot\src\img\MovieImages\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Update="Views\Movie\_ReportModal.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+  </ItemGroup>
+
 </Project>

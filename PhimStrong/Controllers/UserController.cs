@@ -1,19 +1,22 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
-using PhimStrong.Data;
+using PhimStrong.Models;
 using SharedLibrary.Models;
+using System.Text.Encodings.Web;
 
 namespace PhimStrong.Controllers
 {
+#pragma warning disable
 	public class UserController : Controller
 	{
-		private readonly AppDbContext _db;
 		private readonly UserManager<User> _userManager;
+		private readonly IEmailSender _emailSender;
 
-		public UserController(AppDbContext db, UserManager<User> userManager)
+		public UserController(UserManager<User> userManager, IEmailSender emailSender)
 		{
-			_db = db;
 			_userManager = userManager;
+			_emailSender = emailSender;
 		}
 
 		[Route("/User/{id?}")]
@@ -27,6 +30,21 @@ namespace PhimStrong.Controllers
 			}
 
 			return View(user);
+		}
+
+		[Route("/User/Report")]
+		public async Task<JsonResult> Report(ReportModel model)
+		{
+			_emailSender.SendEmailAsync(
+				"vubamanh05@gmail.com",
+				"Báo lỗi",
+				$"Người dùng có Email {model.Email} báo lỗi : {model.Content}"
+			);
+
+			return Json(new
+			{
+				success = true
+			});
 		}
 	}
 }

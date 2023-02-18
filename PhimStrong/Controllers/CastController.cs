@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using PhimStrong.Data;
 using SharedLibrary.Constants;
+using SharedLibrary.Helpers;
 using SharedLibrary.Models;
 using System.IO;
 
@@ -21,7 +22,7 @@ namespace PhimStrong.Controllers
 		{
 			if (value == null) value = "";
 
-			value = value.ToLower().Trim();
+			value = value.RemoveMarks();
 
 			Cast? cast = _db.Casts.FirstOrDefault(c => c.NormalizeName == value);
 
