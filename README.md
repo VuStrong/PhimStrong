@@ -1,5 +1,5 @@
 # Introduction
-- This is a movie streaming website project with ASP.Net Core MVC.
+- This is a movie streaming website project with ASP.Net Core MVC and Sql Server
 - Visit my website on https://phimstrong.azurewebsites.net.
 
 # Page
