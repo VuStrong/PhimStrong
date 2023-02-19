@@ -11,7 +11,7 @@
   <img src="https://phimstrong.azurewebsites.net/src/img/Upload/SearchMovie.png" alt="Alt text" title="Optional title">
 - Movie Info
   <img src="https://phimstrong.azurewebsites.net/src/img/Upload/MovieDetail.png" alt="Alt text" title="Optional title">
-  <img src="https://phimstrong.azurewebsites.net/src/img/Upload/MovieDetail2.png" alt="Alt text" title="Optional title">
+  <img src="https://github.com/VuManh1/PhimStrong/blob/master/PhimStrong/wwwroot/src/img/Logo/moviedetail2.png" alt="Alt text" title="Optional title">
 - Watch Movie
   <img src="https://phimstrong.azurewebsites.net/src/img/Upload/Watch.png" alt="Alt text" title="Optional title">
   <img src="https://phimstrong.azurewebsites.net/src/img/Upload/Watch2.png" alt="Alt text" title="Optional title">
