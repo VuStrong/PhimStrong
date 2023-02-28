@@ -8,13 +8,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="wwwroot\src\img\Upload\**" />
-    <Content Remove="wwwroot\src\img\Upload\**" />
-    <EmbeddedResource Remove="wwwroot\src\img\Upload\**" />
-    <None Remove="wwwroot\src\img\Upload\**" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="MailKit" Version="3.4.3" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.Facebook" Version="6.0.12" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="6.0.12" />
