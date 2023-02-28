@@ -186,11 +186,12 @@
 	$('#relate-movies').load("/Movie/GetRelateMovies?movieid=" + movieid, "", function () {
 		// scroll
 		var itemIndex = 1;
-		var currentItem = $('.owl-slide .movie-item:nth-child(1)');
 		var distance = $('.owl-slide .movie-item:nth-child(2)').offset().left - $('.owl-slide').offset().left
 		var justClick = false;
 
 		setInterval(function () {
+			if (!isOnScreen(document.querySelector('#relate-movies'))) return;
+
 			if (justClick)
 				justClick = false;
 			else {
@@ -220,14 +221,18 @@
 		});
 
 		function scroll(el) {
-			currentItem = $(`.owl-slide .movie-item:nth-child(${el}`);
-
 			$('.owl-slide').stop().animate(
 				{
 					scrollLeft: (el - 1) * distance
 				},
 				1000 //speed
 			);
+		}
+
+		function isOnScreen(element) {
+			const position = element.getBoundingClientRect();
+
+			return position.top >= 0 && position.bottom <= window.innerHeight;
 		}
 	});
 });

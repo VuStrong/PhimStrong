@@ -326,10 +326,14 @@
 
 @section Scripts{
     <script type="text/javascript">
-        const myCarousel = document.getElementById('carouselExampleIndicators');
+        // tính khoảng cách giữa các item
+        var distance = $('.movie-slide-item:nth-child(2)').offset().top - $('.movie-slide').offset().top;
 
+        const myCarousel = document.getElementById('carouselExampleIndicators');
+    
         // event khi slide của bootstrap đã chuyển thì update movie-slide
         myCarousel.addEventListener('slid.bs.carousel', event => {
+
             // lấy position của .carousel-item.active
             var inx = $('.carousel-item.active').index();
          
@@ -338,7 +342,7 @@
 
             $('.movie-slide').animate(
                 {
-                    scrollTop: $(".movie-slide-item.active").offset().top
+                    scrollTop: inx * distance
                 },
                 800 //speed
             );
