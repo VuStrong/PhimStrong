@@ -26,7 +26,7 @@
     <h3 class="text-success">Kết quả tìm kiếm cho thể loại có @TempData["FilterMessage"].</h3>
 }
 
-@if (Model != null && Model.Count > 0)
+@if (Model != null && Model.Any())
 {
     <p class="text-success">@TempData["TotalCount"] kết quả.</p>
     <table class="table table-hover">

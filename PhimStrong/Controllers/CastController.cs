@@ -24,34 +24,29 @@ namespace PhimStrong.Controllers
 
 			value = value.RemoveMarks();
 
-			Cast? cast = _db.Casts.FirstOrDefault(c => c.NormalizeName == value);
+			Cast? cast = _db.Casts.ToList().FirstOrDefault(c => c.NormalizeName == value);
 
 			if (cast == null)
 			{
 				return NotFound("Không tìm thấy diễn viên " + value);
 			}
 
-			List<Movie> movies = cast.Movies != null ?
+			cast.Movies = cast.Movies != null ?
 				cast.Movies.OrderByDescending(m => m.ReleaseDate).ToList() :
 				new List<Movie>();
 
-			int numberOfPages = (int)Math.Ceiling((double)movies.Count / CommonConstants.MOVIES_PER_PAGE);
+			int numberOfPages = (int)Math.Ceiling((double)cast.Movies.Count / CommonConstants.MOVIES_PER_PAGE);
 			if (page > numberOfPages) page = numberOfPages;
 			if (page <= 0) page = 1;
 
-			movies = movies.Skip((page - 1) * CommonConstants.MOVIES_PER_PAGE)
+			cast.Movies = cast.Movies.Skip((page - 1) * CommonConstants.MOVIES_PER_PAGE)
 				.Take(CommonConstants.MOVIES_PER_PAGE).ToList();
 
 			TempData["NumberOfPages"] = numberOfPages;
 			TempData["CurrentPage"] = page;
 			TempData["RouteValue"] = value;
 
-			TempData["Title"] = cast.Name;
-			ViewData["Filter"] = "Diễn viên";
-			ViewData["Description"] = cast.About;
-			ViewData["Image"] = cast.Avatar;
-
-			return View(movies);
+			return View(cast);
 		}
 	}
 }

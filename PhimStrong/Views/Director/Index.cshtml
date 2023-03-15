@@ -1,30 +1,30 @@
-﻿@model List<Movie>
+﻿@model Director
 @{
-	ViewData["Title"] = TempData["Title"] ?? "none";
+	ViewData["Title"] = Model.Name;
 }
 
-@if (ViewData["Description"] != null)
+@if (Model.About != null)
 {
-	<h1 class="text-success mt-5 mb-2">@($"{ViewData["Filter"]}: {ViewData["Title"]}")</h1>
+	<h1 class="text-success mt-5 mb-2">Đạo diễn: @Model.Name</h1>
 	<div class="my-3">
-		<img src="@(ViewData["Image"] ?? "/src/img/UserAvatars/default_avatar.png")"
-			class="avatar avatar-square img-fit" style="width: 200px; height:200px;">
+		<img src="@(Model.Avatar ?? "/src/img/UserAvatars/default_avatar.png")"
+		 class="avatar avatar-square img-fit" style="width: 200px; height:200px;">
 	</div>
 	<div class="px-3 py-2" style="background-color: #423e3e">
-		<p>@ViewData["Description"]</p>
+		<p>@Model.About</p>
 	</div>
 }
 else
 {
-	<h1 class="text-success my-5">@($"{ViewData["Filter"]}: {ViewData["Title"]}")</h1>
+	<h1 class="text-success my-5">Đạo diễn: @Model.Name</h1>
 	<div class="my-3">
-		<img src="@(ViewData["Image"] ?? "/src/img/UserAvatars/default_avatar.png")"
-			class="avatar avatar-square img-fit" style="width: 200px; height:200px;">
+		<img src="@(Model.Avatar ?? "/src/img/UserAvatars/default_avatar.png")"
+		 class="avatar avatar-square img-fit" style="width: 200px; height:200px;">
 	</div>
 }
 
 <h2 class="text-success mt-5">Phim : </h2>
-<partial name="_MovieContainerPartial" for="@Model"></partial>
+<partial name="_MovieContainerPartial" for="@Model.Movies"></partial>
 
 @{
 	PagingModel pagingModel = new PagingModel

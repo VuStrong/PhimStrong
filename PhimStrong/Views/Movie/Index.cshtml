@@ -4,17 +4,7 @@
 	ViewData["Title"] = TempData["Title"] ?? "none";
 }
 
-@if (ViewData["Description"] != null)
-{
-	<h1 class="text-success mt-5 mb-2">@($"{ViewData["Filter"]}: {ViewData["Title"]}")</h1>
-	<div class="px-3 py-2" style="background-color: #423e3e">
-		<p>@ViewData["Description"]</p>
-	</div>
-}
-else
-{
-	<h1 class="text-success my-5">@($"{ViewData["Filter"]}: {ViewData["Title"]}")</h1>
-}
+<h1 class="text-success my-5">@($"{ViewData["Filter"]}: {ViewData["Title"]}")</h1>
 
 <partial name="_MovieContainerPartial" for="@Model"></partial>
 
