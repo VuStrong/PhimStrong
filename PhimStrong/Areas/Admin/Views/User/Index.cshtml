@@ -1,12 +1,8 @@
-﻿@using PhimStrong.Models;
-@model List<User>
+﻿@model List<User>
 @{
     ViewData["Title"] = "Quản lí User";
+    List<IdentityRole> roles = (List<IdentityRole>?)ViewData["Roles"] ?? new List<IdentityRole>();
 }
-
-@inject UserManager<User> UserManager
-@inject RoleManager<IdentityRole> RoleManager
-
 
 <div class="d-flex mt-4 mb-2" style="justify-content: space-between">
     <h2 class="text-success">@ViewData["Title"]</h2>
@@ -20,7 +16,7 @@
                 </a>
                 <div class="dropdown-menu">
                     <a class="dropdown-item" href="@Url.Action("Index", "User", new { area = "Admin", page = 1 } )">Tất cả</a>
-                    @foreach(var role in RoleManager.Roles)
+                    @foreach(var role in roles)
                     {
                         <a class="dropdown-item" href="@Url.Action("Index", "User", new
                             {

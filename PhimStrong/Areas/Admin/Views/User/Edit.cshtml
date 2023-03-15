@@ -1,10 +1,9 @@
 ﻿@model EditUserModel
-@inject UserManager<User> UserManager
 @{
 	ViewData["Title"] = "Chỉnh sửa User";
 	var allRoles = new SelectList(Model.RoleList);
 
-	var isLockout = await UserManager.IsLockedOutAsync(Model.User);
+	var isLockout = Model.IsLock;
 
 	string lockDiv = isLockout ? "none" : "block";
 	string unlockDiv = !isLockout ? "none" : "block";

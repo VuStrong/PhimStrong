@@ -1,18 +1,19 @@
-﻿@model List<string>
-@inject AppDbContext Db
+﻿@model ModalCastModel
 @{
     // Khởi tạo list cast
     var castList = new List<string>();
-    Db.Casts.ToList().ForEach(c =>
+
+    Model.Casts?.ToList().ForEach(c =>
     {
         castList.Add(c.Name);
     });
 
-    string selectedCasts = String.Join(",", Model);
+    Model.SelectedCasts ??= new List<string>();
+    string selectedCasts = String.Join(",", Model.SelectedCasts);
 }
 
 <div class="hidden-cast" hidden>
-    @foreach (string c in Model)
+    @foreach (string c in Model.SelectedCasts)
     {
         <p>@c</p>
     }
@@ -41,7 +42,7 @@
                         {
                             <tr>
                                 <th class="cast-name" scope="row">@cast</th>
-                                @if (Model != null && Model.Contains(cast))
+                                @if (Model != null && Model.SelectedCasts.Contains(cast))
                                 {
                                     <td>
                                         <button name="@cast" class="btn btn-success add-cast-btn">Đã thêm</button>

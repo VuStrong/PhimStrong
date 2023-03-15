@@ -1,5 +1,4 @@
 ﻿@model MovieModel
-@inject AppDbContext Db
 @{
     ViewData["Title"] = "Thêm phim mới";
 
@@ -8,7 +7,7 @@
 
     // Khởi tạo list country
     var countryList = new List<string>();
-    Db.Countries.ToList().ForEach(c =>
+    ((List<Country>?)ViewData["Countries"])?.ForEach(c =>
     {
         countryList.Add(c.Name);
     });
@@ -17,12 +16,6 @@
 }
 
 <h2 class="text-success">@ViewData["Title"]</h2>
-
-@{
-    var tempCateList = new List<string>();
-    var tempCastList = new List<string>();
-    var tempDirectorList = new List<string>();
-}
 
 <partial name="_StatusMessage" for="@TempData["status"]" />
 
@@ -111,11 +104,11 @@
 
 @section Scripts {
     <script src="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
-    <partial name="_ModalCategory" for="@tempCateList" />
-    <partial name="_ModalCast" for="@tempCastList" />
-    <partial name="_ModalDirector" for="@tempDirectorList" />
+    @await Component.InvokeAsync("ModalCast", new { movieid = Model.Id })
+    @await Component.InvokeAsync("ModalCategory", new { movieid = Model.Id })
+    @await Component.InvokeAsync("ModalDirector", new { movieid = Model.Id })
     <script type="text/javascript">
-        var movieid = @Model.Id;
+        var movieid = '@Model.Id';
     </script>
     <script src="/js/Admin/Movie/MovieCreate.js"></script>
 }

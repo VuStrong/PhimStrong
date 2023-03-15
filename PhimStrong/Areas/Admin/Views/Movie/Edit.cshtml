@@ -1,5 +1,4 @@
 ﻿@model MovieModel
-@inject AppDbContext Db
 @{
     ViewData["Title"] = $"Sửa phim {Model.Name}";
 
@@ -8,7 +7,7 @@
 
     // Khởi tạo list country
     var countryList = new List<string>();
-    Db.Countries.ToList().ForEach(c =>
+    ((List<Country>?)ViewData["Countries"])?.ForEach(c =>
     {
         countryList.Add(c.Name);
     });
@@ -23,12 +22,6 @@
 }
 
 <h2 class="text-success">@ViewData["Title"]</h2>
-
-@{
-    var tempCateList = Model.Categories != null ? Model.Categories.ToList() : new List<string>();
-    var tempCastList = Model.Casts != null ? Model.Casts.ToList() : new List<string>();
-    var tempDirectorList = Model.Directors != null ? Model.Directors.ToList() : new List<string>();
-}
 
 <partial name="/Views/Shared/_ModalConfirm.cshtml"></partial>
 <partial name="_StatusMessage" for="@TempData["status"]" />
@@ -153,9 +146,9 @@
 @section Scripts {
     <script src="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
     <script src="~/js/ModalConfirm.js" asp-append-version="true"></script>
-    <partial name="_ModalCategory" for="@tempCateList" />
-    <partial name="_ModalCast" for="@tempCastList" />
-    <partial name="_ModalDirector" for="@tempDirectorList" />
+    @await Component.InvokeAsync("ModalCast", new { movieid = Model.Id })
+    @await Component.InvokeAsync("ModalCategory", new { movieid = Model.Id })
+    @await Component.InvokeAsync("ModalDirector", new { movieid = Model.Id })
     <script type="text/javascript">
         var movieid = '@Model.Id';
     </script>

@@ -93,6 +93,8 @@ namespace PhimStrong.Areas.Admin.Controllers
         [HttpGet]
         public IActionResult Create()
         {
+            ViewData["Countries"] = _db.Countries.ToList();
+
             return View(new MovieModel());
         }
 
@@ -278,6 +280,8 @@ namespace PhimStrong.Areas.Admin.Controllers
             {
                 return NotFound("Không tìm thấy phim.");
             }
+
+            ViewData["Countries"] = _db.Countries.ToList();
 
             return View(GetMovieModel(movie));
         }

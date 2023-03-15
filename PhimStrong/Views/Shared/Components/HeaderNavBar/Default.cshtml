@@ -1,12 +1,8 @@
-﻿@using Microsoft.AspNetCore.Identity
-@using SharedLibrary.Models
-
-@inject UserManager<User> UserManager
-@inject AppDbContext AppDbContext
-
-@{
-    var user = await UserManager.GetUserAsync(User);
-    int currentYear = DateTime.Now.Year;
+﻿@{
+    User? user = (User?)ViewData["User"];
+    List<Category> categories = (List<Category>?)ViewData["Categories"] ?? new List<Category>();
+    List<Country> countries = (List<Country>?)ViewData["Countries"] ?? new List<Country>();
+    List<int> years = (List<int>?)ViewData["Years"] ?? new List<int>();
 }
 
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark p-0">
@@ -29,7 +25,7 @@
                     <a class="nav-link dropdown-toggle text-uppercase" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">thể loại</a>
                     <div class="dropdown-menu row" style="width:400px">
                         <div class="row">
-                            @foreach (var category in AppDbContext.Categories)
+                            @foreach (var category in categories)
                             {
                                 <a class="dropdown-item" style="width:50%;" href="/Category/@category.Name">@category.Name</a>
                             }
@@ -40,7 +36,7 @@
                     <a class="nav-link dropdown-toggle text-uppercase" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">quốc gia</a>
                     <div class="dropdown-menu row" style="width:400px">
                         <div class="row">
-                            @foreach (var country in AppDbContext.Countries)
+                            @foreach (var country in countries)
                             {
                                 <a class="dropdown-item" style="width:50%;" href="/Country/@country.Name">@country.Name</a>
                             }
@@ -51,10 +47,13 @@
                     <a class="nav-link dropdown-toggle text-uppercase" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">năm phát hành</a>
                     <div class="dropdown-menu row" style="width:400px">
                         <div class="row">
-                            <a class="dropdown-item" style="width:50%;" href="/movie/before-year/@(currentYear - 23)">Trước @(currentYear - 23)</a>
-                            @for (int i = currentYear - 22; i <= currentYear; i++)
+                            @if(years.Any())
                             {
-                                <a class="dropdown-item" style="width:50%;" href="/movie/year/@i">@i</a>
+                                <a class="dropdown-item" style="width:50%;" href="/movie/before-year/@(years[0] - 1)">Trước @(years[0] - 1)</a>
+                            }
+                            @foreach (int year in years)
+                            {
+                                <a class="dropdown-item" style="width:50%;" href="/movie/year/@year">@year</a>
                             }
                         </div>
                     </div>
@@ -81,7 +80,35 @@
                 <input class="form-control me-sm-2" type="search" placeholder="Tìm phim...">
                 <button class="btn btn-secondary my-2 my-sm-0" type="submit">Tìm</button>
             </form>
-            @await Html.PartialAsync("_LoginPartial")
+            
+            <ul class="navbar-nav ms-md-3">
+                @if (user != null)
+                {
+                    <li class="nav-item dropdown mt-3 mt-lg-0">
+                        <a class="nav-link dropdown-toggle"
+                            data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+                            <img src="@(user != null ? user.Avatar ?? "/src/img/UserAvatars/default_avatar.png" : "/src/img/UserAvatars/default_avatar.png")"
+                             class="avatar">
+                            <span class="text-truncate d-inline-flex" style="max-width: 100px">@(user != null ? user.DisplayName : "null")</span>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-end">
+                            <a class="dropdown-item" asp-area="Identity" asp-controller="Account" asp-action="Index">Profile</a>
+                            <form id="logoutForm" class="form-inline" asp-area="Identity" asp-controller="Authentication" asp-action="Logout">
+                                <button id="logout" type="submit" class="dropdown-item nav-link btn btn-link">Đăng xuất</button>
+                            </form>
+                        </div>
+                    </li>
+                }
+                else
+                {
+                    <li class="nav-item">
+                        <a class="nav-link d-lg-block d-none" id="register" asp-area="Identity" asp-controller="Authentication" asp-action="Register">Đăng ký</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link btn btn-success text-white px-2 mt-3 mt-lg-0" style="width: fit-content" id="login" asp-area="Identity" asp-controller="Authentication" asp-action="Login">Đăng nhập</a>
+                    </li>
+                }
+            </ul>
         </div>
     </div>
 </nav>

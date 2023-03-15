@@ -36,7 +36,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Areas\Admin\Views\Shared\" />
     <Folder Include="mailssave\" />
     <Folder Include="wwwroot\src\img\CastAvatars\" />
     <Folder Include="wwwroot\src\img\DirectorAvatars\" />

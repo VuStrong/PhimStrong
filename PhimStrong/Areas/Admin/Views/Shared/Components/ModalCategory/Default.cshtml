@@ -1,16 +1,17 @@
-﻿@model List<string>
-@inject AppDbContext Db
+﻿@model ModalCategoryModel
 @{
     // Khởi tạo list category
     var categoryList = new List<string>();
-    Db.Categories.ToList().ForEach(c =>
+    Model.Categories?.ToList().ForEach(c =>
     {
         categoryList.Add(c.Name);
     });
+
+    Model.SelectedCategories ??= new List<string>();
 }
 
 <div class="hidden-category" hidden>
-    @foreach (string c in Model)
+    @foreach (string c in Model.SelectedCategories)
     {
         <p>@c</p>
     }
@@ -27,7 +28,7 @@
             </div>
             <p class="text-success">
                 Thể loại đã chọn :
-                <strong id="categories-text">@String.Join(", ", Model)</strong>
+                <strong id="categories-text">@String.Join(", ", Model.SelectedCategories)</strong>
             </p>
             <div class="d-flex justify-content-center">
                 <input id="search-category" type="search" placeholder="nhập tên để tìm.." />
@@ -39,7 +40,7 @@
                         {
                             <tr>
                                 <th class="category-name" scope="row">@category</th>
-                                @if (Model != null && Model.Contains(category))
+                                @if (Model != null && Model.SelectedCategories.Contains(category))
                                 {
                                     <td>
                                         <button name="@category" class="btn btn-success add-cate-btn">Đã thêm</button>

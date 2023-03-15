@@ -1,18 +1,18 @@
-﻿@model List<string>
-@inject AppDbContext Db
+﻿@model ModalDirectorModel
 @{
     // Khởi tạo list category
     var directorList = new List<string>();
-    Db.Directors.ToList().ForEach(c =>
+    Model.Directors?.ToList().ForEach(c =>
     {
         directorList.Add(c.Name);
     });
 
-    string selectedDirectors = String.Join(",", Model);
+    Model.SelectedDirectors ??= new List<string>();
+    string selectedDirectors = String.Join(",", Model.SelectedDirectors);
 }
 
 <div class="hidden-director" hidden>
-    @foreach (string d in Model)
+    @foreach (string d in Model.SelectedDirectors)
     {
         <p>@d</p>
     }
@@ -41,7 +41,7 @@
                         {
                             <tr>
                                 <th class="director-name" scope="row">@director</th>
-                                @if (Model != null && Model.Contains(director))
+                                @if (Model != null && Model.SelectedDirectors.Contains(director))
                                 {
                                     <td>
                                         <button name="@director" class="btn btn-success add-director-btn">Đã thêm</button>

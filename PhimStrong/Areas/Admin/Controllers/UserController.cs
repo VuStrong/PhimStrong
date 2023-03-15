@@ -99,6 +99,7 @@ namespace PhimStrong.Areas.Admin.Controllers
             TempData["NumberOfPages"] = numberOfPages;
 			TempData["CurrentPage"] = page;
             TempData["filter"] = filter;
+			ViewData["Roles"] = _roleManager.Roles.ToList();
 
             return View(users);
 		}
@@ -252,17 +253,19 @@ namespace PhimStrong.Areas.Admin.Controllers
 		private async Task<EditUserModel> GetEditUserModel(User user)
         {
 			List<string> userRoles = (await _userManager.GetRolesAsync(user)).ToList();
-
+			
 			string? userRole = "none";
 			if (userRoles.Count > 0)
 			{
 				userRole = userRoles[0];
 			}
 
-			List<string> roles = new List<string>();
-			roles.Add("none");
+            List<string> roles = new()
+            {
+                "none"
+            };
 
-			var isThuyTo = await _userManager.IsInRoleAsync(await _userManager.GetUserAsync(User), RoleConstant.THUY_TO);
+            var isThuyTo = await _userManager.IsInRoleAsync(await _userManager.GetUserAsync(User), RoleConstant.THUY_TO);
 
             (await _roleManager.Roles.ToListAsync()).ForEach(r =>
 			{
@@ -276,8 +279,9 @@ namespace PhimStrong.Areas.Admin.Controllers
             {
                 User = user,
                 UserRole = userRole,
-                RoleList = roles
-            };
+                RoleList = roles,
+                IsLock = await _userManager.IsLockedOutAsync(user)
+			};
 		}
 	}
 }
