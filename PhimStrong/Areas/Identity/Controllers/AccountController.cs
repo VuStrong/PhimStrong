@@ -1,12 +1,13 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
-using NuGet.Common;
+using PhimStrong.Application.Interfaces;
 using PhimStrong.Areas.Identity.Models;
+using PhimStrong.Domain.Models;
+using PhimStrong.Models.User;
 using SharedLibrary.Helpers;
-using SharedLibrary.Models;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Text.RegularExpressions;
@@ -18,69 +19,72 @@ namespace PhimStrong.Areas.Identity.Controllers
     [Authorize]
     public class AccountController : Controller
     {
-        private readonly UserManager<User> _userManager;
-		private readonly IWebHostEnvironment _environment;
-		private readonly IEmailSender _emailSender;
+        private readonly IWebHostEnvironment _environment;
+        private readonly IEmailSender _emailSender;
+        private readonly IUserService _userService;
+        private readonly IMapper _mapper;
 
-        public AccountController(UserManager<User> userManager, IWebHostEnvironment environment, IEmailSender emailSender)
+        public AccountController(
+            IWebHostEnvironment environment,
+            IEmailSender emailSender,
+            IUserService userService,
+            IMapper mapper)
         {
-            _userManager = userManager;
             _environment = environment;
             _emailSender = emailSender;
+            _userService = userService;
+            _mapper = mapper;
         }
 
         [HttpGet]
         [Route("/Account")]
         public async Task<IActionResult> Index()
         {
-            var user = await _userManager.GetUserAsync(User);
+            User? user = await _userService.GetByClaims(User);
 
             if (user == null)
-            {
                 return NotFound("Không tìm thấy user :((");
-            }
 
-            return View(user);
+            return View(_mapper.Map<UserViewModel>(user));
         }
 
         [HttpGet]
         [Route("/Account/ChangePassword")]
-        public IActionResult ChangePassword()
-        {
-            return View();
-        }
+        public IActionResult ChangePassword() => View();
 
         [HttpPost]
         [Route("/Account/ChangePassword")]
         public async Task<IActionResult> ChangePassword(ChangePasswordModel model)
-		{
-			var user = await _userManager.GetUserAsync(User);
-			if (user == null)
-			{
-				return NotFound($"Unable to load user.");
-			}
+        {
+            User? user = await _userService.GetByClaims(User);
+            if (user == null)
+            {
+                return NotFound($"Unable to load user.");
+            }
 
-            var result = await _userManager.ChangePasswordAsync(user, model.OldPassword, model.NewPassword);
-            if (result.Succeeded)
+            var result = await _userService.ChangePasswordAsync(user.Id, model.OldPassword, model.NewPassword);
+            if (result.Success)
             {
                 TempData["success"] = "Thay đổi mật khẩu thành công !";
                 return RedirectToAction("Index");
             }
 
-            foreach(var error in result.Errors)
-            {
-                ModelState.AddModelError(string.Empty, error.Description);
-            }
-            TempData["error"] = "Thay đổi mật khẩu thất bại !";
+            if (result.Errors == null) return View();
 
-			return View();
-		}
+            foreach (var error in result.Errors)
+            {
+                ModelState.AddModelError(string.Empty, error);
+            }
+
+            TempData["error"] = "Thay đổi mật khẩu thất bại !";
+            return View();
+        }
 
         [HttpGet]
         [Route("/Account/Email")]
         public async Task<IActionResult> Email()
         {
-            var user = await _userManager.GetUserAsync(User);
+            var user = await _userService.GetByClaims(User);
             if (user == null)
             {
                 return NotFound($"Unable to load user.");
@@ -96,50 +100,42 @@ namespace PhimStrong.Areas.Identity.Controllers
         [HttpPost]
         public async Task<IActionResult> ChangeEmail(ManageEmailModel model)
         {
-            var user = await _userManager.GetUserAsync(User);
+            var user = await _userService.GetByClaims(User);
             if (user == null)
             {
                 return NotFound($"Unable to load user.");
             }
 
-            var emailUser = await _userManager.FindByEmailAsync(model.NewEmail);
-            if (emailUser != null)
+            var result = await _userService.ChangeEmailAsync(user.Id, model.NewEmail);
+
+            if (!result.Success)
             {
-                TempData["status"] = $"Lỗi, Email {model.NewEmail} này đã tồn tại.";
+                TempData["status"] = $"Lỗi, {result.Errors?[0]}";
                 return RedirectToAction("Email");
             }
-
-            if (model.NewEmail != user.Email)
+            if (result.Success)
             {
-                user.Email = model.NewEmail;
-                user.EmailConfirmed = false;
+                string token = await _userService.GenerateEmailConfirmationTokenAsync(user);
+                token = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token));
 
-                var result = await _userManager.UpdateAsync(user);
-
-                if (result.Succeeded)
-                {
-                    string token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-                    token = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token));
-
-                    string callbackUrl = Url.Action("ConfirmEmail", "Authentication",
-                            new
-                            {
-                                area = "Identity",
-                                token = token,
-                                userid = user.Id
-                            },
-                            protocol: Request.Scheme
-                        );
-
-                    _emailSender.SendEmailAsync(
-                        user.Email,
-                        "Xác thực Email",
-                        $"Yô người mới !, click vào <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>đây</a> để xác thực Email của bạn nhé :)"
+                string? callbackUrl = Url.Action("ConfirmEmail", "Authentication",
+                        new
+                        {
+                            area = "Identity",
+                            token = token,
+                            userid = user.Id
+                        },
+                        protocol: Request.Scheme
                     );
 
-                    TempData["success"] = "Đã thay đổi Email";
-                    TempData["status"] = "Đã thay đổi Email, hãy kiểm tra hòm thư Email để xác thực.";
-                }
+                _emailSender.SendEmailAsync(
+                    user.Email,
+                    "Xác thực Email",
+                    $"Yô người mới !, click vào <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>đây</a> để xác thực Email của bạn nhé :)"
+                );
+
+                TempData["success"] = "Đã thay đổi Email";
+                TempData["status"] = "Đã thay đổi Email, hãy kiểm tra hòm thư Email để xác thực.";
             }
 
             return RedirectToAction("Email");
@@ -148,13 +144,13 @@ namespace PhimStrong.Areas.Identity.Controllers
         [HttpPost]
         public async Task<JsonResult> SendEmailVertify()
         {
-			var user = await _userManager.GetUserAsync(User);
+            var user = await _userService.GetByClaims(User);
             if (user == null)
             {
-                return Json(new {success = false});
+                return Json(new { success = false });
             }
 
-            string token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+            string token = await _userService.GenerateEmailConfirmationTokenAsync(user);
             token = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token));
 
             string callbackUrl = Url.Action("ConfirmEmail", "Authentication",
@@ -177,60 +173,39 @@ namespace PhimStrong.Areas.Identity.Controllers
         }
 
         [HttpPost]
-        public async Task<JsonResult> EditInformation(User? userModel)
+        public async Task<JsonResult> EditInformation(EditUserViewModel? model)
         {
-            var user = await _userManager.GetUserAsync(User);
-            
-            if (userModel == null || user == null)
+            var user = await _userService.GetByClaims(User);
+
+            if (model == null || user == null)
             {
                 return Json(new { success = false });
             }
 
-            if (userModel.AvatarFile != null)
+            User userModel = _mapper.Map<User>(model);
+
+            if (model.AvatarFile != null)
             {
-                if (!userModel.AvatarFile.FileName.EndsWith(".png") &&
-                    !userModel.AvatarFile.FileName.EndsWith(".jpg"))
+                if (!model.AvatarFile.FileName.EndsWith(".png") &&
+                    !model.AvatarFile.FileName.EndsWith(".jpg"))
                 {
                     return Json(new { success = false, error = "Định dạng ảnh phải là .png, .jpg !" });
                 }
 
                 var file = Path.Combine(_environment.ContentRootPath, "wwwroot/src/img/UserAvatars", user.Id + ".jpg");
-                
+
                 using (var fileStream = new FileStream(file, FileMode.Create))
                 {
-                    await userModel.AvatarFile.CopyToAsync(fileStream);
+                    await model.AvatarFile.CopyToAsync(fileStream);
                 }
 
-                if(user.Avatar != "/src/img/UserAvatars/" + user.Id + ".jpg") 
-                    user.Avatar = "/src/img/UserAvatars/" + user.Id + ".jpg";
+                userModel.Avatar = "/src/img/UserAvatars/" + user.Id + ".jpg";
             }
 
-            Regex validatePhoneNumberRegex = new Regex("^\\+?\\d{1,4}?[-.\\s]?\\(?\\d{1,3}?\\)?[-.\\s]?\\d{1,4}[-.\\s]?\\d{1,4}[-.\\s]?\\d{1,9}$");
-            if (userModel.PhoneNumber != null && userModel.PhoneNumber != user.PhoneNumber && validatePhoneNumberRegex.IsMatch(userModel.PhoneNumber))
-            {
-                var rel = await _userManager.SetPhoneNumberAsync(user, userModel.PhoneNumber);
-                if(rel.Succeeded) user.PhoneNumberConfirmed = true;
-            }
 
-            if (userModel.DisplayName != null && userModel.DisplayName != user.DisplayName)
-            {
-                user.DisplayName = userModel.DisplayName;
-                user.NormalizeDisplayName = user.DisplayName.RemoveMarks();
-            }
+            var result = await _userService.UpdateAsync(user.Id, userModel);
 
-            if (userModel.Hobby != null && userModel.Hobby != user.Hobby)
-            {
-                user.Hobby = userModel.Hobby;
-            }
-
-            if (userModel.FavoriteMovie != null && userModel.FavoriteMovie != user.FavoriteMovie)
-            {
-                user.FavoriteMovie = userModel.FavoriteMovie;
-            }
-
-            var result = await _userManager.UpdateAsync(user);
-
-            if (!result.Succeeded)
+            if (!result.Success)
             {
                 return Json(new { success = false });
             }
@@ -238,12 +213,12 @@ namespace PhimStrong.Areas.Identity.Controllers
             return Json(new
             {
                 success = true,
-                displayname = user.DisplayName,
-                phone = user.PhoneNumber,
-                favoritemovie = user.FavoriteMovie,
-                hobby = user.Hobby,
-                avatar = user.Avatar ?? ""
+                displayname = userModel.DisplayName,
+                phone = userModel.PhoneNumber,
+                favoritemovie = userModel.FavoriteMovie,
+                hobby = userModel.Hobby,
+                avatar = userModel.Avatar ?? ""
             });
         }
-	}
+    }
 }

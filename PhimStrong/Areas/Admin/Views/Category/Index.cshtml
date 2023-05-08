@@ -1,4 +1,4 @@
-﻿@model List<Category>
+﻿@model PagedList<CategoryViewModel>
 @{
     ViewData["Title"] = "Quản lí Category";
 }
@@ -10,7 +10,7 @@
         <ul class="d-flex align-items-center" style="list-style: none">
             <li class="nav-item">
                 <form id="search-name-form" class="d-flex" method="get" asp-route-page="1">
-                    <input name="filter" class="form-control me-sm-2" type="text" placeholder="Nhập tên">
+                    <input name="value" class="form-control me-sm-2" type="text" placeholder="Nhập tên">
                     <button id="search-name-btn" class="btn btn-secondary my-2 my-sm-0" type="submit">Search</button>
                 </form>
             </li>
@@ -21,14 +21,14 @@
     <a class="btn btn-success" asp-controller="Category" asp-action="Create">Thêm thể loại</a>
 </div>
 
-@if (TempData["FilterMessage"] != null)
+@if (ViewData["value"] != null)
 {
-    <h3 class="text-success">Kết quả tìm kiếm cho thể loại có @TempData["FilterMessage"].</h3>
+    <h3 class="text-success">Kết quả tìm kiếm thể loại : @ViewData["value"].</h3>
 }
 
 @if (Model != null && Model.Any())
 {
-    <p class="text-success">@TempData["TotalCount"] kết quả.</p>
+    <p class="text-success">@Model.TotalItems kết quả.</p>
     <table class="table table-hover">
         <thead>
             <tr class="table-info">
@@ -57,20 +57,20 @@ else
 @{
     PagingModel pagingModel = new PagingModel
             {
-                NumberOfPages = (int)(TempData["NumberOfPages"] ?? 1),
-                CurrentPage = (int)(TempData["CurrentPage"] ?? 1),
+                NumberOfPages = Model?.TotalPage ?? 1,
+                CurrentPage = Model?.CurrentPage ?? 1,
                 Callback = (int page) => Url.Action("Index", "Category", new
                 {
                     area = "Admin",
                     page = page,
-                    filter = (string)(TempData["filter"] ?? "")
+                    value = ViewData["value"]
                 })
             };
 }
 
 <partial name="/Views/Shared/_PagingPartial.cshtml" for="@pagingModel"></partial>
 
-@section Scripts{
+@*@section Scripts{
     <script type="text/javascript">
         // trước khi sumbit thì thay lại giá trị cho thẻ input
         $('#search-name-form').submit(function (e) {
@@ -87,6 +87,6 @@ else
             searchBtn.val('');
         });
     </script>
-}
+}*@
 
 

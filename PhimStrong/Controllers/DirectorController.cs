@@ -1,51 +1,48 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using PhimStrong.Data;
-using SharedLibrary.Constants;
-using SharedLibrary.Helpers;
-using SharedLibrary.Models;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
+using PhimStrong.Application.Interfaces;
+using PhimStrong.Domain.Models;
+using PhimStrong.Domain.PagingModel;
+using PhimStrong.Models.Director;
+using PhimStrong.Models.Movie;
 
 namespace PhimStrong.Controllers
 {
 	public class DirectorController : Controller
 	{
-		private readonly AppDbContext _db;
+		private const int MOVIES_PER_PAGE = 25;
 
-		public DirectorController(AppDbContext db)
+		private readonly IMapper _mapper;
+		private readonly IDirectorService _directorService;
+		private readonly IMovieService _movieService;
+
+		public DirectorController(IDirectorService directorService, IMovieService movieService, IMapper mapper)
 		{
-			_db = db;
+			_directorService = directorService;
+			_movieService = movieService;
+			_mapper = mapper;
 		}
 
 		[HttpGet]
 		[Route("/Director/{value}")]
-		public IActionResult Index(string? value, int page)
+		public async Task<IActionResult> Index(string? value, int page)
 		{
-			if (value == null) value = "";
-
-			value = value.RemoveMarks();
-
-			Director? director = _db.Directors.ToList().FirstOrDefault(d => d.NormalizeName == value);
+			Director? director = await _directorService.GetByNameAsync(value ?? "");
 
 			if (director == null)
 			{
 				return NotFound("Không tìm thấy đạo diễn " + value);
 			}
 
-			director.Movies = director.Movies != null ?
-				director.Movies.OrderByDescending(m => m.ReleaseDate).ToList() :
-				new List<Movie>();
+			PagedList<Movie> movies = await _movieService.FindByDirectorIdAsync(
+															director.Id,
+															new PagingParameter(page, MOVIES_PER_PAGE));
+			ViewData["RouteValue"] = value;
 
-			int numberOfPages = (int)Math.Ceiling((double)director.Movies.Count / CommonConstants.MOVIES_PER_PAGE);
-			if (page > numberOfPages) page = numberOfPages;
-			if (page <= 0) page = 1;
+			DirectorViewModel model = _mapper.Map<DirectorViewModel>(director);
+			model.Movies = _mapper.Map<PagedList<MovieViewModel>>(movies);
 
-			director.Movies = director.Movies.Skip((page - 1) * CommonConstants.MOVIES_PER_PAGE)
-				.Take(CommonConstants.MOVIES_PER_PAGE).ToList();
-
-			TempData["NumberOfPages"] = numberOfPages;
-			TempData["CurrentPage"] = page;
-			TempData["RouteValue"] = value;
-
-			return View(director);
+			return View(model);
 		}
 	}
 }

@@ -3,9 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.4.33205.214
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PhimStrong", "PhimStrong\PhimStrong.csproj", "{9C052DA6-5F30-4D80-A4AF-6DB4C4F67C36}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PhimStrong", "PhimStrong\PhimStrong.csproj", "{9C052DA6-5F30-4D80-A4AF-6DB4C4F67C36}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharedLibrary", "SharedLibrary\SharedLibrary.csproj", "{4182D1E3-F632-4CB6-8BFD-FCB44CC96A43}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PhimStrong.Application", "PhimStrong.Application\PhimStrong.Application.csproj", "{D457C91F-4D3D-4C75-8BED-976D8C1FD49A}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PhimStrong.Domain", "PhimStrong.Domain\PhimStrong.Domain.csproj", "{BA9EFADE-1FA8-4798-BCA6-405683D507E0}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PhimStrong.Infrastructure", "PhimStrong.Infrastructure\PhimStrong.Infrastructure.csproj", "{595B2786-9E6E-4FC4-8ACF-BDAA0894978C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharedLibrary", "SharedLibrary\SharedLibrary.csproj", "{B95FCAC8-4F8F-46B4-BEFB-1EC022BA1CF1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,10 +23,22 @@ Global
 		{9C052DA6-5F30-4D80-A4AF-6DB4C4F67C36}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9C052DA6-5F30-4D80-A4AF-6DB4C4F67C36}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9C052DA6-5F30-4D80-A4AF-6DB4C4F67C36}.Release|Any CPU.Build.0 = Release|Any CPU
-		{4182D1E3-F632-4CB6-8BFD-FCB44CC96A43}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4182D1E3-F632-4CB6-8BFD-FCB44CC96A43}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4182D1E3-F632-4CB6-8BFD-FCB44CC96A43}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4182D1E3-F632-4CB6-8BFD-FCB44CC96A43}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D457C91F-4D3D-4C75-8BED-976D8C1FD49A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D457C91F-4D3D-4C75-8BED-976D8C1FD49A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D457C91F-4D3D-4C75-8BED-976D8C1FD49A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D457C91F-4D3D-4C75-8BED-976D8C1FD49A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BA9EFADE-1FA8-4798-BCA6-405683D507E0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BA9EFADE-1FA8-4798-BCA6-405683D507E0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BA9EFADE-1FA8-4798-BCA6-405683D507E0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BA9EFADE-1FA8-4798-BCA6-405683D507E0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{595B2786-9E6E-4FC4-8ACF-BDAA0894978C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{595B2786-9E6E-4FC4-8ACF-BDAA0894978C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{595B2786-9E6E-4FC4-8ACF-BDAA0894978C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{595B2786-9E6E-4FC4-8ACF-BDAA0894978C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B95FCAC8-4F8F-46B4-BEFB-1EC022BA1CF1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B95FCAC8-4F8F-46B4-BEFB-1EC022BA1CF1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B95FCAC8-4F8F-46B4-BEFB-1EC022BA1CF1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B95FCAC8-4F8F-46B4-BEFB-1EC022BA1CF1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

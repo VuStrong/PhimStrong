@@ -1,4 +1,4 @@
-﻿@model Country
+﻿@model CountryViewModel
 @{
 	ViewData["Title"] = Model.Name;
 }
@@ -21,16 +21,16 @@ else
 @{
 	PagingModel pagingModel = new PagingModel
 			{
-				NumberOfPages = (int)(TempData["NumberOfPages"] ?? 1),
-				CurrentPage = (int)(TempData["CurrentPage"] ?? 1),
+				NumberOfPages = Model.Movies.TotalPage,
+				CurrentPage = Model.Movies.CurrentPage,
 				Callback = (int page) => Url.Action(
-					(TempData["Action"] ?? "Index").ToString(),
+					(ViewData["Action"] ?? "Index").ToString(),
 					"Country",
 					new
 					{
 						area = "",
 						page = page,
-						value = TempData["RouteValue"]
+						value = ViewData["RouteValue"]
 					})
 			};
 }

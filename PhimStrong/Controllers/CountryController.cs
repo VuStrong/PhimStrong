@@ -1,51 +1,48 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using PhimStrong.Data;
-using SharedLibrary.Constants;
-using SharedLibrary.Helpers;
-using SharedLibrary.Models;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
+using PhimStrong.Application.Interfaces;
+using PhimStrong.Domain.Models;
+using PhimStrong.Domain.PagingModel;
+using PhimStrong.Models.Country;
+using PhimStrong.Models.Movie;
 
 namespace PhimStrong.Controllers
 {
 	public class CountryController : Controller
 	{
-		private readonly AppDbContext _db;
+		private const int MOVIES_PER_PAGE = 25;
 
-		public CountryController(AppDbContext db)
+		private readonly IMapper _mapper;
+		private readonly ICountryService _countryService;
+		private readonly IMovieService _movieService;
+
+		public CountryController(ICountryService countryService, IMovieService movieService, IMapper mapper)
 		{
-			_db = db;
+			_countryService = countryService;
+			_movieService = movieService;
+			_mapper = mapper;
 		}
 
 		[HttpGet]
 		[Route("/Country/{value}")]
-		public IActionResult Index(string? value, int page)
+		public async Task<IActionResult> Index(string? value, int page)
 		{
-			if (value == null) value = "";
-
-			value = value.RemoveMarks();
-
-			Country? country = _db.Countries.ToList().FirstOrDefault(c => c.NormalizeName == value);
+			Country? country = await _countryService.GetByNameAsync(value ?? "");
 
 			if (country == null)
 			{
 				return NotFound("Không tìm thấy quốc gia " + value);
 			}
 
-			country.Movies = country.Movies != null ?
-				country.Movies.OrderByDescending(m => m.ReleaseDate).ToList() :
-				new List<Movie>();
+			PagedList<Movie> movies = await _movieService.FindByCountryIdAsync(
+															country.Id,
+															new PagingParameter(page, MOVIES_PER_PAGE));
+			ViewData["RouteValue"] = value;
 
-			int numberOfPages = (int)Math.Ceiling((double)country.Movies.Count / CommonConstants.MOVIES_PER_PAGE);
-			if (page > numberOfPages) page = numberOfPages;
-			if (page <= 0) page = 1;
+			CountryViewModel model = _mapper.Map<CountryViewModel>(country);
+			model.Movies = _mapper.Map<PagedList<MovieViewModel>>(movies);
 
-			country.Movies = country.Movies.Skip((page - 1) * CommonConstants.MOVIES_PER_PAGE)
-				.Take(CommonConstants.MOVIES_PER_PAGE).ToList();
-
-			TempData["NumberOfPages"] = numberOfPages;
-			TempData["CurrentPage"] = page;
-			TempData["RouteValue"] = value;
-
-			return View(country);
+			return View(model);
 		}
 	}
 }

@@ -169,18 +169,32 @@ $('#create-movie-btn').click(function () {
         formData.append("ImageFile", files[0]);
     }
 
-    if (jsSelectedCate.length > 0)
-        formData.append("Categories", jsSelectedCate);
-    if (jsSelectedCast.length > 0)
-        formData.append("Casts", jsSelectedCast);
-    if (jsSelectedDirector.length > 0)
-        formData.append("Directors", jsSelectedDirector);
+    if (jsSelectedCate.length > 0) {
+        jsSelectedCate.forEach(c => {
+            formData.append("Categories[]", c);
+        })
+    }
+
+    if (jsSelectedCast.length > 0) {
+        jsSelectedCast.forEach(c => {
+            formData.append("Casts[]", c);
+        })
+    }
+
+    if (jsSelectedDirector.length > 0) {
+        jsSelectedDirector.forEach(d => {
+            formData.append("Directors[]", d);
+        })
+    }
 
     if ($('#select-country').val())
         formData.append("Country", $('#select-country').val());
 
-    if (postVidUrl.length > 0)
-        formData.append("Videos", postVidUrl);
+    if (postVidUrl.length > 0) {
+        postVidUrl.forEach(v => {
+           formData.append("Videos[]", v);
+        })
+    }
 
     if ($('#movie-trailer').val().trim())
         formData.append("Trailer", $('#movie-trailer').val().trim());

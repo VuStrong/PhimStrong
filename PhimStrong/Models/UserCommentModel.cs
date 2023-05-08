@@ -1,6 +1,4 @@
-﻿using SharedLibrary.Models;
-
-namespace PhimStrong.Models
+﻿namespace PhimStrong.Models
 {
 #pragma warning disable
 	public class UserCommentModel

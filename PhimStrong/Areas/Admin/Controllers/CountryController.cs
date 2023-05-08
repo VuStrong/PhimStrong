@@ -1,13 +1,12 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using PhimStrong.Data;
+using PhimStrong.Application.Interfaces;
+using PhimStrong.Areas.Admin.Models.Country;
+using PhimStrong.Domain.Models;
+using PhimStrong.Domain.PagingModel;
+using PhimStrong.Models.Country;
 using SharedLibrary.Constants;
-using SharedLibrary.Helpers;
-using SharedLibrary.Models;
-using System.Data;
-using System.IO;
-using System.Text.RegularExpressions;
 
 namespace PhimStrong.Areas.Admin.Controllers
 {
@@ -15,174 +14,88 @@ namespace PhimStrong.Areas.Admin.Controllers
     [Authorize(Roles = $"{RoleConstant.ADMIN}, {RoleConstant.THUY_TO}")]
     public class CountryController : Controller
     {
-        private readonly AppDbContext _db;
-        private readonly IWebHostEnvironment _environment;
+        private readonly ICountryService _countryService;
+        private readonly IMapper _mapper;
 
-        public CountryController(AppDbContext db, IWebHostEnvironment environment)
+        public CountryController(ICountryService countryService, IMapper mapper)
         {
-            _db = db;
-            _environment = environment;
+            _countryService = countryService;
+            _mapper = mapper;
         }
 
         private const int COUNTRY_PER_PAGE = 15;
 
         [HttpGet]
-        public IActionResult Index(int page, string? filter = null)
+        public async Task<IActionResult> Index(int page, string? value = null)
         {
-            if (page <= 0) page = 1;
+            PagedList<Country> countries = await _countryService.SearchAsync(value, new PagingParameter(page, COUNTRY_PER_PAGE));
 
-            int numberOfPages = 0;
+            if (value != null) ViewData["value"] = value;
 
-            List<Country> countries = new List<Country>();
-			int count = 0; // total of search result
-			if (filter == null || filter.Trim() == "")
-            {
-                count = _db.Countries.Count();
-
-                numberOfPages = (int)Math.Ceiling((double)count / COUNTRY_PER_PAGE);
-				TempData["TotalCount"] = count;
-
-				if (page > numberOfPages) page = numberOfPages;
-                if (page <= 0) page = 1;
-
-                countries = _db.Countries.Skip((page - 1) * COUNTRY_PER_PAGE).Take(COUNTRY_PER_PAGE).ToList();
-            }
-            else
-            {
-                MatchCollection match = Regex.Matches(filter ?? "", @"^<.+>");
-
-                if (match.Count > 0)
-                {
-                    string matchValue = new Regex(@"<|>").Replace(match[0].ToString(), "");
-
-                    string filterValue = new Regex(@"^<.+>").Replace(filter ?? "", "");
-                    switch (matchValue)
-                    {
-                        case PageFilterConstant.FILTER_BY_NAME:
-                            TempData["FilterMessage"] = "tên là " + filterValue;
-                            filterValue = filterValue.RemoveMarks();
-
-                            countries = _db.Countries.ToList().Where(m =>
-                                (m.NormalizeName ?? "").Contains(filterValue)
-                            ).ToList();
-
-                            break;
-                        default:
-                            break;
-                    }
-                }
-
-                count = countries.Count;
-				TempData["TotalCount"] = count;
-
-				numberOfPages = (int)Math.Ceiling((double)count / COUNTRY_PER_PAGE);
-                if (page > numberOfPages) page = numberOfPages;
-                if (page <= 0) page = 1;
-
-                countries = countries.Skip((page - 1) * COUNTRY_PER_PAGE).Take(COUNTRY_PER_PAGE).ToList();
-            }
-
-            TempData["NumberOfPages"] = numberOfPages;
-            TempData["CurrentPage"] = page;
-            TempData["filter"] = filter;
-
-            return View(countries);
+            return View(_mapper.Map<PagedList<CountryViewModel>>(countries));
         }
 
         [HttpGet]
         public IActionResult Create()
         {
-            return View(new Country());
+            return View(new CreateCountryViewModel());
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(Country country)
+        public async Task<IActionResult> Create(CreateCountryViewModel model)
         {
-            if (country == null)
-            {
-                TempData["status"] = "Lỗi, không có quốc gia được chọn.";
-                return View(country);
-            }
-
             if (!ModelState.IsValid)
             {
                 ModelState.AddModelError(string.Empty, "Lỗi không thể thêm quốc gia.");
-                return View();
+                return View(model);
             }
 
-            country.IdNumber = _db.Countries.Any() ? _db.Countries.Max(x => x.IdNumber) + 1 : 1;
-            country.Id = "country" + country.IdNumber.ToString();
-
-            // chỉnh lại format tên :
-            country.Name = Regex.Replace(country.Name.ToLower().Trim(), @"(^\w)|(\s\w)", m => m.Value.ToUpper());
-            country.NormalizeName = country.Name.RemoveMarks();
-
+            Country country = _mapper.Map<Country>(model);
             try
             {
-                _db.Countries.Add(country);
-                await _db.SaveChangesAsync();
+                await _countryService.CreateAsync(country);
             }
             catch (Exception e)
             {
                 TempData["status"] = "Lỗi, " + e.Message;
-                return View(country);
+                return View(model);
             }
 
-            TempData["success"] = $"Đã thêm quốc gia {country.Name}.";
+            TempData["success"] = $"Đã thêm quốc gia {model.Name}.";
             return RedirectToAction("Index");
         }
 
         [HttpGet]
-        public IActionResult Edit(string countryid)
+        public async Task<IActionResult> Edit(string countryid)
         {
-            var country = _db.Countries.FirstOrDefault(c => c.Id == countryid);
+            var country = await _countryService.GetByIdAsync(countryid);
 
             if (country == null)
             {
                 return NotFound("Không tìm thấy quốc gia.");
             }
 
-            return View(country);
+            return View(_mapper.Map<EditCountryViewModel>(country));
         }
 
         [HttpPost]
-        public async Task<IActionResult> Edit(string countryid, Country country)
+        public async Task<IActionResult> Edit(string countryid, EditCountryViewModel model)
         {
-            if (country == null)
-            {
-                return NotFound("Không tìm thấy quốc gia.");
-            }
-
             if (!ModelState.IsValid)
             {
                 ModelState.AddModelError(string.Empty, "Lỗi không thể sửa.");
-                country.Id = countryid;
-                return View(country);
+                return View(model);
             }
 
-            var countryToEdit = _db.Countries.FirstOrDefault(c => c.Id == countryid);
-
-            if (countryToEdit == null)
-            {
-                return NotFound("Không tìm thấy quốc gia.");
-            }
-
-            if(country.Name != countryToEdit.Name)
-            {
-                countryToEdit.Name = Regex.Replace(country.Name.ToLower().Trim(), @"(^\w)|(\s\w)", m => m.Value.ToUpper());
-                countryToEdit.NormalizeName = countryToEdit.Name.RemoveMarks();
-			}
-            if(country.About != countryToEdit.About) countryToEdit.About = country.About;
-
+            Country country = _mapper.Map<Country>(model);
             try
             {
-                _db.Countries.Update(countryToEdit);
-                await _db.SaveChangesAsync();
+                await _countryService.UpdateAsync(countryid, country);
             }
             catch (Exception e)
             {
                 TempData["status"] = "Lỗi, " + e.Message;
-                return View(country);
+                return View(model);
             }
 
             TempData["success"] = "Chỉnh sửa thành công";
@@ -192,17 +105,9 @@ namespace PhimStrong.Areas.Admin.Controllers
         [HttpPost]
         public async Task<IActionResult> Delete(string countryid)
         {
-            var country = _db.Countries.FirstOrDefault(c => c.Id == countryid);
-
-            if (country == null)
-            {
-                return NotFound("Không tìm thấy quốc gia.");
-            }
-
             try
             {
-                _db.Countries.Remove(country);
-                await _db.SaveChangesAsync();
+                await _countryService.DeleteAsync(countryid);
             }
             catch (Exception e)
             {

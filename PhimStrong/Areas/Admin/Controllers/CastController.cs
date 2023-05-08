@@ -1,11 +1,12 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using PhimStrong.Data;
+using PhimStrong.Application.Interfaces;
+using PhimStrong.Areas.Admin.Models.Cast;
+using PhimStrong.Domain.Models;
+using PhimStrong.Domain.PagingModel;
+using PhimStrong.Models.Cast;
 using SharedLibrary.Constants;
-using SharedLibrary.Helpers;
-using SharedLibrary.Models;
-using System.Data;
-using System.Text.RegularExpressions;
 
 namespace PhimStrong.Areas.Admin.Controllers
 {
@@ -13,203 +14,119 @@ namespace PhimStrong.Areas.Admin.Controllers
     [Authorize(Roles = $"{RoleConstant.ADMIN}, {RoleConstant.THUY_TO}")]
     public class CastController : Controller
     {
-        private readonly AppDbContext _db;
-        private readonly IWebHostEnvironment _environment;
+        private readonly ICastService _castService;
+        private readonly IMapper _mapper;
+		private readonly IWebHostEnvironment _environment;
 
-        public CastController(AppDbContext db, IWebHostEnvironment environment)
+        public CastController(
+            ICastService castService,
+            IMapper mapper,
+            IWebHostEnvironment environment)
         {
-            _db = db;
+            _mapper = mapper;
+            _castService = castService;
             _environment = environment;
         }
 
-        private const int CAST_PER_PAGE = 15;
+        private const int CASTS_PER_PAGE = 15;
 
         [HttpGet]
-        public IActionResult Index(int page, string? filter = null)
+        public async Task<IActionResult> Index(int page, string? value = null)
         {
-            if (page <= 0) page = 1;
+			PagedList<Cast> casts = await _castService.SearchAsync(value, new PagingParameter(page, CASTS_PER_PAGE));
 
-            int numberOfPages = 0;
+            if(value != null) ViewData["value"] = value;
 
-            List<Cast> casts = new List<Cast>();
-			int count = 0; // total of search result
-			if (filter == null || filter.Trim() == "")
-            {
-                count = _db.Casts.Count();
-
-				numberOfPages = (int)Math.Ceiling((double)count / CAST_PER_PAGE);
-				TempData["TotalCount"] = count;
-
-				if (page > numberOfPages) page = numberOfPages;
-                if (page <= 0) page = 1;
-
-                casts = _db.Casts.Skip((page - 1) * CAST_PER_PAGE).Take(CAST_PER_PAGE).ToList();
-            }
-            else
-            {
-                MatchCollection match = Regex.Matches(filter ?? "", @"^<.+>");
-
-                if (match.Count > 0)
-                {
-                    string matchValue = new Regex(@"<|>").Replace(match[0].ToString(), "");
-
-                    string filterValue = new Regex(@"^<.+>").Replace(filter ?? "", "");
-                    switch (matchValue)
-                    {
-                        case PageFilterConstant.FILTER_BY_NAME:
-                            TempData["FilterMessage"] = "tên là " + filterValue;
-                            filterValue = filterValue.RemoveMarks();
-
-                            casts = _db.Casts.ToList().Where(m =>
-                                (m.NormalizeName ?? "").Contains(filterValue)
-                            ).ToList();
-
-                            break;
-                        default:
-                            break;
-                    }
-                }
-
-                count = casts.Count;
-				TempData["TotalCount"] = count;
-
-				numberOfPages = (int)Math.Ceiling((double)count / CAST_PER_PAGE);
-                if (page > numberOfPages) page = numberOfPages;
-                if (page <= 0) page = 1;
-
-                casts = casts.Skip((page - 1) * CAST_PER_PAGE).Take(CAST_PER_PAGE).ToList();
-            }
-
-            TempData["NumberOfPages"] = numberOfPages;
-            TempData["CurrentPage"] = page;
-            TempData["filter"] = filter;
-
-            return View(casts);
+			return View(_mapper.Map<PagedList<CastViewModel>>(casts));
         }
 
         [HttpGet]
         public IActionResult Create()
         {
-            return View(new Cast());
+            return View(new CreateCastViewModel());
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(Cast cast)
+        public async Task<IActionResult> Create(CreateCastViewModel model)
         {
-            if (cast == null)
-            {
-                TempData["status"] = "Lỗi, không có diễn viên được chọn.";
-                return View(cast);
-            }
-
             if (!ModelState.IsValid)
             {
                 ModelState.AddModelError(string.Empty, "Lỗi không thể thêm diễn viên.");
-                return View();
+                return View(model);
             }
 
-            cast.IdNumber = _db.Casts.Any() ? _db.Casts.Max(x => x.IdNumber) + 1 : 1;
-            cast.Id = "cast" + cast.IdNumber.ToString();
+            Cast cast = _mapper.Map<Cast>(model);
 
-            // chỉnh lại format tên :
-            cast.Name = Regex.Replace(cast.Name.ToLower().Trim(), @"(^\w)|(\s\w)", m => m.Value.ToUpper());
-            cast.NormalizeName = cast.Name.RemoveMarks();
-
-            using var transaction = await _db.Database.BeginTransactionAsync();
             try
             {
-                _db.Casts.Add(cast);
-                await _db.SaveChangesAsync();
+                await _castService.CreateAsync(cast);
 
-                if (cast.AvatarFile != null)
-                {
+                // nếu có hình ảnh thì update lại cast và lưu vào file
+				if (model.AvatarFile != null)
+				{
+                    cast.Avatar = "/src/img/CastAvatars/" + cast.Id + ".jpg";
+                    await _castService.UpdateAsync(cast.Id, cast);
+
                     var file = Path.Combine(_environment.WebRootPath, "src/img/CastAvatars", cast.Id + ".jpg");
 
-                    using (var fileStream = new FileStream(file, FileMode.Create))
-                    {
-                        await cast.AvatarFile.CopyToAsync(fileStream);
-                    }
-
-                    cast.Avatar = "/src/img/CastAvatars/" + cast.Id + ".jpg";
-                    await _db.SaveChangesAsync();
-                }
-
-                await transaction.CommitAsync();
-            }
-            catch (Exception e)
+					using var fileStream = new FileStream(file, FileMode.Create);
+					await model.AvatarFile.CopyToAsync(fileStream);
+				}
+			}
+            catch(Exception e)
             {
-                await transaction.RollbackAsync();
-                TempData["status"] = "Lỗi, " + e.Message;
-                return View(cast);
-            }
+				TempData["status"] = "Lỗi, " + e.Message;
+				return View(model);
+			}
 
-            TempData["success"] = $"Đã thêm diễn viên {cast.Name}.";
+            TempData["success"] = $"Đã thêm diễn viên {model.Name}.";
             return RedirectToAction("Index");
         }
 
         [HttpGet]
-        public IActionResult Edit(string castid)
+        public async Task<IActionResult> Edit(string castid)
         {
-            var cast = _db.Casts.FirstOrDefault(c => c.Id == castid);
+            var cast = await _castService.GetByIdAsync(castid);
 
             if (cast == null)
             {
                 return NotFound("Không tìm thấy diễn viên.");
             }
 
-            return View(cast);
+            return View(_mapper.Map<EditCastViewModel>(cast));
         }
 
         [HttpPost]
-        public async Task<IActionResult> Edit(string castid, Cast cast)
+        public async Task<IActionResult> Edit(string castid, EditCastViewModel model)
         {
-            if (cast == null)
-            {
-                return NotFound("Không tìm thấy diễn viên.");
-            }
-
-            var castToEdit = _db.Casts.FirstOrDefault(c => c.Id == castid);
-
-            if (castToEdit == null)
-            {
-                return NotFound("Không tìm thấy diễn viên.");
-            }
-
             if (!ModelState.IsValid)
             {
                 ModelState.AddModelError(string.Empty, "Lỗi không thể sửa.");
-                return View(castToEdit);
+                return View(model);
             }
 
-            if (cast.Name != castToEdit.Name)
-            {
-                castToEdit.Name = Regex.Replace(cast.Name.ToLower().Trim(), @"(^\w)|(\s\w)", m => m.Value.ToUpper());
-                castToEdit.NormalizeName = castToEdit.Name.RemoveMarks();
-            }
-            if(cast.About != castToEdit.About) castToEdit.About = cast.About;
-            if(cast.DateOfBirth != castToEdit.DateOfBirth) castToEdit.DateOfBirth = cast.DateOfBirth;
-            if (cast.AvatarFile != null)
-            {
-                var file = Path.Combine(_environment.WebRootPath, "src/img/CastAvatars", castToEdit.Id + ".jpg");
+            Cast cast = _mapper.Map<Cast>(model);
 
-                using (var fileStream = new FileStream(file, FileMode.Create))
-                {
-                    await cast.AvatarFile.CopyToAsync(fileStream);
-                }
-
-                if(castToEdit.Avatar != "/src/img/CastAvatars/" + castToEdit.Id + ".jpg")
-                    castToEdit.Avatar = "/src/img/CastAvatars/" + castToEdit.Id + ".jpg";
-            }
+            if (model.AvatarFile != null)
+                cast.Avatar = "/src/img/CastAvatars/" + cast.Id + ".jpg";
 
             try
             {
-                _db.Casts.Update(castToEdit);
-                await _db.SaveChangesAsync();
+                await _castService.UpdateAsync(castid, cast);
+
+                // nếu có hình ảnh thì update lại cast và lưu vào file
+                if (model.AvatarFile != null)
+                {
+                    var file = Path.Combine(_environment.WebRootPath, "src/img/CastAvatars", castid + ".jpg");
+
+                    using var fileStream = new FileStream(file, FileMode.Create);
+                    await model.AvatarFile.CopyToAsync(fileStream);
+                }
             }
             catch (Exception e)
             {
                 TempData["status"] = "Lỗi, " + e.Message;
-                return View(cast);
+                return View(model);
             }
 
             TempData["success"] = "Chỉnh sửa thành công";
@@ -219,21 +136,13 @@ namespace PhimStrong.Areas.Admin.Controllers
         [HttpPost]
         public async Task<IActionResult> Delete(string castid)
         {
-            var cast = _db.Casts.FirstOrDefault(c => c.Id == castid);
-
-            if (cast == null)
-            {
-                return NotFound("Không tìm thấy diễn viên.");
-            }
-
             try
             {
-                var file = Path.Combine(_environment.WebRootPath, "src\\img\\CastAvatars", cast.Id + ".jpg");
+                await _castService.DeleteAsync(castid);
                 
-                if (System.IO.File.Exists(file)) System.IO.File.Delete(file);
+                var file = Path.Combine(_environment.WebRootPath, "src\\img\\CastAvatars", castid + ".jpg");
 
-                _db.Casts.Remove(cast);
-                await _db.SaveChangesAsync();
+                if (System.IO.File.Exists(file)) System.IO.File.Delete(file);
             }
             catch (Exception e)
             {

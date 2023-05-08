@@ -1,35 +1,38 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using AutoMapper;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
+using PhimStrong.Application.Interfaces;
+using PhimStrong.Domain.Models;
 using PhimStrong.Models;
-using SharedLibrary.Models;
-using System.Text.Encodings.Web;
+using PhimStrong.Models.User;
 
 namespace PhimStrong.Controllers
 {
 #pragma warning disable
 	public class UserController : Controller
 	{
-		private readonly UserManager<User> _userManager;
+		private readonly IUserService _userService;
 		private readonly IEmailSender _emailSender;
+		private readonly IMapper _mapper;
 
-		public UserController(UserManager<User> userManager, IEmailSender emailSender)
+		public UserController(IUserService userService, IEmailSender emailSender, IMapper mapper)
 		{
-			_userManager = userManager;
+			_userService = userService;
 			_emailSender = emailSender;
+			_mapper = mapper;
 		}
 
 		[Route("/User/{id?}")]
 		public async Task<IActionResult> Index(string id)
 		{
-			User user = await _userManager.FindByIdAsync(id);
+			User? user = await _userService.FindByIdAsync(id);
 
 			if (user == null)
 			{
 				return NotFound("Không tìm thấy User :((");
 			}
 
-			return View(user);
+			return View(_mapper.Map<UserViewModel>(user));
 		}
 
 		[Route("/User/Report")]

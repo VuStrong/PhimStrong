@@ -35,7 +35,7 @@
             <a class="btn btn-secondary" href="@Model.Callback(prev)">@prev</a>
         }
 
-        <a class="btn btn-secondary active" href="@Model.Callback(Model.CurrentPage)">@Model.CurrentPage</a>
+        <a class="btn btn-secondary active" disabled>@Model.CurrentPage</a>
 
         @foreach (int next in nextPages)
         {

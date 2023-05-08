@@ -1,12 +1,12 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using PhimStrong.Data;
+using PhimStrong.Application.Interfaces;
+using PhimStrong.Areas.Admin.Models.Director;
+using PhimStrong.Domain.Models;
+using PhimStrong.Domain.PagingModel;
+using PhimStrong.Models.Director;
 using SharedLibrary.Constants;
-using SharedLibrary.Helpers;
-using SharedLibrary.Models;
-using System.Data;
-using System.Text.RegularExpressions;
 
 namespace PhimStrong.Areas.Admin.Controllers
 {
@@ -14,205 +14,118 @@ namespace PhimStrong.Areas.Admin.Controllers
     [Authorize(Roles = $"{RoleConstant.ADMIN}, {RoleConstant.THUY_TO}")]
     public class DirectorController : Controller
     {
-        private readonly AppDbContext _db;
+        private readonly IDirectorService _directorService;
+        private readonly IMapper _mapper;
         private readonly IWebHostEnvironment _environment;
 
-        public DirectorController(AppDbContext db, IWebHostEnvironment environment)
+        public DirectorController(
+            IDirectorService directorService,
+            IMapper mapper,
+            IWebHostEnvironment environment)
         {
-            _db = db;
+            _mapper = mapper;
+            _directorService = directorService;
             _environment = environment;
         }
 
         private const int DIRECTOR_PER_PAGE = 15;
 
         [HttpGet]
-        public IActionResult Index(int page, string? filter = null)
+        public async Task<IActionResult> Index(int page, string? value = null)
         {
-            if (page <= 0) page = 1;
+            PagedList<Director> directors = await _directorService.SearchAsync(value, new PagingParameter(page, DIRECTOR_PER_PAGE));
 
-            int numberOfPages = 0;
+            if (value != null) ViewData["value"] = value;
 
-            List<Director> directors = new List<Director>();
-			int count = 0; // total of search result
-			if (filter == null || filter.Trim() == "")
-            {
-				count = _db.Directors.Count();
-
-				numberOfPages = (int)Math.Ceiling((double)count / DIRECTOR_PER_PAGE);
-				TempData["TotalCount"] = count;
-
-				if (page > numberOfPages) page = numberOfPages;
-                if (page <= 0) page = 1;
-
-				directors = _db.Directors.Skip((page - 1) * DIRECTOR_PER_PAGE).Take(DIRECTOR_PER_PAGE).ToList();
-            }
-            else
-            {
-                MatchCollection match = Regex.Matches(filter ?? "", @"^<.+>");
-
-                if (match.Count > 0)
-                {
-                    string matchValue = new Regex(@"<|>").Replace(match[0].ToString(), "");
-
-                    string filterValue = new Regex(@"^<.+>").Replace(filter ?? "", "");
-                    switch (matchValue)
-                    {
-                        case PageFilterConstant.FILTER_BY_NAME:
-                            TempData["FilterMessage"] = "tên là " + filterValue;
-                            filterValue = filterValue.RemoveMarks();
-
-                            directors = _db.Directors.ToList().Where(m =>
-                                (m.NormalizeName ?? "").Contains(filterValue)
-                            ).ToList();
-
-                            break;
-                        default:
-                            break;
-                    }
-                }
-
-                count = directors.Count;
-				TempData["TotalCount"] = count;
-
-				numberOfPages = (int)Math.Ceiling((double)count / DIRECTOR_PER_PAGE);
-                if (page > numberOfPages) page = numberOfPages;
-                if (page <= 0) page = 1;
-
-                directors = directors.Skip((page - 1) * DIRECTOR_PER_PAGE).Take(DIRECTOR_PER_PAGE).ToList();
-            }
-
-            TempData["NumberOfPages"] = numberOfPages;
-            TempData["CurrentPage"] = page;
-            TempData["filter"] = filter;
-
-            return View(directors);
+            return View(_mapper.Map<PagedList<DirectorViewModel>>(directors));
         }
 
         [HttpGet]
         public IActionResult Create()
         {
-            return View(new Director());
+            return View(new CreateDirectorViewModel());
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(Director director)
+        public async Task<IActionResult> Create(CreateDirectorViewModel model)
         {
-            if (director == null)
-            {
-                TempData["status"] = "Lỗi, không có đạo diễn được chọn.";
-                return View(director);
-            }
-
             if (!ModelState.IsValid)
             {
                 ModelState.AddModelError(string.Empty, "Lỗi không thể thêm đạo diễn.");
-                return View();
+                return View(model);
             }
 
-            director.IdNumber = _db.Directors.Any() ? _db.Directors.Max(x => x.IdNumber) + 1 : 1;
-            director.Id = "director" + director.IdNumber.ToString();
-
-            // chỉnh lại format tên :
-            director.Name = Regex.Replace(director.Name.ToLower().Trim(), @"(^\w)|(\s\w)", m => m.Value.ToUpper());
-            director.NormalizeName = director.Name.RemoveMarks();
-
-            using var transaction = await _db.Database.BeginTransactionAsync();
+            Director director = _mapper.Map<Director>(model);
             try
             {
-                _db.Directors.Add(director);
-                await _db.SaveChangesAsync();
+                await _directorService.CreateAsync(director);
 
-                if (director.AvatarFile != null)
+                // nếu có hình ảnh thì update lại director và lưu vào file
+                if (model.AvatarFile != null)
                 {
-                    var file = Path.Combine(_environment.ContentRootPath, "wwwroot/src/img/DirectorAvatars", director.Id + ".jpg");
-
-                    using (var fileStream = new FileStream(file, FileMode.Create))
-                    {
-                        await director.AvatarFile.CopyToAsync(fileStream);
-                    }
-
                     director.Avatar = "/src/img/DirectorAvatars/" + director.Id + ".jpg";
+                    await _directorService.UpdateAsync(director.Id, director);
 
-                    await _db.SaveChangesAsync();
+                    var file = Path.Combine(_environment.WebRootPath, "src/img/DirectorAvatars", director.Id + ".jpg");
+
+                    using var fileStream = new FileStream(file, FileMode.Create);
+                    await model.AvatarFile.CopyToAsync(fileStream);
                 }
-
-                await transaction.CommitAsync();
             }
             catch (Exception e)
             {
-                await transaction.RollbackAsync();
                 TempData["status"] = "Lỗi, " + e.Message;
-                return View(director);
+                return View(model);
             }
 
-            TempData["success"] = $"Đã thêm đạo diễn {director.Name}.";
+            TempData["success"] = $"Đã thêm đạo diễn {model.Name}.";
             return RedirectToAction("Index");
         }
 
         [HttpGet]
-        public IActionResult Edit(string directorid)
+        public async Task<IActionResult> Edit(string directorid)
         {
-            var director = _db.Directors.FirstOrDefault(c => c.Id == directorid);
+            var director = await _directorService.GetByIdAsync(directorid);
 
             if (director == null)
             {
                 return NotFound("Không tìm thấy đạo diễn.");
             }
 
-            return View(director);
+            return View(_mapper.Map<EditDirectorViewModel>(director));
         }
 
         [HttpPost]
-        public async Task<IActionResult> Edit(string directorid, Director director)
+        public async Task<IActionResult> Edit(string directorid, EditDirectorViewModel model)
         {
-            if (director == null)
-            {
-                return NotFound("Không tìm thấy đạo diễn.");
-            }
-
-            var directorToEdit = _db.Directors.FirstOrDefault(c => c.Id == directorid);
-
-            if (directorToEdit == null)
-            {
-                return NotFound("Không tìm thấy đạo diễn.");
-            }
-
             if (!ModelState.IsValid)
             {
                 ModelState.AddModelError(string.Empty, "Lỗi không thể sửa.");
-                return View(directorToEdit);
+                return View(model);
             }
 
-            if (director.Name != directorToEdit.Name)
-            {
-                directorToEdit.Name = Regex.Replace(director.Name.ToLower().Trim(), @"(^\w)|(\s\w)", m => m.Value.ToUpper());
-                directorToEdit.NormalizeName = directorToEdit.Name.RemoveMarks();
-			}
+            Director director = _mapper.Map<Director>(model);
 
-            if(director.About != directorToEdit.About) directorToEdit.About = director.About;
-            if(director.DateOfBirth != directorToEdit.DateOfBirth) directorToEdit.DateOfBirth = director.DateOfBirth;
-            if (director.AvatarFile != null)
-            {
-                var file = Path.Combine(_environment.ContentRootPath, "wwwroot/src/img/DirectorAvatars", directorToEdit.Id + ".jpg");
-
-                using (var fileStream = new FileStream(file, FileMode.Create))
-                {
-                    await director.AvatarFile.CopyToAsync(fileStream);
-                }
-
-                if(directorToEdit.Avatar != "/src/img/DirectorAvatars/" + directorToEdit.Id + ".jpg")
-                    directorToEdit.Avatar = "/src/img/DirectorAvatars/" + directorToEdit.Id + ".jpg";
-            }
+            if (model.AvatarFile != null)
+                director.Avatar = "/src/img/DirectorAvatars/" + director.Id + ".jpg";
 
             try
             {
-                _db.Directors.Update(directorToEdit);
-                await _db.SaveChangesAsync();
+                await _directorService.UpdateAsync(directorid, director);
+
+                // nếu có hình ảnh thì update lại director và lưu vào file
+                if (model.AvatarFile != null)
+                {
+                    var file = Path.Combine(_environment.ContentRootPath, "wwwroot/src/img/DirectorAvatars", directorid + ".jpg");
+
+                    using var fileStream = new FileStream(file, FileMode.Create);
+                    await model.AvatarFile.CopyToAsync(fileStream);
+                }
             }
             catch (Exception e)
             {
                 TempData["status"] = "Lỗi, " + e.Message;
-                return View(director);
+                return View(model);
             }
 
             TempData["success"] = "Chỉnh sửa thành công";
@@ -222,27 +135,18 @@ namespace PhimStrong.Areas.Admin.Controllers
         [HttpPost]
         public async Task<IActionResult> Delete(string directorid)
         {
-            var director = _db.Directors.FirstOrDefault(c => c.Id == directorid);
-
-            if (director == null)
-            {
-                return NotFound("Không tìm thấy đạo diễn.");
-            }
-
             try
             {
-                var file = Path.Combine(_environment.ContentRootPath, "wwwroot/src/img/DirectorAvatars", director.Id + ".jpg");
+                await _directorService.DeleteAsync(directorid);
 
-                FileInfo fileInfo = new(file);
-                fileInfo.Delete();
+                var file = Path.Combine(_environment.WebRootPath, "src\\img\\DirectorAvatars", directorid + ".jpg");
 
-                _db.Directors.Remove(director);
-                await _db.SaveChangesAsync();
+                if (System.IO.File.Exists(file)) System.IO.File.Delete(file);
             }
             catch (Exception e)
             {
                 TempData["status"] = "Lỗi, " + e.Message;
-                return RedirectToAction("Edit", new { castid = directorid });
+                return RedirectToAction("Edit", new { directorid = directorid });
             }
 
             TempData["success"] = "Xóa thành công";

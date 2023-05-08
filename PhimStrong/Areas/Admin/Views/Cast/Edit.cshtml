@@ -1,4 +1,4 @@
-﻿@model Cast
+﻿@model EditCastViewModel
 @{
     ViewData["Title"] = "Chỉnh sửa diễn viên";
 }
@@ -19,6 +19,7 @@
         </div>
         <div class="my-3">
             <h5>Ảnh</h5>
+            <input asp-for="Avatar" class="form-control" hidden>
             <img src="@(Model.Avatar ?? "/src/img/UserAvatars/default_avatar.png")" 
                 class="avatar avatar-square img-fit" style="width: 200px; height:200px;">
         </div>

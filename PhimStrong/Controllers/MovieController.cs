@@ -1,344 +1,197 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using PhimStrong.Data;
-using SharedLibrary.Models;
-using SharedLibrary.Constants;
-using PhimStrong.Models;
-using Microsoft.AspNetCore.Identity;
-using SharedLibrary.Helpers;
-using NuGet.Packaging;
-using Newtonsoft.Json.Linq;
+using PhimStrong.Application.Interfaces;
+using PhimStrong.Models.Movie;
+using PhimStrong.Domain.Models;
+using PhimStrong.Domain.PagingModel;
+using AutoMapper;
+using System.Linq.Expressions;
 
 namespace PhimStrong.Controllers
 {
     public class MovieController : Controller
     {
-		private readonly AppDbContext _db;
-		private readonly UserManager<User> _userManager;
+		private const int MOVIES_PER_PAGE = 25;
 
-		public MovieController(AppDbContext db, UserManager<User> userManager)
+		private readonly IMapper _mapper;
+		private readonly IMovieService _movieService;
+		private readonly IUserService _userService;
+
+		public MovieController(
+			IMovieService movieService,
+			IUserService userService,
+			IMapper mapper)
 		{
-			_db = db;
-			_userManager = userManager;
+			_movieService = movieService;
+			_userService = userService;
+			_mapper = mapper;
 		}
 
 		[HttpGet]
         public async Task<IActionResult> Index(int page)
         {
-            List<Movie> movies = await _db.Movies.OrderByDescending(m => m.CreatedDate).ToListAsync();
+			PagedList<Movie> movies = await _movieService.GetAllAsync(new PagingParameter(page, MOVIES_PER_PAGE));
 
-			int numberOfPages = (int)Math.Ceiling((double)movies.Count / CommonConstants.MOVIES_PER_PAGE);
-            if (page > numberOfPages) page = numberOfPages;
-			if (page <= 0) page = 1;
-
-			movies = movies.Skip((page - 1) * CommonConstants.MOVIES_PER_PAGE)
-	            .Take(CommonConstants.MOVIES_PER_PAGE).ToList();
-
-			TempData["NumberOfPages"] = numberOfPages;
-			TempData["CurrentPage"] = page;
-
-			TempData["Title"] = "Danh sách phim";
+			ViewData["Title"] = "Danh sách phim";
             ViewData["Filter"] = "Phim";
 
-            return View(movies);
+            return View(_mapper.Map<PagedList<MovieViewModel>>(movies));
         }
 
         [HttpGet]
         [Route("/Movie/{value}")]
         public async Task<IActionResult> SearchByMovieName(string? value, int page)
         {
-            if (value == null) value = "";
-
-            TempData["Title"] = value;
             ViewData["Filter"] = "Phim có tên";
+			ViewData["Title"] = value;
 
-            value = value.RemoveMarks();
+            PagedList<Movie> movies = await _movieService.SearchAsync(value, new PagingParameter(page, MOVIES_PER_PAGE));                    
 
-            List<Movie> movies = await _db.Movies.Where(m => 
-					(m.NormalizeTranslateName ?? "").Contains(value) ||
-					(m.NormalizeName ?? "").Contains(value)
-				)
-                .OrderByDescending(m => m.ReleaseDate).ToListAsync();
+            ViewData["Action"] = "SearchByMovieName";
+            ViewData["RouteValue"] = value;
 
-			int numberOfPages = (int)Math.Ceiling((double)movies.Count / CommonConstants.MOVIES_PER_PAGE);
-			if (page > numberOfPages) page = numberOfPages;
-			if (page <= 0) page = 1;
-
-            movies = movies.Skip((page - 1) * CommonConstants.MOVIES_PER_PAGE)
-                .Take(CommonConstants.MOVIES_PER_PAGE).ToList();                      
-
-            TempData["NumberOfPages"] = numberOfPages;
-            TempData["CurrentPage"] = page;
-            TempData["Action"] = "SearchByMovieName";
-            TempData["RouteValue"] = value;
-
-			return View("Index", movies);
-        }
+			return View("Index", _mapper.Map<PagedList<MovieViewModel>>(movies));
+		}
 
 		[HttpGet]
 		[Route("/Movie/phim-le")]
 		public async Task<IActionResult> GetPhimLe(int page)
 		{
-			List<Movie> movies = await _db.Movies.Where(m => m.Type == "Phim lẻ")
-				.OrderByDescending(m => m.CreatedDate).ToListAsync();
+			PagedList<Movie> movies = await _movieService.FindByTypeAsync("Phim lẻ", new PagingParameter(page, MOVIES_PER_PAGE));
 
-			int numberOfPages = (int)Math.Ceiling((double)movies.Count / CommonConstants.MOVIES_PER_PAGE);
-			if (page > numberOfPages) page = numberOfPages;
-			if (page <= 0) page = 1;
-
-			movies = movies.Skip((page - 1) * CommonConstants.MOVIES_PER_PAGE)
-				.Take(CommonConstants.MOVIES_PER_PAGE).ToList();
-
-			TempData["NumberOfPages"] = numberOfPages;
-			TempData["CurrentPage"] = page;
-			TempData["Action"] = "GetPhimLe";
-
-			TempData["Title"] = "Phim lẻ";
+			ViewData["Action"] = "GetPhimLe";
+			ViewData["Title"] = "Phim lẻ";
 			ViewData["Filter"] = "Phim";
 
-			return View("Index", movies);
+			return View("Index", _mapper.Map<PagedList<MovieViewModel>>(movies));
 		}
 
 		[HttpGet]
 		[Route("/Movie/phim-bo")]
 		public async Task<IActionResult> GetPhimBo(int page)
 		{
-			List<Movie> movies = await _db.Movies.Where(m => m.Type == "Phim bộ")
-				.OrderByDescending(m => m.CreatedDate).ToListAsync();
+			PagedList<Movie> movies = await _movieService.FindByTypeAsync("Phim bộ", new PagingParameter(page, MOVIES_PER_PAGE));
 
-			int numberOfPages = (int)Math.Ceiling((double)movies.Count / CommonConstants.MOVIES_PER_PAGE);
-			if (page > numberOfPages) page = numberOfPages;
-			if (page <= 0) page = 1;
-
-			movies = movies.Skip((page - 1) * CommonConstants.MOVIES_PER_PAGE)
-				.Take(CommonConstants.MOVIES_PER_PAGE).ToList();
-
-			TempData["NumberOfPages"] = numberOfPages;
-			TempData["CurrentPage"] = page;
-			TempData["Action"] = "GetPhimBo";
-
-			TempData["Title"] = "Phim bộ";
+			ViewData["Action"] = "GetPhimBo";
+			ViewData["Title"] = "Phim bộ";
 			ViewData["Filter"] = "Phim";
 
-			return View("Index", movies);
+			return View("Index", _mapper.Map<PagedList<MovieViewModel>>(movies));
 		}
 
-        [HttpGet]
+		[HttpGet]
         [Route("/Movie/year/{year}")]
         public async Task<IActionResult> GetMovieByReleaseYear(int year, int page)
         {
-            List<Movie> movies = await _db.Movies.Where(m =>
-					m.ReleaseDate != null && m.ReleaseDate.Value.Year == year
-				)
-                .OrderByDescending(m => m.ReleaseDate).ToListAsync();
+            PagedList<Movie> movies = await _movieService.FindByYearAsync(year, new PagingParameter(page, MOVIES_PER_PAGE));
 
-            int numberOfPages = (int)Math.Ceiling((double)movies.Count / CommonConstants.MOVIES_PER_PAGE);
-            if (page > numberOfPages) page = numberOfPages;
-            if (page <= 0) page = 1;
-
-            movies = movies.Skip((page - 1) * CommonConstants.MOVIES_PER_PAGE)
-                .Take(CommonConstants.MOVIES_PER_PAGE).ToList();
-
-            TempData["NumberOfPages"] = numberOfPages;
-            TempData["CurrentPage"] = page;
-            TempData["Action"] = "GetMovieByReleaseYear";
-
-            TempData["Title"] = year.ToString();
+			ViewData["Action"] = "GetMovieByReleaseYear";
+			ViewData["Title"] = year.ToString();
             ViewData["Filter"] = "Phim ra mắt năm";
 
-            return View("Index", movies);
-        }
+			return View("Index", _mapper.Map<PagedList<MovieViewModel>>(movies));
+		}
 
 		[HttpGet]
 		[Route("/Movie/before-year/{year}")]
 		public async Task<IActionResult> GetMovieBeforeYear(int year, int page)
 		{
-			List<Movie> movies = await _db.Movies.Where(m =>
-					m.ReleaseDate != null && m.ReleaseDate.Value.Year <= year
-				)
-				.OrderByDescending(m => m.ReleaseDate).ToListAsync();
+			PagedList<Movie> movies = await _movieService.FindBeforeYearAsync(year, new PagingParameter(page, MOVIES_PER_PAGE));
 
-			int numberOfPages = (int)Math.Ceiling((double)movies.Count / CommonConstants.MOVIES_PER_PAGE);
-			if (page > numberOfPages) page = numberOfPages;
-			if (page <= 0) page = 1;
-
-			movies = movies.Skip((page - 1) * CommonConstants.MOVIES_PER_PAGE)
-				.Take(CommonConstants.MOVIES_PER_PAGE).ToList();
-
-			TempData["NumberOfPages"] = numberOfPages;
-			TempData["CurrentPage"] = page;
-			TempData["Action"] = "GetMovieBeforeYear";
-
-			TempData["Title"] = year.ToString();
+			ViewData["Action"] = "GetMovieBeforeYear";
+			ViewData["Title"] = year.ToString();
 			ViewData["Filter"] = "Phim ra mắt trước năm";
 
-			return View("Index", movies);
+			return View("Index", _mapper.Map<PagedList<MovieViewModel>>(movies));
 		}
 
 		[Route("/Movie/tag/{value}")]
 		public async Task<IActionResult> GetMovieByTag(string? value, int page)
 		{
-			if (value == null) value = "";
+			PagedList<Movie> movies = await _movieService.FindByTagAsync(value ?? "", new PagingParameter(page, MOVIES_PER_PAGE));
 
-			value = value.ToLower().Trim();
-
-			List<Tag> tags = await _db.Tags.Where(t => t.TagName.ToLower() == value).ToListAsync();
-			List<Movie> movies = tags.Select(t => t.Movie).ToList();
-
-            int numberOfPages = (int)Math.Ceiling((double)movies.Count / CommonConstants.MOVIES_PER_PAGE);
-			if (page > numberOfPages) page = numberOfPages;
-			if (page <= 0) page = 1;
-
-			movies = movies.Skip((page - 1) * CommonConstants.MOVIES_PER_PAGE)
-				.Take(CommonConstants.MOVIES_PER_PAGE).ToList();
-
-			TempData["NumberOfPages"] = numberOfPages;
-			TempData["CurrentPage"] = page;
-			TempData["Action"] = "GetMovieByReleaseYear";
-
-			TempData["Title"] = value;
+			ViewData["Action"] = "GetMovieByTag";
+			ViewData["Title"] = value;
 			ViewData["Filter"] = "Phim có Tag";
 
-			return View("Index", movies);
+			return View("Index", _mapper.Map<PagedList<MovieViewModel>>(movies));
 		}
 
         [Route("/Movie/top-rating")]
         public async Task<IActionResult> GetTopRatingMovie(int page)
         {
-            List<Movie> movies = await _db.Movies.OrderByDescending(m => m.Rating).ToListAsync();
+			PagedList<Movie> movies = await _movieService.GetMoviesOrderByRatingAsync(new PagingParameter(page, MOVIES_PER_PAGE));
 
-            int numberOfPages = (int)Math.Ceiling((double)movies.Count / CommonConstants.MOVIES_PER_PAGE);
-            if (page > numberOfPages) page = numberOfPages;
-            if (page <= 0) page = 1;
-
-            movies = movies.Skip((page - 1) * CommonConstants.MOVIES_PER_PAGE)
-                .Take(CommonConstants.MOVIES_PER_PAGE).ToList();
-
-            TempData["NumberOfPages"] = numberOfPages;
-            TempData["CurrentPage"] = page;
-            TempData["Action"] = "GetTopRatingMovie";
-
-            TempData["Title"] = "Top Rating";
+			ViewData["Action"] = "GetTopRatingMovie";
+			ViewData["Title"] = "Top Rating";
             ViewData["Filter"] = "Phim";
 
-            return View("Index", movies);
+            return View("Index", _mapper.Map<PagedList<MovieViewModel>>(movies));
         }
 
         [Route("/Movie/trailer")]
         public async Task<IActionResult> GetTrailer(int page)
 		{
-            List<Movie> movies = await _db.Movies.Where(m => m.Status == "Trailer")
-				.OrderByDescending(m => m.ReleaseDate).ToListAsync();
+			PagedList<Movie> movies = await _movieService.GetTrailerAsync(new PagingParameter(page, MOVIES_PER_PAGE));
 
-            int numberOfPages = (int)Math.Ceiling((double)movies.Count / CommonConstants.MOVIES_PER_PAGE);
-            if (page > numberOfPages) page = numberOfPages;
-            if (page <= 0) page = 1;
-
-            movies = movies.Skip((page - 1) * CommonConstants.MOVIES_PER_PAGE)
-                .Take(CommonConstants.MOVIES_PER_PAGE).ToList();
-
-            TempData["NumberOfPages"] = numberOfPages;
-            TempData["CurrentPage"] = page;
-            TempData["Action"] = "GetTrailer";
-
-            TempData["Title"] = "";
+			ViewData["Action"] = "GetTrailer";
+			ViewData["Title"] = "";
             ViewData["Filter"] = "Trailer";
 
-            return View("Index", movies);
+            return View("Index", _mapper.Map<PagedList<MovieViewModel>>(movies));
         }
 
         [HttpGet]
 		public async Task<IActionResult> Detail(string id)
 		{
-			Movie? movie = await _db.Movies.FirstOrDefaultAsync(m => m.Id == id);
+			Movie? movie = await _movieService.GetByIdAsync(id, new Expression<Func<Movie, object?>>[]
+			{
+				m => m.Casts,
+				m => m.Categories,
+				m => m.Country,
+				m => m.Directors,
+				m => m.Tags,
+			});
 
 			if (movie == null)
 			{
 				return NotFound("Không tìm thấy phim :((");
 			}
 
-			return View(movie);
+			return View(_mapper.Map<MovieViewModel>(movie));
 		}
 
 		[HttpGet]
 		[Route("/Movie/GetRelateMovies")]
 		public async Task<IActionResult> GetRelateMovies(string movieid)
 		{
-			Movie? movie = await _db.Movies.FirstOrDefaultAsync(m => m.Id == movieid);
+			List<Movie> movies = (await _movieService.GetRelateMoviesAsync(movieid, 10)).ToList();
 
-			if (movie == null)
-			{
-				return this.PartialView("_RelatedMoviePartial");
-			}
-
-			List<Movie> movieList = _db.Movies.ToList();
-			List<Movie> movies = new();
-
-			// find movie with similar tag
-			if (movie.Tags != null && movie.Tags.Any())
-			{
-				string tagToFind = movie.Tags[0].TagName.ToLower();
-               
-                movies.AddRange(
-					_db.Tags.Where(t => t.TagName.ToLower() == tagToFind)
-					.Select(t => t.Movie).ToList());
-
-				if (movies.Contains(movie)) movies.Remove(movie);
-            }
-
-            // find movie with similar category
-            if (movies.Count < 10 && movie.Categories != null && movie.Categories.Any())
-			{
-				Category? cateToFind = movie.Categories[0];
-				movies.AddRange(
-					movieList.Where(m => !movies.Contains(m) &&
-						!m.Equals(movie) &&
-						m.Categories != null && 
-						m.Categories.Any(c => c.Equals(cateToFind)))
-					.Take(10 - movies.Count).ToList());
-			}
-
-			// if less than 10 movies, add more
-			if (movies.Count < 10) 
-			{
-                Random random = new();
-                int ran;
-                int count = movieList.Count;
-                while (movies.Count < 10)
-                {
-                    if (movies.Count >= count) break;
-
-                    ran = random.Next(0, count);
-                    if (!movies.Contains(movieList[ran]) && !movieList[ran].Equals(movie))
-                    {
-                        movies.Add(movieList[ran]);
-                    }
-                }
-            }
-
-			return this.PartialView("_RelatedMoviePartial", movies);
+			return this.PartialView("_RelatedMoviePartial", _mapper.Map<List<MovieViewModel>>(movies));
 		}
 
 		[HttpGet]
 		[Route("/Movie/GetLikeButton")]
 		public async Task<string> GetLikeButton(string movieid)
 		{
-			Movie? movie = await _db.Movies.FirstOrDefaultAsync(m => m.Id == movieid);
+			Movie? movie = await _movieService.GetByIdAsync(movieid, new Expression<Func<Movie, object?>>[]
+			{
+				m => m.LikedUsers
+			});
 
 			if (movie == null)
 			{
 				return $"<a id='like-movie-btn' href=\"#\" title=\"thích\" class=\"btn btn-success movie-detail-btn\">\r\n\t\t\t\t<i class=\"bi bi-hand-thumbs-up-fill\"></i>\r\n\t\t\t\t<strong>Thích</strong>\r\n\t\t\t\t<span class=\"ms-1\">0</span>\r\n\t\t\t</a>";
 			}
-			
-			User user = await _userManager.GetUserAsync(User);
 
+			User? user = await _userService.GetByClaims(User);
 			movie.LikedUsers ??= new List<User>();
-			string like = movie.LikedUsers.Contains(user) ? "Đã thích" : "Thích";
 
 			if (user == null)
 			{
 				return $"<a id='like-movie-btn' href=\"#\" title=\"thích\" class=\"btn btn-success movie-detail-btn\">\r\n\t\t\t\t<i class=\"bi bi-hand-thumbs-up-fill\"></i>\r\n\t\t\t\t<strong>Thích</strong>\r\n\t\t\t\t<span class=\"ms-1\">{movie.LikedUsers.Count}</span>\r\n\t\t\t</a>";
 			}
+
+			string like = movie.LikedUsers.Contains(user) ? "Đã thích" : "Thích";
 
 			return $"<a id='like-movie-btn' href=\"#\" title=\"thích\" class=\"btn btn-success movie-detail-btn\">\r\n\t\t\t\t<i class=\"bi bi-hand-thumbs-up-fill\"></i>\r\n\t\t\t\t<strong>{like}</strong>\r\n\t\t\t\t<span class=\"ms-1\">{movie.LikedUsers.Count}</span>\r\n\t\t\t</a>";
 		}
@@ -347,36 +200,17 @@ namespace PhimStrong.Controllers
 		[Route("/Movie/LikeMovie")]
 		public async Task<JsonResult> LikeMovie(string movieid)
 		{
-			Movie? movie = await _db.Movies.FirstOrDefaultAsync(m => m.Id == movieid);
-
-            if (movie == null)
-            {
-                return Json(new { success = false });
-            }
-
-			User user = await _userManager.GetUserAsync(User);
-
+			User? user = await _userService.GetByClaims(User);
+			
 			if(user == null)
 			{
                 return Json(new { success = false, notsignin = true });
             }
 
-			movie.LikedUsers ??= new List<User>();
-
 			bool like = true;
-			if(movie.LikedUsers.Contains(user))
-			{
-				like = false;
-				movie.LikedUsers.Remove(user);
-			}	
-			else
-			{
-                movie.LikedUsers.Add(user);
-			}
-
             try
             {
-				await _db.SaveChangesAsync();
+				like = await _movieService.AddLikedUserAsync(movieid, user);
 			}
 			catch
 			{
@@ -390,41 +224,34 @@ namespace PhimStrong.Controllers
 		[Route("/Movie/Watch/{id}/{episode?}")]
 		public async Task<IActionResult> Watch(string id, int episode)
 		{
-			Movie? movie = await _db.Movies.FirstOrDefaultAsync(m => m.Id == id);
+			Movie? movie = await _movieService.GetByIdAsync(id, new Expression<Func<Movie, object?>>[]
+			{
+				m => m.Videos
+			});
 
 			if (movie == null)
 			{
 				return NotFound();
 			}
 
-			movie.Videos ??= new List<Video>();
-			Video? video = movie.Videos.FirstOrDefault(v => v.Episode == episode);
+			Video? video = movie.Videos?.FirstOrDefault(v => v.Episode == episode);
 
-			TempData["episode"] = episode;
-
-			return View(new WatchMovieModel
+			return View(new WatchMovieViewModel(movie.Id, movie.TranslateName, movie.Type)
 			{
-				Movie = movie,
-				Video = video
+				MovieImage = movie.Image,
+				VideoUrl = video?.VideoUrl,
+				MovieEpisodeCount = movie.EpisodeCount,
+				Episode = video?.Episode ?? 0
 			});
 		}
 
 		[HttpPost]
 		[Route("/Movie/IncreaseView")]
-		public async Task<JsonResult> IncreaseView(string id)
+		public JsonResult IncreaseView(string id)
 		{
-			Movie? movie = await _db.Movies.FirstOrDefaultAsync(m => m.Id == id);
-
-			if (movie == null)
-			{
-				return Json("");
-			}
-
-			movie.View++;
 			try
 			{
-				_db.Movies.Update(movie);
-				await _db.SaveChangesAsync();
+				_movieService.IncreateViewAsync(id);
 			}
 			catch
 			{

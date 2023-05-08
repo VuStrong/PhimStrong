@@ -1,12 +1,6 @@
 ﻿@model ModalDirectorModel
 @{
-    // Khởi tạo list category
-    var directorList = new List<string>();
-    Model.Directors?.ToList().ForEach(c =>
-    {
-        directorList.Add(c.Name);
-    });
-
+    Model.Directors ??= new List<string>();
     Model.SelectedDirectors ??= new List<string>();
     string selectedDirectors = String.Join(",", Model.SelectedDirectors);
 }
@@ -37,7 +31,7 @@
             <div class="modal-body overflow-scroll" style="height:400px">
                 <table class="table table-hover">
                     <tbody>
-                        @foreach (var director in directorList)
+                        @foreach (var director in Model.Directors)
                         {
                             <tr>
                                 <th class="director-name" scope="row">@director</th>

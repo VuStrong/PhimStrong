@@ -2,17 +2,23 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using PhimStrong.Services;
-using PhimStrong.Data;
-using SharedLibrary.Models;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.OAuth;
 using System.Security.Claims;
-using Microsoft.AspNetCore.Authentication.Facebook;
+using PhimStrong.Application.Interfaces;
+using PhimStrong.Application.Services;
+using PhimStrong.Domain.Interfaces;
+using PhimStrong.Infrastructure.UnitOfWork;
+using PhimStrong.Domain.Models;
+using PhimStrong.Mapper;
+using PhimStrong.Infrastructure.Context;
+using PhimStrong.Infrastructure.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews().AddNewtonsoftJson();
+builder.Services.AddAutoMapper(typeof(DomainToViewModelProfile), typeof(ViewModelToDomainProfile));
 
 // Add Send Email Service
 builder.Services.AddOptions(); // Kích hoạt Options
@@ -21,14 +27,13 @@ builder.Services.Configure<MailSettings>(mailsettings);
 builder.Services.AddSingleton<IEmailSender, SendMailService>();
 
 // Add DbContext.
-builder.Services.AddDbContext<AppDbContext>(options =>
+builder.Services.AddDbContext<PhimStrongDbContext>(options =>
 {
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
-           .UseLazyLoadingProxies();
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
 builder.Services.AddIdentity<User, IdentityRole>()
-                .AddEntityFrameworkStores<AppDbContext>()
+                .AddEntityFrameworkStores<PhimStrongDbContext>()
                 .AddDefaultTokenProviders();
 
 builder.Services.ConfigureApplicationCookie(options =>
@@ -82,11 +87,11 @@ builder.Services.Configure<IdentityOptions>(options =>
 
     //// Cấu hình Lockout - khóa user
     //options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5); // Khóa 5 phút
-    //options.Lockout.MaxFailedAccessAttempts = 5; // Thất bại 5 lầ thì khóa
+    //options.Lockout.MaxFailedAccessAttempts = 5; // Thất bại 5 lần thì khóa
     //options.Lockout.AllowedForNewUsers = true;
 
     // Cấu hình về User.
-    options.User.AllowedUserNameCharacters = builder.Configuration["Characters"]; // các ký tự đặt tên user
+    options.User.AllowedUserNameCharacters = builder.Configuration["Characters"];
     options.User.RequireUniqueEmail = true;  // Email là duy nhất
     
     // Cấu hình đăng nhập.
@@ -94,6 +99,18 @@ builder.Services.Configure<IdentityOptions>(options =>
     options.SignIn.RequireConfirmedAccount = false;
 
 });
+
+// add app services
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddScoped<IMovieService, MovieService>();
+builder.Services.AddScoped<ICastService, CastService>();
+builder.Services.AddScoped<ICategoryService, CategoryService>();
+builder.Services.AddScoped<IDirectorService, DirectorService>();
+builder.Services.AddScoped<ICountryService, CountryService>();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IRoleService, RoleService>();
+builder.Services.AddScoped<PhimStrong.Application.Interfaces.IAuthenticationService, PhimStrong.Infrastructure.Identity.AuthenticationService>();
+builder.Services.AddScoped<ICommentService, CommentService>();
 
 var app = builder.Build();
 

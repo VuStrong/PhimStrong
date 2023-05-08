@@ -1,13 +1,12 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using PhimStrong.Data;
+using PhimStrong.Application.Interfaces;
+using PhimStrong.Areas.Admin.Models.Category;
+using PhimStrong.Domain.Models;
+using PhimStrong.Domain.PagingModel;
+using PhimStrong.Models.Category;
 using SharedLibrary.Constants;
-using SharedLibrary.Helpers;
-using SharedLibrary.Models;
-using System.Data;
-using System.IO;
-using System.Text.RegularExpressions;
 
 namespace PhimStrong.Areas.Admin.Controllers
 {
@@ -15,167 +14,88 @@ namespace PhimStrong.Areas.Admin.Controllers
     [Authorize(Roles = $"{RoleConstant.ADMIN}, {RoleConstant.THUY_TO}")]
     public class CategoryController : Controller
     {
-        private readonly AppDbContext _db;
+        private readonly ICategoryService _categoryService;
+        private readonly IMapper _mapper;
 
-        public CategoryController(AppDbContext db)
+        public CategoryController(ICategoryService categoryService, IMapper mapper)
         {
-            _db = db;
+            _categoryService = categoryService;
+            _mapper = mapper;
         }
 
         private const int CATE_PER_PAGE = 15;
 
         [HttpGet]
-        public IActionResult Index(int page, string? filter = null)
+        public async Task<IActionResult> Index(int page, string? value = null)
         {
-            if (page <= 0) page = 1;
+            PagedList<Category> categories = await _categoryService.SearchAsync(value, new PagingParameter(page, CATE_PER_PAGE));
 
-            int numberOfPages = 0;
+            if (value != null) ViewData["value"] = value;
 
-            List<Category> categories = new List<Category>();
-			int count = 0; // total of search result
-			if (filter == null || filter.Trim() == "")
-            {
-                count = _db.Categories.Count();
-
-				numberOfPages = (int)Math.Ceiling((double)count / CATE_PER_PAGE);
-				TempData["TotalCount"] = count;
-
-				if (page > numberOfPages) page = numberOfPages;
-                if (page <= 0) page = 1;
-
-                categories = _db.Categories.Skip((page - 1) * CATE_PER_PAGE).Take(CATE_PER_PAGE).ToList();
-            }
-            else
-            {
-                MatchCollection match = Regex.Matches(filter ?? "", @"^<.+>");
-
-                if (match.Count > 0)
-                {
-                    string matchValue = new Regex(@"<|>").Replace(match[0].ToString(), "");
-
-                    string filterValue = new Regex(@"^<.+>").Replace(filter ?? "", "");
-                    switch (matchValue)
-                    {
-                        case PageFilterConstant.FILTER_BY_NAME:
-                            TempData["FilterMessage"] = "tên là " + filterValue;
-                            filterValue = filterValue.RemoveMarks();
-
-                            categories = _db.Categories.ToList().Where(m => (m.NormalizeName ?? "").Contains(filterValue)).ToList();
-
-                            break;
-                        default:
-                            break;
-                    }
-                }
-
-				count = categories.Count;
-				TempData["TotalCount"] = count;
-
-				numberOfPages = (int)Math.Ceiling((double)count / CATE_PER_PAGE);
-                if (page > numberOfPages) page = numberOfPages;
-                if (page <= 0) page = 1;
-
-                categories = categories.Skip((page - 1) * CATE_PER_PAGE).Take(CATE_PER_PAGE).ToList();
-            }
-
-            TempData["NumberOfPages"] = numberOfPages;
-            TempData["CurrentPage"] = page;
-            TempData["filter"] = filter;
-
-            return View(categories);
+            return View(_mapper.Map<PagedList<CategoryViewModel>>(categories));
         }
 
         [HttpGet]
         public IActionResult Create()
         {
-            return View(new Category());
+            return View(new CreateCategoryViewModel());
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(Category category)
+        public async Task<IActionResult> Create(CreateCategoryViewModel model)
         {
-            if (category == null)
-            {
-                TempData["status"] = "Lỗi, không có thể loại được chọn.";
-                return View(category);
-            }
-
             if (!ModelState.IsValid)
             {
                 ModelState.AddModelError(string.Empty, "Lỗi không thể thêm.");
                 return View();
             }
 
-            category.IdNumber = _db.Categories.Any() ? _db.Categories.Max(x => x.IdNumber) + 1 : 1;
-            category.Id = "cate" + category.IdNumber.ToString();
-
-            // chỉnh lại format tên :
-            category.Name = category.Name[0].ToString().ToUpper() + category.Name.Substring(1).ToLower();
-            category.NormalizeName = category.Name.RemoveMarks();
-
+            Category category = _mapper.Map<Category>(model);
             try
             {
-                _db.Categories.Add(category);
-                await _db.SaveChangesAsync();
+                await _categoryService.CreateAsync(category);
             }
             catch (Exception e)
             {
                 TempData["status"] = "Lỗi, " + e.Message;
-                return View(category);
+                return View(model);
             }
 
-            TempData["success"] = $"Đã thêm thể loại {category.Name}.";
+            TempData["success"] = $"Đã thêm thể loại {model.Name}.";
             return RedirectToAction("Index");
         }
 
         [HttpGet]
-        public IActionResult Edit(string cateid)
+        public async Task<IActionResult> Edit(string cateid)
         {
-            var category = _db.Categories.FirstOrDefault(c => c.Id == cateid);
+            var category = await _categoryService.GetByIdAsync(cateid);
 
             if (category == null)
             {
                 return NotFound("Không tìm thấy thể loại.");
             }
 
-            return View(category);
+            return View(_mapper.Map<EditCategoryViewModel>(category));
         }
 
         [HttpPost]
-        public async Task<IActionResult> Edit(string cateid, Category category)
+        public async Task<IActionResult> Edit(string cateid, EditCategoryViewModel model)
         {
-            if (category == null)
-            {
-                return NotFound("Không tìm thấy thể loại.");
-            }
-
             if (!ModelState.IsValid)
             {
                 ModelState.AddModelError(string.Empty, "Lỗi không thể sửa.");
-                category.Id = cateid;
-                return View(category);
+                return View(model);
             }
 
-            var categoryToEdit = _db.Categories.FirstOrDefault(c => c.Id == cateid);
-
-            if (categoryToEdit == null)
-            {
-                return NotFound("Không tìm thấy thể loại.");
-            }
-
-            categoryToEdit.Name = category.Name[0].ToString().ToUpper() + category.Name.Substring(1).ToLower();
-            categoryToEdit.NormalizeName = categoryToEdit.Name.RemoveMarks();
-            categoryToEdit.Description = category.Description;
-
+            Category category = _mapper.Map<Category>(model);
             try
             {
-                _db.Categories.Update(categoryToEdit);
-                await _db.SaveChangesAsync();
+                await _categoryService.UpdateAsync(cateid, category);
             }
             catch (Exception e)
             {
                 TempData["status"] = "Lỗi, " + e.Message;
-                return View(category);
+                return View(model);
             }
 
             TempData["success"] = "Chỉnh sửa thành công";
@@ -185,17 +105,9 @@ namespace PhimStrong.Areas.Admin.Controllers
         [HttpPost]
         public async Task<IActionResult> Delete(string cateid)
         {
-            var category = _db.Categories.FirstOrDefault(c => c.Id == cateid);
-
-            if (category == null)
-            {
-                return NotFound("Không tìm thấy thể loại.");
-            }
-
             try
             {
-                _db.Categories.Remove(category);
-                await _db.SaveChangesAsync();
+                await _categoryService.DeleteAsync(cateid);
             }
             catch (Exception e)
             {

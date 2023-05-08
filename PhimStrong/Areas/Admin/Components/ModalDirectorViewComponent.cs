@@ -1,28 +1,33 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+using PhimStrong.Application.Interfaces;
 using PhimStrong.Areas.Admin.Models;
-using PhimStrong.Data;
-using SharedLibrary.Models;
+using PhimStrong.Domain.Models;
+using System.Linq.Expressions;
 
 namespace PhimStrong.Areas.Admin.Components
 {
     public class ModalDirectorViewComponent : ViewComponent
     {
-        private readonly AppDbContext _db;
+        private readonly IMovieService _movieService;
+        private readonly IDirectorService _directorService;
 
-        public ModalDirectorViewComponent(AppDbContext db)
+        public ModalDirectorViewComponent(IMovieService movieService, IDirectorService directorService)
         {
-            _db = db;
+            _movieService = movieService;
+            _directorService = directorService;
         }
 
         public async Task<IViewComponentResult> InvokeAsync(string movieid)
         {
-            Movie? movie = await _db.Movies.FirstOrDefaultAsync(m => m.Id == movieid);
+            Movie? movie = await _movieService.GetByIdAsync(movieid, new Expression<Func<Movie, object?>>[]
+            {
+                m => m.Directors
+            });
 
             return View(new ModalDirectorModel
             {
-                SelectedDirectors = movie?.Directors?.Select(c => c.Name).ToList(),
-                Directors = _db.Directors.ToList()
+                SelectedDirectors = movie?.Directors?.Select(d => d.Name).ToList(),
+                Directors = (await _directorService.GetAllAsync()).Select(d => d.Name).ToList()
             });
         }
     }

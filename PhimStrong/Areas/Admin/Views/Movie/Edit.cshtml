@@ -1,18 +1,11 @@
-﻿@model MovieModel
+﻿@model EditMovieViewModel
 @{
     ViewData["Title"] = $"Sửa phim {Model.Name}";
 
     var typeList = new SelectList(new List<string>{"none", "Phim lẻ", "Phim bộ"});
     var statusList = new SelectList(new List<string> { "none", "Full HD", "CAM", "Trailer" });
 
-    // Khởi tạo list country
-    var countryList = new List<string>();
-    ((List<Country>?)ViewData["Countries"])?.ForEach(c =>
-    {
-        countryList.Add(c.Name);
-    });
-
-    var countries = new SelectList(countryList);
+    var countries = (SelectList)(ViewData["countries"] ?? new SelectList(null));
 
     string videoUrl = "";
     if (Model.Videos != null && Model.Videos.Length > 0 && Model.Type == "Phim lẻ")

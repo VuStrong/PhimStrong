@@ -1,7 +1,6 @@
-﻿@model List<Movie>
+﻿@model PagedList<MovieViewModel>
 @{
 	Layout = "/Views/Shared/_Layout.cshtml";
-	ViewData["Title"] = TempData["Title"] ?? "none";
 }
 
 <h1 class="text-success my-5">@($"{ViewData["Filter"]}: {ViewData["Title"]}")</h1>
@@ -11,15 +10,15 @@
 @{
 	PagingModel pagingModel = new PagingModel
 			{
-				NumberOfPages = (int)(TempData["NumberOfPages"] ?? 1),
-				CurrentPage = (int)(TempData["CurrentPage"] ?? 1),
+				NumberOfPages = Model.TotalPage,
+				CurrentPage = Model.CurrentPage,
 				Callback = (int page) => Url.Action(
-					(TempData["Action"] ?? "Index").ToString(),
+					(ViewData["Action"] ?? "Index").ToString(),
 					"Movie",
 					new {
 						area = "",
 						page = page,
-						value = TempData["RouteValue"]
+						value = ViewData["RouteValue"]
 					})
 			};
 }

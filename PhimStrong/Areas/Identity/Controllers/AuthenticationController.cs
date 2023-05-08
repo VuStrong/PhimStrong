@@ -3,12 +3,12 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
 using PhimStrong.Areas.Identity.Models;
-using SharedLibrary.Models;
 using System.Text.Encodings.Web;
 using System.Text;
 using System.Security.Claims;
 using SharedLibrary.Constants;
 using SharedLibrary.Helpers;
+using PhimStrong.Domain.Models;
 
 #pragma warning disable
 namespace PhimStrong.Areas.Identity.Controllers
@@ -20,7 +20,7 @@ namespace PhimStrong.Areas.Identity.Controllers
         private readonly UserManager<User> _userManager;
         private readonly IEmailSender _emailSender;
 
-		public AuthenticationController(SignInManager<User> signInManager, UserManager<User> userManager, IEmailSender emailSender)
+        public AuthenticationController(SignInManager<User> signInManager, UserManager<User> userManager, IEmailSender emailSender)
         {
             _signInManager = signInManager;
             _userManager = userManager;
@@ -56,7 +56,7 @@ namespace PhimStrong.Areas.Identity.Controllers
                 }
 
                 user = new User()
-                { 
+                {
                     UserName = model.Email,
                     Email = model.Email,
                     DisplayName = model.Name,
@@ -64,10 +64,10 @@ namespace PhimStrong.Areas.Identity.Controllers
                 };
 
                 user.NormalizeDisplayName = user.DisplayName.RemoveMarks();
-                
+
                 var result = await _userManager.CreateAsync(user, model.Password);
 
-				if (result.Succeeded)
+                if (result.Succeeded)
                 {
                     await _userManager.AddToRoleAsync(user, RoleConstant.MEMBER);
 
@@ -196,7 +196,7 @@ namespace PhimStrong.Areas.Identity.Controllers
         [HttpGet]
         public IActionResult AccessDenied(string text = null)
         {
-            return View(model:text);
+            return View(model: text);
         }
 
         [HttpGet]
@@ -223,7 +223,7 @@ namespace PhimStrong.Areas.Identity.Controllers
                 code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
 
                 var callbackUrl = Url.Action(
-                    "ResetPassword", 
+                    "ResetPassword",
                     "Authentication",
                     values: new { area = "Identity", code },
                     protocol: Request.Scheme);
@@ -258,7 +258,7 @@ namespace PhimStrong.Areas.Identity.Controllers
             {
                 ResetPasswordModel model = new ResetPasswordModel();
                 model.Code = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(code));
-                
+
                 return View(model);
             }
         }
@@ -338,9 +338,9 @@ namespace PhimStrong.Areas.Identity.Controllers
             }
             else if (result.IsLockedOut)
             {
-				return RedirectToAction("Lockout");
-			}
-			else
+                return RedirectToAction("Lockout");
+            }
+            else
             {
                 var user = new User();
                 user.EmailConfirmed = true;
@@ -379,7 +379,7 @@ namespace PhimStrong.Areas.Identity.Controllers
                 else
                 {
                     TempData["status"] = "Lỗi, Email đã tồn tại !";
-				}
+                }
 
                 return RedirectToAction("Login");
             }

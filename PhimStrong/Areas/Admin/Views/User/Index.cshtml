@@ -1,12 +1,11 @@
-﻿@model List<User>
+﻿@model PagedList<UserViewModel>
 @{
     ViewData["Title"] = "Quản lí User";
-    List<IdentityRole> roles = (List<IdentityRole>?)ViewData["Roles"] ?? new List<IdentityRole>();
+    List<string> roles = (List<string>?)ViewData["roles"] ?? new List<string>();
 }
 
 <div class="d-flex mt-4 mb-2" style="justify-content: space-between">
     <h2 class="text-success">@ViewData["Title"]</h2>
-
     <div>
         <ul class="d-flex flex-wrap-reverse align-items-center" style="list-style: none">
             <li class="mt-4 mt-sm-0 me-3 nav-item dropdown ignore-hover">
@@ -15,23 +14,28 @@
                     Lọc theo Role
                 </a>
                 <div class="dropdown-menu">
-                    <a class="dropdown-item" href="@Url.Action("Index", "User", new { area = "Admin", page = 1 } )">Tất cả</a>
+                    <a class="dropdown-item" href="@Url.Action("Index", "User", 
+                        new {
+                            area = "Admin",
+                            page = 1 
+                        })">Tất cả</a>
+                    
                     @foreach(var role in roles)
                     {
                         <a class="dropdown-item" href="@Url.Action("Index", "User", new
                             {
                                 area = "Admin",
                                 page = 1, 
-                                filter = $"<{PageFilterConstant.FILTER_BY_ROLE}>{role.Name}"
+                                role = role
                             })">
-                            @role.Name
+                            @role
                         </a>
                     }
                 </div>
             </li>
             <li class="nav-item">
                 <form id="search-name-form" class="d-flex" method="get" asp-area="Admin" asp-controller="User" asp-action="Index" asp-route-page="1">
-                    <input name="filter" class="form-control me-sm-2" type="text" placeholder="Nhập tên">
+                    <input name="value" class="form-control me-sm-2" type="text" placeholder="Nhập tên">
                     <button id="search-name-btn" class="btn btn-secondary my-2 my-sm-0" type="submit">Search</button>
                 </form>
             </li>
@@ -46,7 +50,7 @@
 
 @if(Model != null && Model.Any())
 {
-    <p class="text-success">@TempData["TotalCount"] kết quả.</p>
+    <p class="text-success">@Model.TotalItems kết quả.</p>
     <table class="table table-hover">
         <thead>
             <tr class="table-info">
@@ -88,20 +92,21 @@ else
 @{
     PagingModel pagingModel = new PagingModel
             {
-                NumberOfPages = (int)(TempData["NumberOfPages"] ?? 1),
-                CurrentPage = (int)(TempData["CurrentPage"] ?? 1),
+                NumberOfPages = Model?.TotalPage ?? 1,
+                CurrentPage = Model?.CurrentPage ?? 1,
                 Callback = (int page) => Url.Action("Index", "User", new
                 {
                     area = "Admin",
                     page = page,
-                    filter = (string)(TempData["filter"] ?? "")
+                    value = ViewData["value"],
+                    role = ViewData["role"]
                 })
             };
 }
 
 <partial name="/Views/Shared/_PagingPartial.cshtml" for="@pagingModel"></partial>
 
-@section Scripts{
+@*@section Scripts{
     <script type="text/javascript">
         // trước khi sumbit thì thay lại giá trị cho thẻ input
         $('#search-name-form').submit(function (e) {
@@ -118,4 +123,4 @@ else
             searchBtn.val('');
         });
     </script>
-}
+}*@

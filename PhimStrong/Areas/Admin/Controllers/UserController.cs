@@ -1,14 +1,12 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using PhimStrong.Areas.Admin.Models;
-using PhimStrong.Data;
-using SharedLibrary.Models;
 using SharedLibrary.Constants;
-using System.Data;
-using System.Text.RegularExpressions;
-using SharedLibrary.Helpers;
+using PhimStrong.Domain.Models;
+using PhimStrong.Application.Interfaces;
+using PhimStrong.Domain.PagingModel;
+using AutoMapper;
+using PhimStrong.Models.User;
 
 namespace PhimStrong.Areas.Admin.Controllers
 {
@@ -16,160 +14,74 @@ namespace PhimStrong.Areas.Admin.Controllers
 	[Authorize(Roles = $"{RoleConstant.ADMIN}, {RoleConstant.THUY_TO}")]
 	public class UserController : Controller
 	{
-		private readonly AppDbContext _db;
-		private readonly UserManager<User> _userManager;
-		private readonly RoleManager<IdentityRole> _roleManager;
-		private readonly IWebHostEnvironment _environment;
+        private readonly IMapper _mapper;
+        private readonly IUserService _userService;
+        private readonly IRoleService _roleService;
+        private readonly IWebHostEnvironment _environment;
 
 		public UserController(
-			AppDbContext db, 
-			UserManager<User> userManager, 
-			RoleManager<IdentityRole> roleManager, 
-			IWebHostEnvironment environment)
+            IMapper mapper,
+            IUserService userService,
+            IRoleService roleService,
+            IWebHostEnvironment environment)
 		{
-			_db = db;
-			_userManager = userManager;
-			_roleManager = roleManager;
+			_mapper = mapper;
+			_userService = userService;
+			_roleService = roleService;
 			_environment = environment;
 		}
 
 		private const int USERS_PER_PAGE = 15;
 
 		[HttpGet]
-		public async Task<IActionResult> Index(int page, string? filter = null)
+		public async Task<IActionResult> Index(int page, string? role = null, string? value = null)
 		{
-			if (page <= 0) page = 1;
+			PagedList<User> users = await _userService.SearchAsync(new PagingParameter(page, USERS_PER_PAGE), value, role);
+            
+			if (role != null) ViewData["role"] = role;
+			if (value != null) ViewData["value"] = value;
 
-			int numberOfPages = 0;
+			ViewData["roles"] = (await _roleService.GetRolesAsync()).ToList();
 
-            List<User> users = new List<User>();
-			int count = 0; // total of search result
-			if (filter == null || filter.Trim() == "")
-            {
-				count = _db.Users.Count();
-				numberOfPages = (int)Math.Ceiling((double)count / USERS_PER_PAGE);
-				TempData["TotalCount"] = count;
-
-				if (page > numberOfPages) page = numberOfPages;
-                if (page <= 0) page = 1;
-
-                users = _db.Users.Skip((page - 1) * USERS_PER_PAGE).Take(USERS_PER_PAGE).ToList();
-            }
-            else
-            {
-                MatchCollection match = Regex.Matches(filter ?? "", @"^<.+>");
-
-                if (match.Count > 0)
-                {
-                    string matchValue = new Regex(@"<|>").Replace(match[0].ToString(), "");
-
-					string filterValue = new Regex(@"^<.+>").Replace(filter ?? "", "");
-                    switch (matchValue)
-                    {
-                        case PageFilterConstant.FILTER_BY_ROLE:
-                            users = (await _userManager.GetUsersInRoleAsync(filterValue) ?? new List<User>()).ToList();
-
-							TempData["FilterMessage"] = "Role là " + filterValue;
-
-							break;
-						case PageFilterConstant.FILTER_BY_NAME:
-							TempData["FilterMessage"] = "tên là " + filterValue;
-						 	filterValue = filterValue.RemoveMarks();
-
-                            users = _db.Users.ToList().Where(u => 
-                                (u.NormalizeDisplayName ?? "").Contains(filterValue)
-                            ).ToList();
-
-							break;
-                        default:
-                            break;
-                    }
-                }
-
-				count = users.Count;
-				TempData["TotalCount"] = count;
-
-				numberOfPages = (int)Math.Ceiling((double)count / USERS_PER_PAGE);
-                if (page > numberOfPages) page = numberOfPages;
-                if (page <= 0) page = 1;
-
-                users = users.Skip((page - 1) * USERS_PER_PAGE).Take(USERS_PER_PAGE).ToList();
-            }
-
-            TempData["NumberOfPages"] = numberOfPages;
-			TempData["CurrentPage"] = page;
-            TempData["filter"] = filter;
-			ViewData["Roles"] = _roleManager.Roles.ToList();
-
-            return View(users);
+            return View(_mapper.Map<PagedList<UserViewModel>>(users));
 		}
 
-        [HttpGet]
+		[HttpGet]
 		public async Task<IActionResult> Edit(string? userid)
 		{
-            if (userid == null)
-            {
-                return NotFound("Không tìm thấy User :((");
-            }
+			var myUser = await _userService.GetByClaims(User);
+			var user = await _userService.FindByIdAsync(userid ?? "");
 
-            var myUser = await _userManager.GetUserAsync(User);
-            if (myUser == null)
-            {
-                return NotFound("Không tìm thấy User :((");
-            }
-
-            var user = await _userManager.FindByIdAsync(userid);
-			if(user == null)
+			if (user == null || myUser == null)
 			{
-                return NotFound("Không tìm thấy User :((");
-            }
+				return NotFound("Không tìm thấy User :((");
+			}
 
-			if (await _userManager.IsInRoleAsync(user, RoleConstant.THUY_TO) && !await _userManager.IsInRoleAsync(myUser, RoleConstant.THUY_TO))
+			if (await _userService.IsInRoleAsync(user, RoleConstant.THUY_TO) && !await _userService.IsInRoleAsync(myUser, RoleConstant.THUY_TO))
 			{
-                return RedirectToAction("AccessDenied", "Authentication", new
-				{ 
+				return RedirectToAction("AccessDenied", "Authentication", new
+				{
 					area = "Identity",
 					text = $"Oops ! Bạn không được phép chỉnh sửa thông tin của User có Role là {RoleConstant.THUY_TO} :("
 				});
-            }
+			}
 
-            return View(await GetEditUserModel(user));
+			return View(await GetEditUserModel(user));
 		}
 
 		[HttpPost]
 		public async Task<JsonResult> EditRole(string? userid, EditUserModel model)
 		{
-			if (model == null || userid == null)
+			try
 			{
-				return Json(new { success = false });
+                string? role = model.UserRole != null && model.UserRole != "none" ? model.UserRole : null;
+
+				await _userService.ChangeUserRoleAsync(userid ?? "", role);
 			}
-
-			var user = await _userManager.FindByIdAsync(userid);
-
-			if (user == null)
+			catch
 			{
-				return Json(new { success = false });
-			}
-
-			user.RoleName = null;
-			var result = await _userManager.RemoveFromRolesAsync(user, await _userManager.GetRolesAsync(user));
-            if (!result.Succeeded)
-            {
-				return Json(new { success = false });
-			}
-
-			if (model.UserRole != null && model.UserRole != "none")
-			{
-				result = await _userManager.AddToRoleAsync(user, model.UserRole);
-				
-				if (!result.Succeeded)
-				{
-					return Json(new { success = false });
-				}
-
-				user.RoleName = model.UserRole;
-				await _userManager.UpdateAsync(user);
-			}
+                return Json(new { success = false });
+            }
 
 			return Json(new { success = true });
 		}
@@ -177,110 +89,71 @@ namespace PhimStrong.Areas.Admin.Controllers
 		[HttpPost]
 		public async Task<JsonResult> ToggleLockUser(string? userid)
 		{
-			if (userid == null)
+			try
 			{
-				return Json(new { success = false });
+				await _userService.ToggleLockUserAsync(userid ?? "");
 			}
-
-			var user = await _userManager.FindByIdAsync(userid);
-			
-			if (user == null)
+			catch
 			{
-				return Json(new { success = false });
-			}
+                return Json(new { success = false });
+            }
 
-
-		 	var result = await _userManager.SetLockoutEnabledAsync(user, true);
-			if (!result.Succeeded)
-			{
-				return Json(new { success = false });
-			}
-
-			if (await _userManager.IsLockedOutAsync(user))
-			{
-				result = await _userManager.SetLockoutEndDateAsync(user, new DateTime(2020, 12, 20));
-			}
-			else
-			{
-				result = await _userManager.SetLockoutEndDateAsync(user, DateTimeOffset.Now.AddYears(10));
-			}
-
-			if (!result.Succeeded)
-			{
-				return Json(new { success = false });
-			}
-
-			return Json(new { success = true });
+            return Json(new { success = true });
 		}
 
 		[HttpPost]
 		public async Task<IActionResult> Delete(string userid)
 		{
-			if (userid == null)
-			{
-				TempData["error"] = "Xóa tài khoản thất bại.";
-			}
-
-			var user = await _userManager.FindByIdAsync(userid);
-
-			if (user == null)
-			{
-				TempData["error"] = "Xóa tài khoản thất bại.";
-				return RedirectToAction("Index");
-			}
-
 			try
 			{
-				var file = Path.Combine(_environment.ContentRootPath, "wwwroot/src/img/CastAvatars", user.Id + ".jpg");
+				await _userService.DeleteAsync(userid);
 
-				FileInfo fileInfo = new FileInfo(file);
+				var file = Path.Combine(_environment.ContentRootPath, "wwwroot/src/img/UserAvatars", userid + ".jpg");
+
+				FileInfo fileInfo = new(file);
 				fileInfo.Delete();
 			}
-			catch { }
-
-			var result = await _userManager.DeleteAsync(user);
-
-			if (!result.Succeeded)
+			catch 
 			{
-				TempData["error"] = "Xóa tài khoản thất bại.";
-				return RedirectToAction("Index");
-			}
+                TempData["error"] = "Xóa tài khoản thất bại.";
+                return RedirectToAction("Index");
+            }
 
 			TempData["success"] = "Xóa tài khoản thành công.";
 			return RedirectToAction("Index");
 		}
 
 		private async Task<EditUserModel> GetEditUserModel(User user)
-        {
-			List<string> userRoles = (await _userManager.GetRolesAsync(user)).ToList();
-			
+		{
+			List<string> userRoles = (await _userService.GetRolesAsync(user)).ToList();
+
 			string? userRole = "none";
 			if (userRoles.Count > 0)
 			{
 				userRole = userRoles[0];
 			}
 
-            List<string> roles = new()
-            {
-                "none"
-            };
-
-            var isThuyTo = await _userManager.IsInRoleAsync(await _userManager.GetUserAsync(User), RoleConstant.THUY_TO);
-
-            (await _roleManager.Roles.ToListAsync()).ForEach(r =>
+			List<string> roles = new()
 			{
-				if (r.Name != RoleConstant.THUY_TO || isThuyTo)
-				{
-					roles.Add(r.Name);
-				}
+				"none"
+			};
+
+			var isThuyTo = await _userService.IsInRoleAsync(await _userService.GetByClaims(User), RoleConstant.THUY_TO);
+
+			(await _roleService.GetRolesAsync()).ToList().ForEach(r =>
+			{
+				 if (r != RoleConstant.THUY_TO || isThuyTo)
+				 {
+					 roles.Add(r);
+				 }
 			});
 
 			return new EditUserModel
-            {
-                User = user,
-                UserRole = userRole,
-                RoleList = roles,
-                IsLock = await _userManager.IsLockedOutAsync(user)
+			{
+				User = _mapper.Map<UserViewModel>(user),
+				UserRole = userRole,
+				RoleList = roles,
+				IsLock = await _userService.IsLockedOutAsync(user)
 			};
 		}
 	}

@@ -1,7 +1,7 @@
 ﻿@{
-    User? user = (User?)ViewData["User"];
-    List<Category> categories = (List<Category>?)ViewData["Categories"] ?? new List<Category>();
-    List<Country> countries = (List<Country>?)ViewData["Countries"] ?? new List<Country>();
+    UserViewModel? user = (UserViewModel?)ViewData["User"];
+    List<CategoryViewModel> categories = (List<CategoryViewModel>?)ViewData["Categories"] ?? new List<CategoryViewModel>();
+    List<CountryViewModel> countries = (List<CountryViewModel>?)ViewData["Countries"] ?? new List<CountryViewModel>();
     List<int> years = (List<int>?)ViewData["Years"] ?? new List<int>();
 }
 

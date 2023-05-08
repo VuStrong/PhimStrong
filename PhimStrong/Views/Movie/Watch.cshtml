@@ -1,26 +1,26 @@
-﻿@model WatchMovieModel
+﻿@model WatchMovieViewModel
 @{
 	Layout = "/Views/Movie/_Layout.cshtml";
-	ViewData["MovieId"] = Model.Movie.Id;
+	ViewData["MovieId"] = Model.MovieId;
 
-	int currentVideoEpi = (int)(TempData["episode"] ?? "1");
+	int currentVideoEpi = Model.Episode;
 	
-	ViewData["Title"] = Model.Movie.Type == "Phim lẻ" ?
-		"Xem " + Model.Movie.TranslateName : $"Xem {Model.Movie.TranslateName} tập {currentVideoEpi}";
+	ViewData["Title"] = Model.MovieType == "Phim lẻ" ?
+		"Xem " + Model.MovieName : $"Xem {Model.MovieName} tập {currentVideoEpi}";
 	
-	ViewData["MovieName"] = Model.Movie.Type == "Phim lẻ" ?
-		Model.Movie.TranslateName : $"{Model.Movie.TranslateName} tập {currentVideoEpi}.";
+	ViewData["MovieName"] = Model.MovieType == "Phim lẻ" ?
+		Model.MovieName : $"{Model.MovieName} tập {currentVideoEpi}.";
 
 }
 
 <partial name="_ReportModal"></partial>
 
 <div id="movie-player" class="w-100 mb-4 mt-3 position-relative">
-	<video id="movie-video" controls name="media" poster="@Model.Movie.Image">
+	<video id="movie-video" controls name="media" poster="@Model.MovieImage">
 		@*<source src="https://www.googleapis.com/drive/v3/files/1i328m4OfLLjHHEV-yenYjJgocj8_AO_z?alt=media&key=AIzaSyALAnovaVGD6gFejFLClsUB8Ho68ztlTPM" type='video/mp4'>*@
-		<source src="@(Model.Video != null ? Model.Video.VideoUrl : "")" type='video/mp4' />
+		<source src="@(Model.VideoUrl != null ? Model.VideoUrl : "")" type='video/mp4' />
 	</video>
-	@if (Model.Video == null || String.IsNullOrEmpty(Model.Video.VideoUrl))
+	@if (Model.VideoUrl == null || String.IsNullOrEmpty(Model.VideoUrl))
 	{
 		<p class="text-danger position-absolute p-3">Video không thể tải được <i class="bi bi-emoji-frown-fill"></i></p>
 	}
@@ -38,13 +38,13 @@
 		<button id="report-btn" class="btn btn-success d-inline ms-3">Báo lỗi</button>
 	</div> 
 </div>
-@if (Model.Movie.Type == "Phim bộ")
+@if (Model.MovieType == "Phim bộ")
 {
 	<div class="my-4 p-3" style="background-color: #423e3e">
 		<p class="text-success">Danh sách tập</p>
-		@for (int i = 0; i < Model.Movie.EpisodeCount; i++)
+		@for (int i = 0; i < Model.MovieEpisodeCount; i++)
 		{
-			<a asp-area="" asp-controller="Movie" asp-action="Watch" asp-route-id="@Model.Movie.Id" asp-route-episode="@(i + 1)"
+			<a asp-area="" asp-controller="Movie" asp-action="Watch" asp-route-id="@Model.MovieId" asp-route-episode="@(i + 1)"
 				class="mb-1 btn @(currentVideoEpi == i + 1 ? "btn-success" : "btn-dark")">
 				Tập @(i + 1)
 			</a>
@@ -55,7 +55,7 @@
 @section Scripts{
 	<script src="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 	<script type="text/javascript">
-		var movieid = '@Model.Movie.Id';
+		var movieid = '@Model.MovieId';
 	</script>
 	<script src="/js/ModalReport.js"></script>
 	<script src="/js/Movie/MovieWatch.js"></script>

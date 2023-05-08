@@ -1,94 +1,98 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using PhimStrong.Data;
+using PhimStrong.Application.Interfaces;
+using PhimStrong.Models.Comment;
 using PhimStrong.Models;
 using SharedLibrary.Constants;
-using SharedLibrary.Models;
+using PhimStrong.Domain.Models;
+using PhimStrong.Domain.PagingModel;
+using AutoMapper;
 using System.Text.Encodings.Web;
 
 namespace PhimStrong.Controllers
 {
-#pragma warning disable
 	public class CommentController : Controller
 	{
-		private readonly AppDbContext _db;
-		private readonly UserManager<User> _userManager;
-		private readonly SignInManager<User> _signInManager;
-		private readonly IEmailSender _emailSender;
+#pragma warning disable
+		public const int COMMENTS_PER_PAGE = 10;
+
+		private readonly IMapper _mapper;
+        private readonly IEmailSender _emailSender;
+		private readonly IMovieService _movieService;
+		private readonly ICommentService _commentService;
+        private readonly IUserService _userService;
 
 		public CommentController(
-			AppDbContext db,
-			UserManager<User> userManager,
-			SignInManager<User> signInManager,
-			IEmailSender emailSender)
+            IMapper mapper,
+            IMovieService movieService,
+			IUserService userService,
+			IEmailSender emailSender,
+            ICommentService commentService)
 		{
-			_db = db;
-			_userManager = userManager;
-			_signInManager = signInManager;
+			_mapper = mapper;
 			_emailSender = emailSender;
+			_movieService = movieService;
+			_userService = userService;
+			_commentService = commentService;
 		}
 
 		[HttpGet]
 		[Route("/Comment/GetCommentsPartial")]
 		public async Task<IActionResult> GetCommentsPartial(int page, string movieid)
 		{
-			Movie? movie = await _db.Movies.FirstOrDefaultAsync(m => m.Id == movieid);
+			if (page == 0) page = 1;
+
+			Movie? movie = await _movieService.GetByIdAsync(movieid);
+
 			if (movie == null) return Json("null");
 
-			if (page <= 0) page = 1;
+			PagedList<Comment> comments = await _commentService.GetByMovieIdAsync(
+				movieid, new PagingParameter(page, 1));
 
-			List<Comment>? comments = movie.Comments != null ?
-				movie.Comments.Where(c => c.ResponseTo == null)
-				.OrderByDescending(c => c.CreatedAt)
-				.Skip((page - 1) * CommonConstants.COMMENTS_PER_PAGE)
-				.Take(CommonConstants.COMMENTS_PER_PAGE).ToList() :
-				null;
+			User? user = await _userService.GetByClaims(User);
 
-			User user = await _userManager.GetUserAsync(User);
-
-			CommentModel model = new()
+			CommentContainerModel model = new()
 			{
-				Comments = comments,
-				UserLogin = _signInManager.IsSignedIn(User),
-				CommentCount = movie.Comments != null ? movie.Comments.Count : 0,
+				IsEnd = page >= comments.TotalPage,
+				Comments = _mapper.Map<List<CommentViewModel>>(comments),
+				UserLogin = _userService.IsSignIn(User),
+				CommentCount = comments.TotalItems,
 				RenderCommentOnly = false,
-				UserAvatar = user != null ? user.Avatar : null,
+				UserAvatar = user?.Avatar,
 				MovieId = movie.Id,
 				IsAdmin = user != null && user.RoleName != null && (user.RoleName == RoleConstant.ADMIN || user.RoleName == RoleConstant.THUY_TO)
 			};
 
-			return this.PartialView("_CommentPartial", model);
+			Console.WriteLine("page : " + page);
+			Console.WriteLine("total : " + comments.TotalPage);
+			Console.WriteLine("End ?? : " + model.IsEnd);
+
+			return this.PartialView("_CommentContainerPartial", model);
 		}
 
 		[HttpGet]
 		[Route("/Comment/LoadMoreComments")]
 		public async Task<IActionResult> LoadMoreComments(int page, string movieid)
 		{
-			Movie? movie = await _db.Movies.FirstOrDefaultAsync(m => m.Id == movieid);
+			Movie? movie = await _movieService.GetByIdAsync(movieid);
+
 			if (movie == null) return Json("null");
 
-			if (page <= 0) page = 1;
+			User? user = await _userService.GetByClaims(User);
 
-            User user = await _userManager.GetUserAsync(User);
+            PagedList<Comment> comments = await _commentService.GetByMovieIdAsync(
+                movieid, new PagingParameter(page, COMMENTS_PER_PAGE));
 
-            List<Comment>? comments = movie.Comments != null ?
-				movie.Comments.Where(c => c.ResponseTo == null)
-				.OrderByDescending(c => c.CreatedAt)
-				.Skip((page - 1) * CommonConstants.COMMENTS_PER_PAGE)
-				.Take(CommonConstants.COMMENTS_PER_PAGE).ToList() :
-				null;
-
-			CommentModel model = new()
+            CommentContainerModel model = new()
 			{
-				Comments = comments,
+                IsEnd = page >= comments.TotalPage,
+                Comments = _mapper.Map<List<CommentViewModel>>(comments),
 				RenderCommentOnly = true,
-                IsAdmin = user != null && user.RoleName != null && (user.RoleName == RoleConstant.ADMIN || user.RoleName == RoleConstant.THUY_TO)
-            };
+				IsAdmin = user != null && user.RoleName != null && (user.RoleName == RoleConstant.ADMIN || user.RoleName == RoleConstant.THUY_TO)
+			};
 
-			return this.PartialView("_CommentPartial", model);
+			return this.PartialView("_CommentContainerPartial", model);
 		}
 
 		[HttpPost]
@@ -100,16 +104,16 @@ namespace PhimStrong.Controllers
 				return Json(new { success = false });
 			}
 
-			User user = await _userManager.GetUserAsync(User);
-			Movie? movie = await _db.Movies.FirstOrDefaultAsync(m => m.Id == model.MovieId);
+			User? user = await _userService.GetByClaims(User);
+			Movie? movie = await _movieService.GetByIdAsync(model.MovieId);
 
 			if (user == null || movie == null)
 			{
 				return Json(new { success = false });
 			}
 
-			Comment? responseToComment = model.ResponseToId > 0 ? 
-				_db.Comments.FirstOrDefault(c => c.Id == model.ResponseToId) : null;
+			Comment? responseToComment = model.ResponseToId > 0 ?
+				await _commentService.GetByIdAsync(model.ResponseToId) : null;
 
 			Comment comment = new()
 			{
@@ -119,19 +123,19 @@ namespace PhimStrong.Controllers
 				CreatedAt = DateTime.Now,
 				Like = 0,
 				ResponseTo = responseToComment
-			};
+            };
 
 			try
 			{
-				_db.Comments.Add(comment);
-				await _db.SaveChangesAsync();
+				await _commentService.CreateAsync(comment);
 			}
-			catch
+			catch(Exception e)
 			{
+				Console.WriteLine(e);
 				return Json(new { success = false });
 			}
 
-			// gửi email tới user đc phàn hồi
+			//gửi email tới user đc phàn hồi
 			if (responseToComment != null)
 			{
 				var callbackUrl = Url.Action(
@@ -162,18 +166,9 @@ namespace PhimStrong.Controllers
 		[Route("/Comment/LikeComment")]
 		public async Task<JsonResult> LikeComment(int commentid)
 		{
-			Comment? comment = await _db.Comments.FirstOrDefaultAsync(c => c.Id == commentid);
-
-			if (comment == null)
-			{
-				return Json(new { success = false });
-			}
-
-			comment.Like += 1;
 			try
 			{
-				_db.Update(comment);
-				await _db.SaveChangesAsync();
+				await _commentService.LikeComment(commentid);
 			}
 			catch
 			{
@@ -188,32 +183,16 @@ namespace PhimStrong.Controllers
 		[Authorize(Roles = $"{RoleConstant.ADMIN}, {RoleConstant.THUY_TO}")]
 		public async Task<JsonResult> DeleteComment(int commentid)
         {
-            Comment? comment = await _db.Comments.FirstOrDefaultAsync(c => c.Id == commentid);
+			try
+			{
+				await _commentService.DeleteAsync(commentid);
+			}
+			catch
+			{
+				return Json(new { success = false });
+			}
 
-            if (comment == null)
-            {
-                return Json(new { success = false });
-            }
-
-            try
-            {
-				if (comment.Responses != null && comment.Responses.Count > 0)
-				{
-					foreach (var cmt in comment.Responses)
-					{
-						_db.Comments.Remove(cmt);
-					}
-				}
-
-                _db.Comments.Remove(comment);
-                await _db.SaveChangesAsync();
-            }
-            catch
-            {
-                return Json(new { success = false });
-            }
-
-            return Json(new { success = true });
+			return Json(new { success = true });
         }
     }
 }

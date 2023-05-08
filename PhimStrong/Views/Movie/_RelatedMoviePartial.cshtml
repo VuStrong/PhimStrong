@@ -1,7 +1,7 @@
-﻿@model List<Movie>?
+﻿@model List<MovieViewModel>
 
 <h3 class="text-success mb-5">Phim liên quan</h3>
-@if (Model != null)
+@if (Model != null && Model.Any())
 {
 	<div id="relate-movies" class="row row-cols-lg-5 row-cols-md-4 row-cols-2 flex-nowrap overflow-hidden
 						movie-container owl-slide position-relative" style="height: var(--movie-item-height)">

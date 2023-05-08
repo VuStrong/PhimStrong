@@ -1,28 +1,41 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using PhimStrong.Data;
-using SharedLibrary.Models;
+using PhimStrong.Application.Interfaces;
+using PhimStrong.Models.Category;
+using PhimStrong.Models.Country;
+using PhimStrong.Models.User;
 
 namespace PhimStrong.Components
 {
     public class HeaderNavBarViewComponent : ViewComponent
     {
-        private readonly AppDbContext _db;
-        private readonly UserManager<User> _userManager;
+		private readonly IUserService _userService;
+		private readonly ICategoryService _categoryService;
+		private readonly ICountryService _countryService;
+        private readonly IMapper _mapper;
 
-        public HeaderNavBarViewComponent(AppDbContext db, UserManager<User> userManager)
+        public HeaderNavBarViewComponent(
+			IUserService userService,
+			ICategoryService categoryService,
+			ICountryService countryService,
+            IMapper mapper)
         {
-            _db = db;
-            _userManager = userManager;
+			_userService = userService;
+            _categoryService = categoryService;
+            _countryService = countryService;
+            _mapper = mapper;
         }
 
         public async Task<IViewComponentResult> InvokeAsync()
         {
-            ViewData["Categories"] = await _db.Categories.ToListAsync();
-            ViewData["Countries"] = await _db.Countries.ToListAsync();
+            ViewData["Categories"] = _mapper.Map<List<CategoryViewModel>>(
+                (await _categoryService.GetAllAsync()).ToList());
+            
+            ViewData["Countries"] = _mapper.Map<List<CountryViewModel>>(
+                (await _countryService.GetAllAsync()).ToList());
 
-            ViewData["User"] = await _userManager.GetUserAsync((System.Security.Claims.ClaimsPrincipal)User);
+            ViewData["User"] = _mapper.Map<UserViewModel>(
+                await _userService.GetByClaims((System.Security.Claims.ClaimsPrincipal)User));
 
             List<int> years = new();
             int currentYear = DateTime.Now.Year;

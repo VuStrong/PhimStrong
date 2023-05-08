@@ -1,13 +1,6 @@
 ﻿@model ModalCastModel
 @{
-    // Khởi tạo list cast
-    var castList = new List<string>();
-
-    Model.Casts?.ToList().ForEach(c =>
-    {
-        castList.Add(c.Name);
-    });
-
+    Model.Casts ??= new List<string>();
     Model.SelectedCasts ??= new List<string>();
     string selectedCasts = String.Join(",", Model.SelectedCasts);
 }
@@ -38,7 +31,7 @@
             <div class="modal-body overflow-scroll" style="height:400px">
                 <table class="table table-hover">
                     <tbody>
-                        @foreach (var cast in castList)
+                        @foreach (var cast in Model.Casts)
                         {
                             <tr>
                                 <th class="cast-name" scope="row">@cast</th>

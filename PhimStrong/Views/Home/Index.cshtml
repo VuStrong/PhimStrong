@@ -1,30 +1,22 @@
-﻿@{
+﻿@model HomeViewModel
+@{
     ViewData["Title"] = "Trang chủ";
+    
+    int listMovieRandomLength = Model.ListRandomMovies != null ? Model.ListRandomMovies.Count : 0;
 
-    // phim đề cử
-    var listMovieSlide = (List<Movie>?)(ViewData["MoviesSlide"]);
-    int listMovieSlideLength = listMovieSlide != null ? listMovieSlide.Count : 0;
+    int listMovieNewLength = Model.ListMovieNew != null ? Model.ListMovieNew.Length : 0;
 
-    // phim mới
-    var listMovieNew = (Movie[]?)(ViewData["ListMovieNew"]);
-    int listMovieNewLength = listMovieNew != null ? listMovieNew.Length : 0;
+    int listMovieTopRatingLength = Model.ListMovieTopRating != null ? Model.ListMovieTopRating.Length : 0;
 
-    var listMovieTopRating = (Movie[]?)(ViewData["ListMovieTopRating"]);
-    int listMovieTopRatingLength = listMovieTopRating != null ? listMovieTopRating.Length : 0;
+    int listPhimLeLength = Model.ListPhimLe != null ? Model.ListPhimLe.Length : 0;
 
-    // Phim lẻ
-    var listPhimLe = (Movie[]?)(ViewData["ListPhimLe"]);
-    int listPhimLeLength = listPhimLe != null ? listPhimLe.Length : 0;
-
-    // Phim bộ
-    var listPhimBo = (Movie[]?)(ViewData["ListPhimBo"]);
-    int listPhimBoLength = listPhimBo != null ? listPhimBo.Length : 0;
+    int listPhimBoLength = Model.ListPhimBo != null ? Model.ListPhimBo.Length : 0;
 }
 
 <div class="row mb-5 mt-5 random-movies">
     <div id="carouselExampleIndicators" class="carousel slide col-lg-9 col-12 h-100" data-bs-ride="true">
         <div class="carousel-indicators">
-            @for (int i = 0; i < listMovieSlideLength; i++)
+            @for (int i = 0; i < listMovieRandomLength; i++)
             {
                 <button type="button" data-bs-target="#carouselExampleIndicators" 
                     data-bs-slide-to="@i" class="@(i == 0 ? "active" : "")" 
@@ -36,9 +28,9 @@
             @{
                 bool first = true;
                 
-                if(listMovieSlide != null)
+                if(Model.ListRandomMovies != null)
                 {
-                    foreach (var movie in listMovieSlide)
+                    foreach (var movie in Model.ListRandomMovies)
                     {
                         <div class="carousel-item h-100 @(first ? "active" : "")">
                             <img src="@movie.Image" class="img-fit w-100 h-100" alt="...">
@@ -68,9 +60,9 @@
         @{
             bool first2 = true;
 
-            if (listMovieSlide != null)
+            if (Model.ListRandomMovies != null)
             {
-                foreach (var movie in listMovieSlide)
+                foreach (var movie in Model.ListRandomMovies)
                 {
                     <a href="/Movie/Detail/@movie.Id" class="movie-slide-item @(first2 ? "active" : "") row py-2">
                         <div class="col-5 h-100">
@@ -97,29 +89,29 @@
     </div>
     <div class="w-100">
         <div class="d-flex flex-wrap movie-row">
-            @if (listMovieNew != null && listMovieNewLength > 0)
+            @if (Model.ListMovieNew != null && listMovieNewLength > 0)
             {
                 <div class="movie-item movie-item-large">
-                    <a href="/Movie/Detail/@listMovieNew[0].Id" class="movie-item-body">
-                        <img src="@(listMovieNew[0].Image ?? "~/src/img/UserAvatars/default_avatar.png")" class="w-100 h-100 img-fit">
-                        <p class="movie-item-name background-blur text-truncate w-100">@listMovieNew[0].TranslateName</p>
-                        <p class="movie-status">@listMovieNew[0].StatusToString</p>
+                    <a href="/Movie/Detail/@Model.ListMovieNew[0].Id" class="movie-item-body">
+                        <img src="@(Model.ListMovieNew[0].Image ?? "~/src/img/UserAvatars/default_avatar.png")" class="w-100 h-100 img-fit">
+                        <p class="movie-item-name background-blur text-truncate w-100">@Model.ListMovieNew[0].TranslateName</p>
+                        <p class="movie-status">@Model.ListMovieNew[0].StatusToString</p>
                     </a>
                 </div>   
             }
             <div class="col row row-cols-lg-3 row-cols-2 flex-wrap movie-row movie-row-6">
-                @if (listMovieNew != null)
+                @if (Model.ListMovieNew != null)
                 {
                     for (int i = 1; i <= 6; i++)
                     {
                         if (i >= listMovieNewLength) break;
 
                         <div class="movie-item">
-                            <a href="/Movie/Detail/@listMovieNew[i].Id" class="movie-item-body">
-                                <img src="@(listMovieNew[i].Image ?? "~/src/img/UserAvatars/default_avatar.png")"
+                            <a href="/Movie/Detail/@Model.ListMovieNew[i].Id" class="movie-item-body">
+                                <img src="@(Model.ListMovieNew[i].Image ?? "~/src/img/UserAvatars/default_avatar.png")"
                                     class="w-100 h-100 img-fit">
-                                <p class="movie-item-name background-blur text-truncate w-100">@listMovieNew[i].TranslateName</p>
-                                <p class="movie-status">@listMovieNew[i].StatusToString</p>
+                                <p class="movie-item-name background-blur text-truncate w-100">@Model.ListMovieNew[i].TranslateName</p>
+                                <p class="movie-status">@Model.ListMovieNew[i].StatusToString</p>
                             </a>
                         </div>
                     }
@@ -127,18 +119,18 @@
             </div>
         </div>
         <div class="row row-cols-lg-5 row-cols-2 movie-row">
-            @if (listMovieNew != null)
+            @if (Model.ListMovieNew != null)
             {
                 for (int i = 7; i <= 11; i++)
                 {
                     if (i >= listMovieNewLength) break;
 
                     <div class="movie-item">
-                        <a href="/Movie/Detail/@listMovieNew[i].Id" class="movie-item-body">
-                            <img src="@(listMovieNew[i].Image ?? "~/src/img/UserAvatars/default_avatar.png")"
+                        <a href="/Movie/Detail/@Model.ListMovieNew[i].Id" class="movie-item-body">
+                            <img src="@(Model.ListMovieNew[i].Image ?? "~/src/img/UserAvatars/default_avatar.png")"
                                 class="w-100 h-100 img-fit">
-                            <p class="movie-item-name background-blur text-truncate w-100">@listMovieNew[i].TranslateName</p>
-                            <p class="movie-status">@listMovieNew[i].StatusToString</p>
+                            <p class="movie-item-name background-blur text-truncate w-100">@Model.ListMovieNew[i].TranslateName</p>
+                            <p class="movie-status">@Model.ListMovieNew[i].StatusToString</p>
                         </a>
                     </div>
                 }
@@ -155,30 +147,30 @@
     </div>
     <div class="w-100">
         <div class="d-flex flex-wrap movie-row">
-            @if (listMovieTopRating != null && listMovieTopRatingLength > 0)
+            @if (Model.ListMovieTopRating != null && listMovieTopRatingLength > 0)
             {
                 <div class="movie-item movie-item-large">
-                    <a href="/Movie/Detail/@listMovieTopRating[0].Id" class="movie-item-body">
-                        <img src="@(listMovieTopRating[0].Image ?? "~/src/img/UserAvatars/default_avatar.png")" 
+                    <a href="/Movie/Detail/@Model.ListMovieTopRating[0].Id" class="movie-item-body">
+                        <img src="@(Model.ListMovieTopRating[0].Image ?? "~/src/img/UserAvatars/default_avatar.png")" 
                             class="w-100 h-100 img-fit">
-                        <p class="movie-item-name background-blur text-truncate w-100">@listMovieTopRating[0].TranslateName</p>
-                        <p class="movie-status">@listMovieTopRating[0].StatusToString</p>
+                        <p class="movie-item-name background-blur text-truncate w-100">@Model.ListMovieTopRating[0].TranslateName</p>
+                        <p class="movie-status">@Model.ListMovieTopRating[0].StatusToString</p>
                     </a>
                 </div>
             }
             <div class="col row row-cols-lg-3 row-cols-2 flex-wrap movie-row movie-row-6">
-                @if (listMovieTopRating != null)
+                @if (Model.ListMovieTopRating != null)
                 {
                     for (int i = 1; i <= 6; i++)
                     {
                         if (i >= listMovieTopRatingLength) break;
 
                         <div class="movie-item">
-                            <a href="/Movie/Detail/@listMovieTopRating[i].Id" class="movie-item-body">
-                                <img src="@(listMovieTopRating[i].Image ?? "~/src/img/UserAvatars/default_avatar.png")"
+                            <a href="/Movie/Detail/@Model.ListMovieTopRating[i].Id" class="movie-item-body">
+                                <img src="@(Model.ListMovieTopRating[i].Image ?? "~/src/img/UserAvatars/default_avatar.png")"
                                      class="w-100 h-100 img-fit">
-                                <p class="movie-item-name background-blur text-truncate w-100">@listMovieTopRating[i].TranslateName</p>
-                                <p class="movie-status">@listMovieTopRating[i].StatusToString</p>
+                                <p class="movie-item-name background-blur text-truncate w-100">@Model.ListMovieTopRating[i].TranslateName</p>
+                                <p class="movie-status">@Model.ListMovieTopRating[i].StatusToString</p>
                             </a>
                         </div>
                     }
@@ -186,18 +178,18 @@
             </div>
         </div>
         <div class="row row-cols-lg-5 row-cols-2 movie-row">
-            @if (listMovieTopRating != null)
+            @if (Model.ListMovieTopRating != null)
             {
                 for (int i = 7; i <= 11; i++)
                 {
                     if (i >= listMovieTopRatingLength) break;
 
                     <div class="movie-item">
-                        <a href="/Movie/Detail/@listMovieTopRating[i].Id" class="movie-item-body">
-                            <img src="@(listMovieTopRating[i].Image ?? "~/src/img/UserAvatars/default_avatar.png")"
+                        <a href="/Movie/Detail/@Model.ListMovieTopRating[i].Id" class="movie-item-body">
+                            <img src="@(Model.ListMovieTopRating[i].Image ?? "~/src/img/UserAvatars/default_avatar.png")"
                                 class="w-100 h-100 img-fit">
-                            <p class="movie-item-name background-blur text-truncate w-100">@listMovieTopRating[i].TranslateName</p>
-                            <p class="movie-status">@listMovieTopRating[i].StatusToString</p>
+                            <p class="movie-item-name background-blur text-truncate w-100">@Model.ListMovieTopRating[i].TranslateName</p>
+                            <p class="movie-status">@Model.ListMovieTopRating[i].StatusToString</p>
                         </a>
                     </div>
                 }
@@ -214,30 +206,30 @@
     </div>
     <div class="w-100">
         <div class="d-flex flex-wrap movie-row">
-            @if (listPhimLe != null && listPhimLeLength > 0)
+            @if (Model.ListPhimLe != null && listPhimLeLength > 0)
             {
                 <div class="movie-item movie-item-large">
-                    <a href="/Movie/Detail/@listPhimLe[0].Id" class="movie-item-body">
-                        <img src="@(listPhimLe[0].Image ?? "~/src/img/UserAvatars/default_avatar.png")"
+                    <a href="/Movie/Detail/@Model.ListPhimLe[0].Id" class="movie-item-body">
+                        <img src="@(Model.ListPhimLe[0].Image ?? "~/src/img/UserAvatars/default_avatar.png")"
                             class="w-100 h-100 img-fit">
-                        <p class="movie-item-name background-blur text-truncate w-100">@listPhimLe[0].TranslateName</p>
-                        <p class="movie-status">@listPhimLe[0].StatusToString</p>
+                        <p class="movie-item-name background-blur text-truncate w-100">@Model.ListPhimLe[0].TranslateName</p>
+                        <p class="movie-status">@Model.ListPhimLe[0].StatusToString</p>
                     </a>
                 </div>
             }
             <div class="col row row-cols-lg-3 row-cols-2 flex-wrap movie-row movie-row-6">
-                @if (listPhimLe != null)
+                @if (Model.ListPhimLe != null)
                 {
                     for (int i = 1; i <= 6; i++)
                     {
                         if (i >= listPhimLeLength) break;
 
                         <div class="movie-item">
-                            <a href="/Movie/Detail/@listPhimLe[i].Id" class="movie-item-body">
-                                <img src="@(listPhimLe[i].Image ?? "~/src/img/UserAvatars/default_avatar.png")"
+                            <a href="/Movie/Detail/@Model.ListPhimLe[i].Id" class="movie-item-body">
+                                <img src="@(Model.ListPhimLe[i].Image ?? "~/src/img/UserAvatars/default_avatar.png")"
                                      class="w-100 h-100 img-fit">
-                                <p class="movie-item-name background-blur text-truncate w-100">@listPhimLe[i].TranslateName</p>
-                                <p class="movie-status">@listPhimLe[i].StatusToString</p>
+                                <p class="movie-item-name background-blur text-truncate w-100">@Model.ListPhimLe[i].TranslateName</p>
+                                <p class="movie-status">@Model.ListPhimLe[i].StatusToString</p>
                             </a>
                         </div>
                     }
@@ -245,18 +237,18 @@
             </div>
         </div>
         <div class="row row-cols-lg-5 row-cols-2 movie-row">
-            @if (listPhimLe != null)
+            @if (Model.ListPhimLe != null)
             {
                 for (int i = 7; i <= 11; i++)
                 {
                     if (i >= listPhimLeLength) break;
 
                     <div class="movie-item">
-                        <a href="/Movie/Detail/@listPhimLe[i].Id" class="movie-item-body">
-                            <img src="@(listPhimLe[i].Image ?? "~/src/img/UserAvatars/default_avatar.png")"
+                        <a href="/Movie/Detail/@Model.ListPhimLe[i].Id" class="movie-item-body">
+                            <img src="@(Model.ListPhimLe[i].Image ?? "~/src/img/UserAvatars/default_avatar.png")"
                                 class="w-100 h-100 img-fit">
-                            <p class="movie-item-name background-blur text-truncate w-100">@listPhimLe[i].TranslateName</p>
-                            <p class="movie-status">@listPhimLe[i].StatusToString</p>
+                            <p class="movie-item-name background-blur text-truncate w-100">@Model.ListPhimLe[i].TranslateName</p>
+                            <p class="movie-status">@Model.ListPhimLe[i].StatusToString</p>
                         </a>
                     </div>
                 }
@@ -273,30 +265,30 @@
     </div>
     <div class="w-100">
         <div class="d-flex flex-wrap movie-row">
-            @if (listPhimBo != null && listPhimBoLength > 0)
+            @if (Model.ListPhimBo != null && listPhimBoLength > 0)
             {
                 <div class="movie-item movie-item-large">
-                    <a href="/Movie/Detail/@listPhimBo[0].Id" class="movie-item-body">
-                        <img src="@(listPhimBo[0].Image ?? "~/src/img/UserAvatars/default_avatar.png")"
+                    <a href="/Movie/Detail/@Model.ListPhimBo[0].Id" class="movie-item-body">
+                        <img src="@(Model.ListPhimBo[0].Image ?? "~/src/img/UserAvatars/default_avatar.png")"
                             class="w-100 h-100 img-fit">
-                        <p class="movie-item-name background-blur text-truncate w-100">@listPhimBo[0].TranslateName</p>
-                        <p class="movie-status">@listPhimBo[0].StatusToString</p>
+                        <p class="movie-item-name background-blur text-truncate w-100">@Model.ListPhimBo[0].TranslateName</p>
+                        <p class="movie-status">@Model.ListPhimBo[0].StatusToString</p>
                     </a>
                 </div>
             }
             <div class="col row row-cols-lg-3 row-cols-2 flex-wrap movie-row movie-row-6">
-                @if (listPhimBo != null)
+                @if (Model.ListPhimBo != null)
                 {
                     for (int i = 1; i <= 6; i++)
                     {
                         if (i >= listPhimBoLength) break;
 
                         <div class="movie-item">
-                            <a href="/Movie/Detail/@listPhimBo[i].Id" class="movie-item-body">
-                                <img src="@(listPhimBo[i].Image ?? "~/src/img/UserAvatars/default_avatar.png")"
+                            <a href="/Movie/Detail/@Model.ListPhimBo[i].Id" class="movie-item-body">
+                                <img src="@(Model.ListPhimBo[i].Image ?? "~/src/img/UserAvatars/default_avatar.png")"
                                     class="w-100 h-100 img-fit">
-                                <p class="movie-item-name background-blur text-truncate w-100">@listPhimBo[i].TranslateName</p>
-                                <p class="movie-status">@listPhimBo[i].StatusToString</p>
+                                <p class="movie-item-name background-blur text-truncate w-100">@Model.ListPhimBo[i].TranslateName</p>
+                                <p class="movie-status">@Model.ListPhimBo[i].StatusToString</p>
                             </a>
                         </div>
                     }
@@ -304,18 +296,18 @@
             </div>
         </div>
         <div class="row row-cols-lg-5 row-cols-2 movie-row">
-            @if (listPhimBo != null)
+            @if (Model.ListPhimBo != null)
             {
                 for (int i = 7; i <= 11; i++)
                 {
                     if (i >= listPhimBoLength) break;
 
                     <div class="movie-item">
-                        <a href="/Movie/Detail/@listPhimBo[i].Id" class="movie-item-body">
-                            <img src="@(listPhimBo[i].Image ?? "~/src/img/UserAvatars/default_avatar.png")"
+                        <a href="/Movie/Detail/@Model.ListPhimBo[i].Id" class="movie-item-body">
+                            <img src="@(Model.ListPhimBo[i].Image ?? "~/src/img/UserAvatars/default_avatar.png")"
                                 class="w-100 h-100 img-fit">
-                            <p class="movie-item-name background-blur text-truncate w-100">@listPhimBo[i].TranslateName</p>
-                            <p class="movie-status">@listPhimBo[i].StatusToString</p>
+                            <p class="movie-item-name background-blur text-truncate w-100">@Model.ListPhimBo[i].TranslateName</p>
+                            <p class="movie-status">@Model.ListPhimBo[i].StatusToString</p>
                         </a>
                     </div>
                 }

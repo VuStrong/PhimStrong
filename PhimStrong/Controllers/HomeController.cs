@@ -1,76 +1,58 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using PhimStrong.Data;
+using PhimStrong.Application.Interfaces;
 using PhimStrong.Models;
-using SharedLibrary.Models;
 using System.Diagnostics;
+using PhimStrong.Domain.PagingModel;
+using PhimStrong.Domain.Models;
+using AutoMapper;
+using PhimStrong.Models.Movie;
 
 namespace PhimStrong.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly AppDbContext _db;
+        private readonly IMovieService _movieService;
+        private readonly IMapper _mapper;
 
-        public HomeController(AppDbContext db)
+
+        public HomeController(IMovieService movieService, IMapper mapper)
         {
-            _db = db;
+            _movieService = movieService;
+            _mapper = mapper;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            List<Movie> randomMovies = new();
-            Movie[] movies = _db.Movies.ToArray();
-            int count = movies.Length;
+            List<Movie> randomMovies = (await _movieService.GetRandomMoviesAsync(10)).ToList();
 
-            Random random = new();
-            int randomNum;
-            if (count > 0)
+            PagingParameter pagingParameter = new(1, 12);
+
+            Movie[] newMovies = (await _movieService.GetAllAsync(pagingParameter)).ToArray();
+            Movie[] topRatingMovies = (await _movieService.GetMoviesOrderByRatingAsync(pagingParameter)).ToArray();
+            Movie[] phimLe = (await _movieService.FindByTypeAsync("Phim lẻ", pagingParameter)).ToArray();
+            Movie[] phimBo = (await _movieService.FindByTypeAsync("Phim bộ", pagingParameter)).ToArray();
+
+            return View(new HomeViewModel()
             {
-                for (int i = 0; i < 10; i++)
-                {
-                    if (i >= count) break;
-                    randomNum = random.Next(0, count);
-
-                    while (randomMovies.Contains(movies[randomNum]))
-                    {
-                        randomNum = random.Next(0, count);
-                    }
-
-                    randomMovies.Add(movies[randomNum]);
-                }
-            }
-
-            ViewData["MoviesSlide"] = randomMovies;
-            ViewData["ListMovieNew"] = _db.Movies.OrderByDescending(m => m.CreatedDate).Take(12).ToArray();
-            ViewData["ListMovieTopRating"] = _db.Movies.OrderByDescending(m => m.Rating).Take(12).ToArray();
-            ViewData["ListPhimLe"] = _db.Movies.Where(m => m.Type == "Phim lẻ").OrderByDescending(m => m.CreatedDate).Take(12).ToArray();
-            ViewData["ListPhimBo"] = _db.Movies.Where(m => m.Type == "Phim bộ").OrderByDescending(m => m.CreatedDate).Take(12).ToArray();
-
-            return View();
+                ListRandomMovies = _mapper.Map<List<MovieViewModel>>(randomMovies),
+                ListMovieTopRating = _mapper.Map<MovieViewModel[]>(topRatingMovies),
+                ListMovieNew = _mapper.Map<MovieViewModel[]>(newMovies),
+                ListPhimLe = _mapper.Map<MovieViewModel[]>(phimLe),
+                ListPhimBo = _mapper.Map<MovieViewModel[]>(phimBo)
+            });
         }
 
         [Route("/chinh-sach-rieng-tu")]
-        public IActionResult Privacy()
-        {
-			return View();
-        }
+        public IActionResult Privacy() => View();
 
         [Route("/dieu-khoan-su-dung")]
-        public IActionResult TermsOfUse()
-        {
-            return View();
-        }
+        public IActionResult TermsOfUse() => View();
 
         [Route("/khieu-nai-ban-quyen")]
-        public IActionResult License()
-        {
-            return View();
-        }
+        public IActionResult License() => View();
 
         [Route("/contact")]
-        public IActionResult Contact()
-        {
-            return View();
-        }
+        public IActionResult Contact() => View();
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()

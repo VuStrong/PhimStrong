@@ -1,4 +1,4 @@
-﻿@model Movie
+﻿@model MovieViewModel
 @{
 	Layout = "/Views/Movie/_Layout.cshtml";
 	ViewData["Title"] = Model.TranslateName;
@@ -7,8 +7,7 @@
 
 	int movieYear = Model.ReleaseDate != null ? Model.ReleaseDate.Value.Year : 0;
 	string movieCountry = Model.Country != null ? Model.Country.Name : "";
-	string movieLength = Model.Length != null ? 
-		(Model.Type == "Phim lẻ" ? $"{Model.Length} phút" : $"{Model.Length} phút / tập") : "0";
+	string movieLength = Model.Type == "Phim lẻ" ? $"{Model.Length} phút" : $"{Model.Length} phút / tập";
 }
 
 <div style="background-image: url(@(Model.Image ?? "/src/img/UserAvatars/default_avatar.png"))"

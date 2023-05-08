@@ -1,51 +1,49 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using PhimStrong.Data;
-using SharedLibrary.Constants;
-using SharedLibrary.Helpers;
-using SharedLibrary.Models;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
+using PhimStrong.Application.Interfaces;
+using PhimStrong.Domain.Models;
+using PhimStrong.Domain.PagingModel;
+using PhimStrong.Models.Category;
+using PhimStrong.Models.Movie;
 
 namespace PhimStrong.Controllers
 {
 	public class CategoryController : Controller
 	{
-		private readonly AppDbContext _db;
+		private const int MOVIES_PER_PAGE = 25;
 
-		public CategoryController(AppDbContext db)
+		private readonly IMapper _mapper;
+		private readonly ICategoryService _categoryService;
+		private readonly IMovieService _movieService;
+
+		public CategoryController(ICategoryService categoryService, IMovieService movieService, IMapper mapper)
 		{
-			_db = db;
+			_categoryService = categoryService;
+			_movieService = movieService;
+			_mapper = mapper;
 		}
 
 		[HttpGet]
 		[Route("/Category/{value}")]
-		public IActionResult Index(string? value, int page)
+		public async Task<IActionResult> Index(string? value, int page)
 		{
-			if (value == null) value = "";
-
-			value = value.RemoveMarks();
-
-			Category? category = _db.Categories.ToList().FirstOrDefault(c => c.NormalizeName == value);
+			Category? category = await _categoryService.GetByNameAsync(value ?? "");
 
 			if (category == null)
 			{
 				return NotFound("Không tìm thấy thể loại " + value);
 			}
 
-			category.Movies = category.Movies != null ?
-				category.Movies.OrderByDescending(m => m.ReleaseDate).ToList() :
-				new List<Movie>();
+			PagedList<Movie> movies = await _movieService.FindByCategoryIdAsync(
+															category.Id,
+															new PagingParameter(page, MOVIES_PER_PAGE));
 
-			int numberOfPages = (int)Math.Ceiling((double)category.Movies.Count / CommonConstants.MOVIES_PER_PAGE);
-			if (page > numberOfPages) page = numberOfPages;
-			if (page <= 0) page = 1;
+			ViewData["RouteValue"] = value;
 
-			category.Movies = category.Movies.Skip((page - 1) * CommonConstants.MOVIES_PER_PAGE)
-				.Take(CommonConstants.MOVIES_PER_PAGE).ToList();
+			CategoryViewModel model = _mapper.Map<CategoryViewModel>(category);
+			model.Movies = _mapper.Map<PagedList<MovieViewModel>>(movies);
 
-			TempData["NumberOfPages"] = numberOfPages;
-			TempData["CurrentPage"] = page;
-			TempData["RouteValue"] = value;
-
-			return View(category);
+			return View(model);
 		}
 	}
 }

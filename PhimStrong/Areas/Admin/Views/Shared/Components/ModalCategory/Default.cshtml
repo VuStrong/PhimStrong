@@ -1,12 +1,6 @@
 ﻿@model ModalCategoryModel
 @{
-    // Khởi tạo list category
-    var categoryList = new List<string>();
-    Model.Categories?.ToList().ForEach(c =>
-    {
-        categoryList.Add(c.Name);
-    });
-
+    Model.Categories ??= new List<string>();
     Model.SelectedCategories ??= new List<string>();
 }
 
@@ -36,7 +30,7 @@
             <div class="modal-body overflow-scroll" style="height:400px">
                 <table class="table table-hover">
                     <tbody>
-                        @foreach (var category in categoryList)
+                        @foreach (var category in Model.Categories)
                         {
                             <tr>
                                 <th class="category-name" scope="row">@category</th>
