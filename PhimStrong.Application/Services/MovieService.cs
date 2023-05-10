@@ -31,23 +31,6 @@ namespace PhimStrong.Application.Services
 				await _unitOfWork.MovieRepository.MaxIdNumberAsync() + 1 : 1;
 
 			movie.Id = "ps" + movie.IdNumber.ToString();
-			//Movie movie = new()
-			//{
-			//    IdNumber = idToCreate,
-			//    Id = "ps" + idToCreate.ToString(),
-			//    Name = model.Name.NormalizeString(),
-			//    TranslateName = model.TranslateName.NormalizeString(),
-			//    Description = model.Description,
-			//    ReleaseDate = model.ReleaseDate,
-			//    CreatedDate = DateTime.Now,
-			//    ShowInSlide = false,
-			//    Length = model.Length == null ? 0 : model.Length,
-			//    Type = model.Type,
-			//    EpisodeCount = model.EpisodeCount,
-			//    Rating = model.Rating,
-			//    Status = model.Status,
-			//    Trailer = model.Trailer
-			//};
 
 			movie.Name = movie.Name.NormalizeString();
             movie.NormalizeName = movie.Name.RemoveMarks();
@@ -494,7 +477,7 @@ namespace PhimStrong.Application.Services
 
 		public async Task<IEnumerable<Movie>> GetRandomMoviesAsync(int count)
 		{
-			PagingParameter pagingParameter = new(1, count);
+			PagingParameter pagingParameter = new(1, count, false);
 
 			return await _unitOfWork.MovieRepository.GetAsync(
 														pagingParameter,

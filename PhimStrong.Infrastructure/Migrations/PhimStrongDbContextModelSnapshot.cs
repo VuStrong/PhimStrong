@@ -2,6 +2,8 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PhimStrong.Infrastructure.Context;
 
 #nullable disable
@@ -684,7 +686,8 @@ namespace PhimStrong.Infrastructure.Migrations
 
                     b.HasOne("PhimStrong.Domain.Models.Comment", "ResponseTo")
                         .WithMany("Responses")
-                        .HasForeignKey("ResponseToId");
+                        .HasForeignKey("ResponseToId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("PhimStrong.Domain.Models.User", "User")
                         .WithMany()

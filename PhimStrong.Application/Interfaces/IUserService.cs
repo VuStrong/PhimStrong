@@ -8,7 +8,8 @@ namespace PhimStrong.Application.Interfaces
     public interface IUserService
 	{
         Task<User?> FindByIdAsync(string id);
-        Task<User?> GetByClaims(ClaimsPrincipal claims);
+        Task<User?> FindByEmailAsync(string email);
+		Task<User?> GetByClaims(ClaimsPrincipal claims);
 		bool IsSignIn(ClaimsPrincipal claims);
 		Task<bool> IsInRoleAsync(User? user, string role);
 		Task<bool> IsLockedOutAsync(User user);
@@ -16,10 +17,13 @@ namespace PhimStrong.Application.Interfaces
 		Task<IEnumerable<string>> GetRolesAsync(User user);
 		Task<Result> ChangePasswordAsync(string userid, string oldPasswd, string newPasswd);
 		Task<Result> ChangeEmailAsync(string userid, string email);
-        Task ChangeUserRoleAsync(string userid, string? role);
-        Task ToggleLockUserAsync(string userid);
+        Task<Result> ChangeUserRoleAsync(string userid, string? role);
+        Task<Result> ToggleLockUserAsync(string userid);
 		Task<Result> UpdateAsync(string userid, User user);
-		Task DeleteAsync(string userid);
+		Task<Result> DeleteAsync(string userid);
         Task<string> GenerateEmailConfirmationTokenAsync(User user);
-    }
+        Task<string> GeneratePasswordResetTokenAsync(User user);
+		Task<Result> ResetPasswordAsync(string userEmail, string code, string newPassword);
+		Task<Result> ConfirmEmailAsync(string userid, string token);
+	}
 }

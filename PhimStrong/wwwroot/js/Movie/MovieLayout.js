@@ -111,7 +111,7 @@
 	}
 
 	var commentPage = 1;
-	var firstUrl = '/Comment/GetCommentsPartial?movieid=' + movieid;
+	var firstUrl = `/Comment/GetCommentsPartial?movieid=${movieid}&page=${commentPage}`;
 	// render comment after page finish loaded
 	$('#cmt-container').load(firstUrl, "", function () {
 		handleLikeAndResponse();
@@ -121,7 +121,10 @@
 			commentPage++;
 			let url = `/Comment/LoadMoreComments?movieid=${movieid}&page=${commentPage}`;
 
+			$('#expand-cmt-btn').addClass('disabled');
+
 			$.get(url, function (data) {
+				$('#expand-cmt-btn').removeClass('disabled');
 				$('#cmt-body').append(data);
 				handleLikeAndResponse();
 			});

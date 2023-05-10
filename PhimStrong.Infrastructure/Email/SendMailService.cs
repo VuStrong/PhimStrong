@@ -1,9 +1,9 @@
 ﻿using MimeKit;
 using MailKit.Security;
-using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.Extensions.Options;
+using PhimStrong.Application.Interfaces;
 
-namespace PhimStrong.Services
+namespace PhimStrong.Infrastructure.Email
 {
 #pragma warning disable
     public class MailSettings
@@ -21,12 +21,12 @@ namespace PhimStrong.Services
 
         public SendMailService(IOptions<MailSettings> mailSettings)
         {
-            this._mailSettings = mailSettings.Value;
+            _mailSettings = mailSettings.Value;
         }
 
         public async Task SendEmailAsync(string email, string subject, string htmlMessage)
         {
-            var message = new MimeMessage();
+			var message = new MimeMessage();
             message.Sender = new MailboxAddress(_mailSettings.DisplayName, _mailSettings.Mail);
             message.From.Add(new MailboxAddress(_mailSettings.DisplayName, _mailSettings.Mail));
             message.To.Add(MailboxAddress.Parse(email));
@@ -37,13 +37,14 @@ namespace PhimStrong.Services
             message.Body = builder.ToMessageBody();
 
             using var smtp = new MailKit.Net.Smtp.SmtpClient();
+
             try
             {
                 smtp.Connect(_mailSettings.Host, _mailSettings.Port, SecureSocketOptions.StartTls);
                 smtp.Authenticate(_mailSettings.Mail, _mailSettings.Password);
                 await smtp.SendAsync(message);
             }
-            catch (Exception ex)
+            catch
             {
                 // Gửi mail thất bại, nội dung email sẽ lưu vào thư mục mailssave
                 System.IO.Directory.CreateDirectory("mailssave");

@@ -7,7 +7,7 @@ namespace PhimStrong.Application.Interfaces
 	{
 		Task<Comment?> GetByIdAsync(int id);
 		Task<PagedList<Comment>> GetByMovieIdAsync(string movieid, PagingParameter pagingParameter);
-		Task CreateAsync(Comment comment);
+		Task CreateAsync(Comment comment, string? userid = null, string? movieid = null, int responseToId = 0);
 		Task DeleteAsync(int commentid);
 		Task LikeComment(int commentid);
     }

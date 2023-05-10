@@ -1,10 +1,11 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using PhimStrong.Application.Interfaces;
 using PhimStrong.Application.Models;
-using PhimStrong.Domain.Exceptions.NotFound;
+using PhimStrong.Domain.Interfaces;
 using PhimStrong.Domain.Models;
 using PhimStrong.Domain.PagingModel;
 using SharedLibrary.Helpers;
+using System.Linq.Expressions;
 using System.Security.Claims;
 using System.Text.RegularExpressions;
 
@@ -12,13 +13,16 @@ namespace PhimStrong.Infrastructure.Identity
 {
     public class UserService : IUserService
     {
+        private readonly IUnitOfWork _unitOfWork;
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
 
         public UserService(
+            IUnitOfWork unitOfWork,
             UserManager<User> userManager,
             SignInManager<User> signInManager)
         {
+            _unitOfWork = unitOfWork;
             _userManager = userManager;
             _signInManager = signInManager;
         }
@@ -29,13 +33,13 @@ namespace PhimStrong.Infrastructure.Identity
 
             if (user == null)
             {
-                return Result.Error(new List<string> { "Unable to load user." });
+                return Result.Error("Unable to load user.");
             }
 
             var emailUser = await _userManager.FindByEmailAsync(email);
             if (emailUser != null)
             {
-                return Result.Error(new List<string> { $"Email {email} đã tồn tại." });
+                return Result.Error($"Email {email} đã tồn tại.");
             }
 
             if (email != user.Email)
@@ -51,31 +55,39 @@ namespace PhimStrong.Infrastructure.Identity
             return Result.OK();
         }
 
-        public async Task<Result> ChangePasswordAsync(string userid, string oldPasswd, string newPasswd)
+		public async Task<Result> ConfirmEmailAsync(string userid, string token)
+		{
+			var user = await _userManager.FindByIdAsync(userid);
+
+			if (user == null) return Result.Error();
+
+			var result = await _userManager.ConfirmEmailAsync(user, token);
+
+			return Result.ToAppResult(result);
+		}
+
+		public async Task<Result> ChangePasswordAsync(string userid, string oldPasswd, string newPasswd)
         {
             User? user = await this.FindByIdAsync(userid);
 
-            if (user == null)
-            {
-                return Result.Error(new List<string> { "Unable to load user." });
-            }
+            if (user == null) return Result.Error("Unable to load user.");
 
             var result = await _userManager.ChangePasswordAsync(user, oldPasswd, newPasswd);
 
             return Result.ToAppResult(result);
         }
 
-        public async Task ChangeUserRoleAsync(string userid, string? role)
+        public async Task<Result> ChangeUserRoleAsync(string userid, string? role)
         {
             User? user = await this.FindByIdAsync(userid);
 
-            if (user == null) throw new UserNotFoundException(userid);
+            if (user == null) return Result.Error("User not found");
 
             user.RoleName = null;
             var result = await _userManager.RemoveFromRolesAsync(user, await _userManager.GetRolesAsync(user));
             if (!result.Succeeded)
             {
-                throw new Exception();
+                return Result.ToAppResult(result);
             }
 
             if (role != null)
@@ -84,29 +96,51 @@ namespace PhimStrong.Infrastructure.Identity
 
                 if (!result.Succeeded)
                 {
-                    throw new Exception();
-                }
+					return Result.ToAppResult(result);
+				}
 
-                user.RoleName = role;
-                await _userManager.UpdateAsync(user);
+				user.RoleName = role;
+				result = await _userManager.UpdateAsync(user);
             }
-        }
 
-        public async Task DeleteAsync(string userid)
+			return Result.ToAppResult(result);
+		}
+
+		public async Task<Result> DeleteAsync(string userid)
         {
             User user = await _userManager.FindByIdAsync(userid);
 
-            if (user == null) throw new UserNotFoundException(userid);
+            if (user == null) return Result.Error("User not found");
 
-            var result = await _userManager.DeleteAsync(user);
+            IEnumerable<Comment> comments = await _unitOfWork.CommentRepository.GetAsync(
+                c => c.User.Id == userid,
+                includes: new Expression<Func<Comment, object?>>[]
+                {
+                    c => c.Responses
+                });
 
-            if (!result.Succeeded)
+            foreach(var comment in comments)
             {
-                throw new Exception();
+                if (comment.Responses != null)
+                {
+                    foreach (var resComment in comment.Responses)
+                    {
+                        _unitOfWork.CommentRepository.Delete(resComment);
+                    }
+                }
             }
-        }
 
-        public async Task<User?> FindByIdAsync(string id)
+			var result = await _userManager.DeleteAsync(user);
+
+			return Result.ToAppResult(result);
+		}
+
+		public async Task<User?> FindByEmailAsync(string email)
+		{
+			return await _userManager.FindByEmailAsync(email);
+		}
+
+		public async Task<User?> FindByIdAsync(string id)
         {
             return await _userManager.FindByIdAsync(id);
         }
@@ -116,7 +150,12 @@ namespace PhimStrong.Infrastructure.Identity
             return await _userManager.GenerateEmailConfirmationTokenAsync(user);
         }
 
-        public async Task<User?> GetByClaims(ClaimsPrincipal claims)
+		public async Task<string> GeneratePasswordResetTokenAsync(User user)
+		{
+            return await _userManager.GeneratePasswordResetTokenAsync(user);
+		}
+
+		public async Task<User?> GetByClaims(ClaimsPrincipal claims)
         {
             return await _userManager.GetUserAsync(claims);
         }
@@ -141,7 +180,18 @@ namespace PhimStrong.Infrastructure.Identity
             return _signInManager.IsSignedIn(claims);
         }
 
-        public async Task<PagedList<User>> SearchAsync(PagingParameter pagingParameter, string? value = null, string? role = null)
+		public async Task<Result> ResetPasswordAsync(string userEmail, string code, string newPassword)
+		{
+			var user = await _userManager.FindByEmailAsync(userEmail);
+
+            if (user == null) return Result.Error();
+
+			var result = await _userManager.ResetPasswordAsync(user, code, newPassword);
+
+            return Result.ToAppResult(result);
+        }
+
+		public async Task<PagedList<User>> SearchAsync(PagingParameter pagingParameter, string? value = null, string? role = null)
         {
             IQueryable<User> users = _userManager.Users;
 
@@ -156,20 +206,21 @@ namespace PhimStrong.Infrastructure.Identity
                 users = users.Where(u => (u.NormalizeDisplayName ?? "").Contains(value));
             }
 
-            return await PagedList<User>.ToPagedList(users, pagingParameter.Page, pagingParameter.Size);
+            return await PagedList<User>.ToPagedList(
+                users, pagingParameter.Page, pagingParameter.Size, pagingParameter.AllowCalculateCount);
         }
 
-        public async Task ToggleLockUserAsync(string userid)
+        public async Task<Result> ToggleLockUserAsync(string userid)
         {
             User? user = await _userManager.FindByIdAsync(userid);
 
-            if (user == null) throw new UserNotFoundException(userid);
+            if (user == null) return Result.Error("User not found");
 
-            var result = await _userManager.SetLockoutEnabledAsync(user, true);
+			var result = await _userManager.SetLockoutEnabledAsync(user, true);
 
-            if (!result.Succeeded) throw new Exception();
+            if (!result.Succeeded) return Result.ToAppResult(result);
 
-            if (await _userManager.IsLockedOutAsync(user))
+			if (await _userManager.IsLockedOutAsync(user))
             {
                 result = await _userManager.SetLockoutEndDateAsync(user, new DateTime(2020, 12, 20));
             }
@@ -178,17 +229,14 @@ namespace PhimStrong.Infrastructure.Identity
                 result = await _userManager.SetLockoutEndDateAsync(user, DateTimeOffset.Now.AddYears(10));
             }
 
-            if (!result.Succeeded) throw new Exception();
-        }
+			return Result.ToAppResult(result);
+		}
 
         public async Task<Result> UpdateAsync(string userid, User user)
         {
             User? userToEdit = await this.FindByIdAsync(userid);
 
-            if (userToEdit == null)
-            {
-                return Result.Error(new List<string> { "User not found" });
-            }
+            if (userToEdit == null) return Result.Error("User not found");
 
             Regex validatePhoneNumberRegex = new Regex("^\\+?\\d{1,4}?[-.\\s]?\\(?\\d{1,3}?\\)?[-.\\s]?\\d{1,4}[-.\\s]?\\d{1,4}[-.\\s]?\\d{1,9}$");
             if (user.PhoneNumber != null && user.PhoneNumber != userToEdit.PhoneNumber && validatePhoneNumberRegex.IsMatch(user.PhoneNumber))

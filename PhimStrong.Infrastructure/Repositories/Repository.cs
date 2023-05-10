@@ -79,7 +79,8 @@ namespace PhimStrong.Infrastructure.Repositories
 				}
 			}
 
-			return await PagedList<T>.ToPagedList(query, pagingParameter.Page, pagingParameter.Size);
+			return await PagedList<T>.ToPagedList(
+				query, pagingParameter.Page, pagingParameter.Size, pagingParameter.AllowCalculateCount);
 		}
 
 		public virtual T Create(T entity)

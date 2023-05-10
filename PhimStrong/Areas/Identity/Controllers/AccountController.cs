@@ -1,16 +1,13 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
 using PhimStrong.Application.Interfaces;
 using PhimStrong.Areas.Identity.Models;
 using PhimStrong.Domain.Models;
 using PhimStrong.Models.User;
-using SharedLibrary.Helpers;
 using System.Text;
 using System.Text.Encodings.Web;
-using System.Text.RegularExpressions;
 #pragma warning disable
 
 namespace PhimStrong.Areas.Identity.Controllers
@@ -59,7 +56,7 @@ namespace PhimStrong.Areas.Identity.Controllers
             User? user = await _userService.GetByClaims(User);
             if (user == null)
             {
-                return NotFound($"Unable to load user.");
+                return NotFound("Unable to load user.");
             }
 
             var result = await _userService.ChangePasswordAsync(user.Id, model.OldPassword, model.NewPassword);

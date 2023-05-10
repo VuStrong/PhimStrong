@@ -2,6 +2,12 @@
 
 @if (Model.RenderCommentOnly)
 {
+	@if (Model.IsEnd)
+	{
+		<script type="text/javascript">
+			$('#expand-cmt-btn').addClass('disabled');
+		</script>
+	}
 	if (Model.Comments != null)
 	{
 		foreach (var comment in Model.Comments)

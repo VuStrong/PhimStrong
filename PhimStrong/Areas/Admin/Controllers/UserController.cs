@@ -72,16 +72,11 @@ namespace PhimStrong.Areas.Admin.Controllers
 		[HttpPost]
 		public async Task<JsonResult> EditRole(string? userid, EditUserModel model)
 		{
-			try
-			{
-                string? role = model.UserRole != null && model.UserRole != "none" ? model.UserRole : null;
+			string? role = model.UserRole != null && model.UserRole != "none" ? model.UserRole : null;
 
-				await _userService.ChangeUserRoleAsync(userid ?? "", role);
-			}
-			catch
-			{
-                return Json(new { success = false });
-            }
+			var result = await _userService.ChangeUserRoleAsync(userid ?? "", role);
+			
+			if (!result.Success) return Json(new { success = false });
 
 			return Json(new { success = true });
 		}
@@ -89,41 +84,34 @@ namespace PhimStrong.Areas.Admin.Controllers
 		[HttpPost]
 		public async Task<JsonResult> ToggleLockUser(string? userid)
 		{
-			try
-			{
-				await _userService.ToggleLockUserAsync(userid ?? "");
-			}
-			catch
-			{
-                return Json(new { success = false });
-            }
+			var result = await _userService.ToggleLockUserAsync(userid ?? "");
+			
+			if (!result.Success) return Json(new { success = false });
 
-            return Json(new { success = true });
+			return Json(new { success = true });
 		}
 
 		[HttpPost]
 		public async Task<IActionResult> Delete(string userid)
 		{
-			try
+			var result = await _userService.DeleteAsync(userid);
+
+			if (!result.Success)
 			{
-				await _userService.DeleteAsync(userid);
-
-				var file = Path.Combine(_environment.ContentRootPath, "wwwroot/src/img/UserAvatars", userid + ".jpg");
-
-				FileInfo fileInfo = new(file);
-				fileInfo.Delete();
+				TempData["error"] = "Xóa tài khoản thất bại.";
+				return RedirectToAction("Index", new { area = "Admin" });
 			}
-			catch 
-			{
-                TempData["error"] = "Xóa tài khoản thất bại.";
-                return RedirectToAction("Index");
-            }
+
+			var file = Path.Combine(_environment.ContentRootPath, "wwwroot/src/img/UserAvatars", userid + ".jpg");
+
+			FileInfo fileInfo = new(file);
+			fileInfo.Delete();
 
 			TempData["success"] = "Xóa tài khoản thành công.";
-			return RedirectToAction("Index");
-		}
+            return RedirectToAction("Index", new { area = "Admin" });
+        }
 
-		private async Task<EditUserModel> GetEditUserModel(User user)
+        private async Task<EditUserModel> GetEditUserModel(User user)
 		{
 			List<string> userRoles = (await _userService.GetRolesAsync(user)).ToList();
 

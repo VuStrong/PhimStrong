@@ -7,12 +7,9 @@ namespace PhimStrong.Application.Models
         public bool Success { get; set; }
         public List<string>? Errors { get; set; }
 
-        public static Result OK()
-        {
-            return new Result { Success = true };
-        }
+        public static Result OK() => new Result { Success = true };
 
-        public static Result Error(IEnumerable<string> errors)
+        public static Result Error(params string[] errors)
         {
             return new Result 
             {
@@ -25,7 +22,7 @@ namespace PhimStrong.Application.Models
         {
             return identityResult.Succeeded ?
                 OK() :
-                Error(identityResult.Errors.Select(e => e.Description));
+                Error(identityResult.Errors.Select(e => e.Description).ToArray());
         }
     }
 }

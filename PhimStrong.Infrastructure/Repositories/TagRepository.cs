@@ -5,6 +5,6 @@ namespace PhimStrong.Infrastructure.Repositories
 {
 	public class TagRepository : Repository<Tag>
 	{
-		public TagRepository(PhimStrongDbContext context) : base(context) {}
+		public TagRepository(PhimStrongDbContext context) : base(context) { }
 	}
 }

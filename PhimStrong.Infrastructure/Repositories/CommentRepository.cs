@@ -22,7 +22,8 @@ namespace PhimStrong.Infrastructure.Repositories
 									  .Where(c => c.Movie.Id == movieId && c.ResponseTo == null)
                                       .OrderByDescending(c => c.CreatedAt);
 
-            return await PagedList<Comment>.ToPagedList(comments, pagingParameter.Page, pagingParameter.Size);
+            return await PagedList<Comment>.ToPagedList(
+                comments, pagingParameter.Page, pagingParameter.Size, pagingParameter.AllowCalculateCount);
         }
     }
 }

@@ -14,7 +14,6 @@ namespace PhimStrong.Controllers
         private readonly IMovieService _movieService;
         private readonly IMapper _mapper;
 
-
         public HomeController(IMovieService movieService, IMapper mapper)
         {
             _movieService = movieService;
@@ -25,7 +24,7 @@ namespace PhimStrong.Controllers
         {
             List<Movie> randomMovies = (await _movieService.GetRandomMoviesAsync(10)).ToList();
 
-            PagingParameter pagingParameter = new(1, 12);
+            PagingParameter pagingParameter = new(1, 12, false);
 
             Movie[] newMovies = (await _movieService.GetAllAsync(pagingParameter)).ToArray();
             Movie[] topRatingMovies = (await _movieService.GetMoviesOrderByRatingAsync(pagingParameter)).ToArray();

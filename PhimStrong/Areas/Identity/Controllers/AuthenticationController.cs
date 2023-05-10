@@ -1,14 +1,9 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI.Services;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
 using PhimStrong.Areas.Identity.Models;
 using System.Text.Encodings.Web;
 using System.Text;
-using System.Security.Claims;
-using SharedLibrary.Constants;
-using SharedLibrary.Helpers;
-using PhimStrong.Domain.Models;
+using PhimStrong.Application.Interfaces;
 
 #pragma warning disable
 namespace PhimStrong.Areas.Identity.Controllers
@@ -16,14 +11,17 @@ namespace PhimStrong.Areas.Identity.Controllers
     [Area("Identity")]
     public class AuthenticationController : Controller
     {
-        private readonly SignInManager<User> _signInManager;
-        private readonly UserManager<User> _userManager;
+        private readonly IUserService _userService;
+        private readonly IAuthenticationService _authenticationService;
         private readonly IEmailSender _emailSender;
 
-        public AuthenticationController(SignInManager<User> signInManager, UserManager<User> userManager, IEmailSender emailSender)
+        public AuthenticationController(
+            IUserService userService,
+            IAuthenticationService authenticationService, 
+            IEmailSender emailSender)
         {
-            _signInManager = signInManager;
-            _userManager = userManager;
+            _userService = userService;
+            _authenticationService = authenticationService;
             _emailSender = emailSender;
         }
 
@@ -36,7 +34,10 @@ namespace PhimStrong.Areas.Identity.Controllers
                 return RedirectToAction("Index", "Home", new { area = "" });
             }
 
-            return View(new RegisterModel() { ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList() });
+            return View(new RegisterModel() 
+            {
+                ExternalLogins = (await _authenticationService.GetExternalAuthenticationSchemesAsync()).ToList() 
+            });
         }
 
         [HttpPost]
@@ -47,31 +48,11 @@ namespace PhimStrong.Areas.Identity.Controllers
 
             if (ModelState.IsValid)
             {
-                var user = await _userManager.FindByEmailAsync(model.Email);
+                var result = await _authenticationService.RegisterAsync(model.Name, model.Email, model.Password);
 
-                if (user != null)
+                if (result.Success)
                 {
-                    ModelState.AddModelError(string.Empty, "Email đã tồn tại.");
-                    return View(new RegisterModel() { ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList() });
-                }
-
-                user = new User()
-                {
-                    UserName = model.Email,
-                    Email = model.Email,
-                    DisplayName = model.Name,
-                    RoleName = RoleConstant.MEMBER
-                };
-
-                user.NormalizeDisplayName = user.DisplayName.RemoveMarks();
-
-                var result = await _userManager.CreateAsync(user, model.Password);
-
-                if (result.Succeeded)
-                {
-                    await _userManager.AddToRoleAsync(user, RoleConstant.MEMBER);
-
-                    string token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                    string token = await _userService.GenerateEmailConfirmationTokenAsync(result.User);
                     token = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token));
 
                     string callbackUrl = Url.Action("ConfirmEmail", "Authentication",
@@ -79,30 +60,32 @@ namespace PhimStrong.Areas.Identity.Controllers
                             {
                                 area = "Identity",
                                 token = token,
-                                userid = user.Id
+                                userid = result.User.Id
                             },
                             protocol: Request.Scheme
                         );
 
                     await _emailSender.SendEmailAsync(
-                        user.Email,
+						result.User.Email,
                         "Xác thực Email",
                         $"Yô người mới !, click vào <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>đây</a> để xác thực Email của bạn nhé :)"
                     );
 
-                    await _signInManager.SignInAsync(user, false);
-                    return LocalRedirect(returnUrl);
-                }
+					return LocalRedirect(returnUrl);
+				}
                 else
                 {
                     foreach (var error in result.Errors)
                     {
-                        ModelState.AddModelError(string.Empty, error.Description);
+                        ModelState.AddModelError(string.Empty, error);
                     }
                 }
-            }
+			}
 
-            return View(new RegisterModel() { ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList() });
+            return View(new RegisterModel() 
+            {
+                ExternalLogins = (await _authenticationService.GetExternalAuthenticationSchemesAsync()).ToList() 
+            });
         }
 
         [HttpGet]
@@ -114,7 +97,10 @@ namespace PhimStrong.Areas.Identity.Controllers
                 return RedirectToAction("Index", "Home", new { area = "" });
             }
 
-            return View(new LoginModel() { ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList() });
+            return View(new LoginModel()
+            {
+                ExternalLogins = (await _authenticationService.GetExternalAuthenticationSchemesAsync()).ToList()
+            });
         }
 
         [HttpPost]
@@ -125,37 +111,33 @@ namespace PhimStrong.Areas.Identity.Controllers
 
             if (ModelState.IsValid)
             {
-                var user = await _userManager.FindByEmailAsync(model.Email);
+                var result = await _authenticationService.LoginAsync(model.Email, model.Password, model.RememberMe);
 
-                if (user != null)
-                {
-                    var result = await _signInManager.PasswordSignInAsync(user, model.Password, model.RememberMe, lockoutOnFailure: false);
-                    if (result.Succeeded)
-                    {
-                        return LocalRedirect(returnUrl);
-                    }
-                    if (result.IsLockedOut)
-                    {
-                        return RedirectToAction("Lockout");
-                    }
-                }
+				if (result.Success)
+				{
+					return LocalRedirect(returnUrl);
+				}
+				if (result.IsLockedOut)
+				{
+					return RedirectToAction("Lockout");
+				}
 
-                ModelState.AddModelError(string.Empty, "Email hoặc mật khấu không chính xác.");
+				ModelState.AddModelError(string.Empty, "Email hoặc mật khấu không chính xác.");
             }
 
-            return View(new LoginModel() { ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList() });
+            return View(new LoginModel()
+            {
+                ExternalLogins = (await _authenticationService.GetExternalAuthenticationSchemesAsync()).ToList() 
+            });
         }
 
         [HttpGet]
-        public IActionResult Lockout()
-        {
-            return View();
-        }
+        public IActionResult Lockout() => View();
 
         [HttpPost]
         public async Task<IActionResult> Logout(string? returnUrl = null)
         {
-            await _signInManager.SignOutAsync();
+            await _authenticationService.LogoutAsync();
 
             if (returnUrl != null)
             {
@@ -175,17 +157,10 @@ namespace PhimStrong.Areas.Identity.Controllers
                 return View(model: "Lỗi xác thực Email.");
             }
 
-            var user = await _userManager.FindByIdAsync(userid);
-
-            if (user == null)
-            {
-                return View(model: "Lỗi xác thực Email.");
-            }
-
             token = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(token));
-            var result = await _userManager.ConfirmEmailAsync(user, token);
+            var result = await _userService.ConfirmEmailAsync(userid, token);
 
-            if (!result.Succeeded)
+            if (!result.Success)
             {
                 return View(model: "Lỗi xác thực Email.");
             }
@@ -194,17 +169,11 @@ namespace PhimStrong.Areas.Identity.Controllers
         }
 
         [HttpGet]
-        public IActionResult AccessDenied(string text = null)
-        {
-            return View(model: text);
-        }
+        public IActionResult AccessDenied(string text = null) => View(model: text);
 
         [HttpGet]
         [Route("/forgot-password")]
-        public IActionResult ForgotPassword()
-        {
-            return View();
-        }
+        public IActionResult ForgotPassword() => View();
 
         [HttpPost]
         [Route("/forgot-password")]
@@ -212,14 +181,14 @@ namespace PhimStrong.Areas.Identity.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = await _userManager.FindByEmailAsync(model.Email);
+                var user = await _userService.FindByEmailAsync(model.Email);
 
                 if (user == null)
                 {
                     return RedirectToAction("ForgotPasswordConfirmation");
                 }
 
-                var code = await _userManager.GeneratePasswordResetTokenAsync(user);
+                var code = await _userService.GeneratePasswordResetTokenAsync(user);
                 code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
 
                 var callbackUrl = Url.Action(
@@ -241,10 +210,7 @@ namespace PhimStrong.Areas.Identity.Controllers
 
         [HttpGet]
         [Route("/forgot-password-confirmation")]
-        public IActionResult ForgotPasswordConfirmation()
-        {
-            return View();
-        }
+        public IActionResult ForgotPasswordConfirmation() => View();
 
         [HttpGet]
         [Route("/reset-password")]
@@ -272,21 +238,15 @@ namespace PhimStrong.Areas.Identity.Controllers
                 return View(model);
             }
 
-            var user = await _userManager.FindByEmailAsync(model.Email);
-            if (user == null)
+            var result = await _userService.ResetPasswordAsync(model.Email, model.Code, model.Password);
+            if (result.Success)
             {
                 return RedirectToAction("ResetPasswordConfirmation");
             }
 
-            var result = await _userManager.ResetPasswordAsync(user, model.Code, model.Password);
-            if (result.Succeeded)
+			foreach (var error in result.Errors)
             {
-                return RedirectToAction("ResetPasswordConfirmation");
-            }
-
-            foreach (var error in result.Errors)
-            {
-                ModelState.AddModelError(string.Empty, error.Description);
+                ModelState.AddModelError(string.Empty, error);
             }
 
             return View(model);
@@ -308,7 +268,7 @@ namespace PhimStrong.Areas.Identity.Controllers
         {
             // Request a redirect to the external login provider.
             var redirectUrl = Url.Action("ExternalLoginCallback", values: new { returnUrl });
-            var properties = _signInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl);
+            var properties = _authenticationService.ConfigureExternalAuthenticationProperties(provider, redirectUrl);
             return new ChallengeResult(provider, properties);
         }
 
@@ -323,16 +283,9 @@ namespace PhimStrong.Areas.Identity.Controllers
                 return RedirectToAction("Login");
             }
 
-            var info = await _signInManager.GetExternalLoginInfoAsync();
-            if (info == null)
-            {
-                TempData["status"] = "Error loading external login information.";
-                return RedirectToAction("Login");
-            }
+            var result = await _authenticationService.ExternalLoginAsync();
 
-            // Sign in the user with this external login provider if the user already has a login.
-            var result = await _signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, isPersistent: false, bypassTwoFactor: true);
-            if (result.Succeeded)
+            if (result.Success)
             {
                 return LocalRedirect(returnUrl);
             }
@@ -340,49 +293,11 @@ namespace PhimStrong.Areas.Identity.Controllers
             {
                 return RedirectToAction("Lockout");
             }
-            else
-            {
-                var user = new User();
-                user.EmailConfirmed = true;
 
-                // get profile's picture from google account :
-                if (info.Principal.HasClaim(c => c.Type == "image"))
-                {
-                    user.Avatar = info.Principal.FindFirstValue("image");
-                }
+            if (result.Errors != null && result.Errors.Count > 0) 
+                TempData["status"] = result.Errors[0];
 
-                // get profile's name from google account :
-                if (info.Principal.HasClaim(c => c.Type == ClaimTypes.Name))
-                {
-                    user.DisplayName = info.Principal.FindFirstValue(ClaimTypes.Name);
-                    user.NormalizeDisplayName = user.DisplayName.RemoveMarks();
-                }
-
-                // get Email address from google account :
-                if (info.Principal.HasClaim(c => c.Type == ClaimTypes.Email))
-                {
-                    user.Email = info.Principal.FindFirstValue(ClaimTypes.Email);
-                    user.UserName = user.Email;
-                }
-
-                var result2 = await _userManager.CreateAsync(user);
-                if (result2.Succeeded)
-                {
-                    result2 = await _userManager.AddLoginAsync(user, info);
-
-                    if (result2.Succeeded)
-                    {
-                        await _signInManager.SignInAsync(user, isPersistent: false, info.LoginProvider);
-                        return LocalRedirect(returnUrl);
-                    }
-                }
-                else
-                {
-                    TempData["status"] = "Lỗi, Email đã tồn tại !";
-                }
-
-                return RedirectToAction("Login");
-            }
+            return RedirectToAction("Login");
         }
     }
 }

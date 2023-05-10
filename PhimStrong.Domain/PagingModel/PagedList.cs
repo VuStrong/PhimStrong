@@ -24,17 +24,21 @@ namespace PhimStrong.Domain.PagingModel
 			TotalItems = totalItems;
 		}
 
-		public static async Task<PagedList<T>> ToPagedList(IQueryable<T> items, int page, int size)
+		public static async Task<PagedList<T>> ToPagedList(IQueryable<T> items, int page, int size, bool allowCalculateCount)
 		{
-			int totalItems = await items.CountAsync();
+			if (items == null)
+				throw new ArgumentNullException(nameof(items));
+
+			int totalItems = allowCalculateCount ? await items.CountAsync() : 0;
 
 			if (size <= 0) size = 1;
 
 			int totalPage = (int)Math.Ceiling((double)totalItems / size);
 			
 			if (totalPage <= 0) totalPage = 1;
-			
-			page = Math.Clamp(page, 1, totalPage);
+			if (page <= 0) page = 1;
+
+			if (allowCalculateCount && page > totalPage) page = totalPage;
 
 			var pagingItems = await items.Skip((page - 1) * size).Take(size).ToListAsync();
 

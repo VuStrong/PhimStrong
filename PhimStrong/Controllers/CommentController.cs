@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using PhimStrong.Application.Interfaces;
 using PhimStrong.Models.Comment;
@@ -41,14 +40,12 @@ namespace PhimStrong.Controllers
 		[Route("/Comment/GetCommentsPartial")]
 		public async Task<IActionResult> GetCommentsPartial(int page, string movieid)
 		{
-			if (page == 0) page = 1;
-
 			Movie? movie = await _movieService.GetByIdAsync(movieid);
 
 			if (movie == null) return Json("null");
 
 			PagedList<Comment> comments = await _commentService.GetByMovieIdAsync(
-				movieid, new PagingParameter(page, 1));
+				movieid, new PagingParameter(page, 2));
 
 			User? user = await _userService.GetByClaims(User);
 
@@ -82,7 +79,7 @@ namespace PhimStrong.Controllers
 			User? user = await _userService.GetByClaims(User);
 
             PagedList<Comment> comments = await _commentService.GetByMovieIdAsync(
-                movieid, new PagingParameter(page, COMMENTS_PER_PAGE));
+                movieid, new PagingParameter(page, 2));
 
             CommentContainerModel model = new()
 			{
@@ -99,11 +96,6 @@ namespace PhimStrong.Controllers
 		[Route("/Comment/CreateComment")]
 		public async Task<JsonResult> CreateComment(UserCommentModel? model)
 		{
-			if (model == null)
-			{
-				return Json(new { success = false });
-			}
-
 			User? user = await _userService.GetByClaims(User);
 			Movie? movie = await _movieService.GetByIdAsync(model.MovieId);
 
@@ -129,9 +121,8 @@ namespace PhimStrong.Controllers
 			{
 				await _commentService.CreateAsync(comment);
 			}
-			catch(Exception e)
+			catch
 			{
-				Console.WriteLine(e);
 				return Json(new { success = false });
 			}
 

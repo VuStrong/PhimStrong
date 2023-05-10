@@ -17,7 +17,8 @@ namespace PhimStrong.Infrastructure.Repositories
 													.Include(t => t.Movie)
 													.Select(t => t.Movie);
 
-			return await PagedList<Movie>.ToPagedList(movies, pagingParameter.Page, pagingParameter.Size);
+			return await PagedList<Movie>.ToPagedList(
+				movies, pagingParameter.Page, pagingParameter.Size, pagingParameter.AllowCalculateCount);
 		}
 
 		public async Task<int> MaxIdNumberAsync()
