@@ -45,7 +45,7 @@ namespace PhimStrong.Controllers
 			if (movie == null) return Json("null");
 
 			PagedList<Comment> comments = await _commentService.GetByMovieIdAsync(
-				movieid, new PagingParameter(page, 2));
+				movieid, new PagingParameter(page, COMMENTS_PER_PAGE));
 
 			User? user = await _userService.GetByClaims(User);
 
@@ -79,7 +79,7 @@ namespace PhimStrong.Controllers
 			User? user = await _userService.GetByClaims(User);
 
             PagedList<Comment> comments = await _commentService.GetByMovieIdAsync(
-                movieid, new PagingParameter(page, 2));
+                movieid, new PagingParameter(page, COMMENTS_PER_PAGE));
 
             CommentContainerModel model = new()
 			{
