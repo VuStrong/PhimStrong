@@ -178,6 +178,9 @@ $('#edit-movie-btn').click(function () {
     formData.append("Rating", $('#movie-rating').val());
     formData.append("Tags", $('#select-tag').val());
 
+    if ($('#movie-image-text').val())
+        formData.append("Image", $('#movie-image-text').val());
+
     let count = $('#type-list').val() === "Phim lẻ" ? 1 : postVidUrl.length;
     formData.append("EpisodeCount", count);
 
