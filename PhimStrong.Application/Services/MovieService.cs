@@ -11,10 +11,12 @@ namespace PhimStrong.Application.Services
 {
     public class MovieService : IMovieService
 	{
+		private readonly IUserService _userService;
 		private readonly IUnitOfWork _unitOfWork;
 
-		public MovieService(IUnitOfWork unitOfWork)
+		public MovieService(IUserService userService, IUnitOfWork unitOfWork)
 		{
+			_userService = userService;
 			_unitOfWork = unitOfWork;
 		}
 
@@ -496,7 +498,7 @@ namespace PhimStrong.Application.Services
 			await _unitOfWork.SaveAsync();
 		}
 
-		public async Task<bool> AddLikedUserAsync(string movieid, User user)
+		public async Task<bool> LikeMovieAsync(string movieid, string userid)
 		{
 			Movie? movie = await _unitOfWork.MovieRepository.FirstOrDefaultAsync(
 																m => m.Id == movieid,
@@ -507,7 +509,14 @@ namespace PhimStrong.Application.Services
 
 			if (movie == null)
 			{
-				throw new Exception();
+				throw new MovieNotFoundException(movieid);
+			}
+
+			User? user = await _userService.FindByIdAsync(userid);
+
+			if (user == null)
+			{
+				throw new UserNotFoundException(userid);
 			}
 
 			movie.LikedUsers ??= new List<User>();

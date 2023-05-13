@@ -1,0 +1,32 @@
+﻿@model MovieLikeButtonViewModel
+@{
+	string likeStatus = Model.UserLike ? "Đã thích" : "Thích";
+}
+
+@if (Model.MovieExist)
+{
+	@if (Model.UserLogin)
+	{
+		<a id='like-movie-btn' href="#" title="thích" class="btn btn-success movie-detail-btn">
+			<i class="bi bi-hand-thumbs-up-fill"></i>
+			<strong>@likeStatus</strong>
+			<span class="ms-1">@Model.LikeCount</span>
+		</a>
+	}
+	else
+	{
+	    <a id='like-movie-btn' href="#" title="thích" class="btn btn-success movie-detail-btn" notsignin>
+			<i class="bi bi-hand-thumbs-up-fill"></i>
+			<strong>Thích</strong>
+			<span class="ms-1">@Model.LikeCount</span>
+		</a>		
+	}
+}
+else
+{
+	 <a id='like-movie-btn' href="#" title="thích" class="btn btn-success movie-detail-btn">
+		 <i class="bi bi-hand-thumbs-up-fill"></i>
+		 <strong>Thích</strong>
+		 <span class="ms-1">0</span>
+	 </a>
+}

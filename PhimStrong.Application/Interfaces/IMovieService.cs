@@ -54,6 +54,6 @@ namespace PhimStrong.Application.Interfaces
 
 		Task DeleteAsync(string movieid);
 		Task IncreateViewAsync(string movieid);
-		Task<bool> AddLikedUserAsync(string movieid, User user);
+		Task<bool> LikeMovieAsync(string movieid, string userid);
 	}
 }

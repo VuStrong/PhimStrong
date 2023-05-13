@@ -5,6 +5,7 @@ using PhimStrong.Domain.Models;
 using PhimStrong.Domain.PagingModel;
 using AutoMapper;
 using System.Linq.Expressions;
+using System.Security.Claims;
 
 namespace PhimStrong.Controllers
 {
@@ -14,15 +15,12 @@ namespace PhimStrong.Controllers
 
 		private readonly IMapper _mapper;
 		private readonly IMovieService _movieService;
-		private readonly IUserService _userService;
 
 		public MovieController(
 			IMovieService movieService,
-			IUserService userService,
 			IMapper mapper)
 		{
 			_movieService = movieService;
-			_userService = userService;
 			_mapper = mapper;
 		}
 
@@ -171,46 +169,34 @@ namespace PhimStrong.Controllers
 
 		[HttpGet]
 		[Route("/Movie/GetLikeButton")]
-		public async Task<string> GetLikeButton(string movieid)
+		public async Task<IActionResult> GetLikeButton(string movieid)
 		{
 			Movie? movie = await _movieService.GetByIdAsync(movieid, new Expression<Func<Movie, object?>>[]
 			{
 				m => m.LikedUsers
 			});
 
-			if (movie == null)
+			string userid = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+			return this.PartialView("_MovieLikeButton", new MovieLikeButtonViewModel
 			{
-				return $"<a id='like-movie-btn' href=\"#\" title=\"thích\" class=\"btn btn-success movie-detail-btn\">\r\n\t\t\t\t<i class=\"bi bi-hand-thumbs-up-fill\"></i>\r\n\t\t\t\t<strong>Thích</strong>\r\n\t\t\t\t<span class=\"ms-1\">0</span>\r\n\t\t\t</a>";
-			}
-
-			User? user = await _userService.GetByClaims(User);
-			movie.LikedUsers ??= new List<User>();
-
-			if (user == null)
-			{
-				return $"<a id='like-movie-btn' href=\"#\" title=\"thích\" class=\"btn btn-success movie-detail-btn\">\r\n\t\t\t\t<i class=\"bi bi-hand-thumbs-up-fill\"></i>\r\n\t\t\t\t<strong>Thích</strong>\r\n\t\t\t\t<span class=\"ms-1\">{movie.LikedUsers.Count}</span>\r\n\t\t\t</a>";
-			}
-
-			string like = movie.LikedUsers.Contains(user) ? "Đã thích" : "Thích";
-
-			return $"<a id='like-movie-btn' href=\"#\" title=\"thích\" class=\"btn btn-success movie-detail-btn\">\r\n\t\t\t\t<i class=\"bi bi-hand-thumbs-up-fill\"></i>\r\n\t\t\t\t<strong>{like}</strong>\r\n\t\t\t\t<span class=\"ms-1\">{movie.LikedUsers.Count}</span>\r\n\t\t\t</a>";
+				MovieExist = movie != null,
+				UserLike = movie?.LikedUsers?.Any(u => u.Id == userid) ?? false,
+				UserLogin = !String.IsNullOrEmpty(userid),
+				LikeCount = movie?.LikedUsers?.Count ?? 0
+			});
 		}
 
 		[HttpPost]
 		[Route("/Movie/LikeMovie")]
 		public async Task<JsonResult> LikeMovie(string movieid)
 		{
-			User? user = await _userService.GetByClaims(User);
+			string userid = User.FindFirstValue(ClaimTypes.NameIdentifier);
 			
-			if(user == null)
-			{
-                return Json(new { success = false, notsignin = true });
-            }
-
 			bool like = true;
             try
             {
-				like = await _movieService.AddLikedUserAsync(movieid, user);
+				like = await _movieService.LikeMovieAsync(movieid, userid);
 			}
 			catch
 			{

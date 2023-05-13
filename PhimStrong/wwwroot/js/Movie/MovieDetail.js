@@ -3,6 +3,12 @@
 	$('.like-movie').load("/Movie/GetLikeButton?movieid=" + movieid, "", function () {
 		$('#like-movie-btn').click(function (e) {
 			e.preventDefault();
+
+			if ($(this).is('[notsignin]')) {
+				window.location.href = "/login?returnUrl=/Movie/Detail/" + movieid;
+				return;
+			}
+
 			$.post(
 				"/Movie/LikeMovie?movieid=" + movieid,
 				{},
@@ -22,8 +28,7 @@
 							toastr.success('Đã bỏ like phim này !');
 						}
 					} else {
-						if (data.notsignin) window.location.href = "/login?returnUrl=/Movie/Detail/" + movieid;
-						else toastr.error('Like thất bại, hãy thử lại :((');
+						toastr.error('Like thất bại, hãy thử lại :((');
 					}
 				}
 			);

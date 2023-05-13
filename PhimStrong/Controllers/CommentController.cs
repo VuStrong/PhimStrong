@@ -11,7 +11,7 @@ using System.Text.Encodings.Web;
 
 namespace PhimStrong.Controllers
 {
-	public class CommentController : Controller
+    public class CommentController : Controller
 	{
 #pragma warning disable
 		public const int COMMENTS_PER_PAGE = 10;
@@ -94,7 +94,7 @@ namespace PhimStrong.Controllers
 
 		[HttpPost]
 		[Route("/Comment/CreateComment")]
-		public async Task<JsonResult> CreateComment(UserCommentModel? model)
+		public async Task<JsonResult> CreateComment(CreateCommentViewModel? model)
 		{
 			User? user = await _userService.GetByClaims(User);
 			Movie? movie = await _movieService.GetByIdAsync(model.MovieId);
