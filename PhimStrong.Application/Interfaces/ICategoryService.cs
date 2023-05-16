@@ -1,5 +1,6 @@
 ﻿using PhimStrong.Domain.Models;
 using PhimStrong.Domain.PagingModel;
+using PhimStrong.Domain.Parameters;
 
 namespace PhimStrong.Application.Interfaces
 {

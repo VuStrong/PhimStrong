@@ -4,6 +4,7 @@ using PhimStrong.Application.Models;
 using PhimStrong.Domain.Interfaces;
 using PhimStrong.Domain.Models;
 using PhimStrong.Domain.PagingModel;
+using PhimStrong.Domain.Parameters;
 using SharedLibrary.Helpers;
 using System.Linq.Expressions;
 using System.Security.Claims;
@@ -206,7 +207,7 @@ namespace PhimStrong.Infrastructure.Identity
                 users = users.Where(u => (u.NormalizeDisplayName ?? "").Contains(value));
             }
 
-            return await PagedList<User>.ToPagedList(
+            return await PagedList<User>.ToPagedListAsync(
                 users, pagingParameter.Page, pagingParameter.Size, pagingParameter.AllowCalculateCount);
         }
 

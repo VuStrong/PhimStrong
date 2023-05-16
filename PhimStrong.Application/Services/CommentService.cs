@@ -4,11 +4,12 @@ using PhimStrong.Domain.Exceptions.NotFound;
 using PhimStrong.Domain.Interfaces;
 using PhimStrong.Domain.Models;
 using PhimStrong.Domain.PagingModel;
+using PhimStrong.Domain.Parameters;
 using System.Linq.Expressions;
 
 namespace PhimStrong.Application.Services
 {
-	public class CommentService : ICommentService
+    public class CommentService : ICommentService
 	{
         private readonly IUserService _userService;
 		private readonly IUnitOfWork _unitOfWork;

@@ -6,6 +6,7 @@ using PhimStrong.Domain.PagingModel;
 using AutoMapper;
 using System.Linq.Expressions;
 using System.Security.Claims;
+using PhimStrong.Domain.Parameters;
 
 namespace PhimStrong.Controllers
 {
@@ -39,13 +40,17 @@ namespace PhimStrong.Controllers
         [Route("/Movie/{value}")]
         public async Task<IActionResult> SearchByMovieName(string? value, int page)
         {
-            ViewData["Filter"] = "Phim có tên";
+			ViewData["Filter"] = "Phim có tên";
 			ViewData["Title"] = value;
 
-            PagedList<Movie> movies = await _movieService.SearchAsync(value, new PagingParameter(page, MOVIES_PER_PAGE));                    
+			PagedList<Movie> movies = await _movieService.SearchAsync(new MovieParameter(page, MOVIES_PER_PAGE)
+			{
+				Value = value,
+				OrderBy = "CreatedDate_desc"
+			});
 
-            ViewData["Action"] = "SearchByMovieName";
-            ViewData["RouteValue"] = value;
+			ViewData["Action"] = "SearchByMovieName";
+			ViewData["RouteValue"] = value;
 
 			return View("Index", _mapper.Map<PagedList<MovieViewModel>>(movies));
 		}

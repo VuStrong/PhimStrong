@@ -2,10 +2,10 @@
 using PhimStrong.Application.Interfaces;
 using PhimStrong.Models;
 using System.Diagnostics;
-using PhimStrong.Domain.PagingModel;
 using PhimStrong.Domain.Models;
 using AutoMapper;
 using PhimStrong.Models.Movie;
+using PhimStrong.Domain.Parameters;
 
 namespace PhimStrong.Controllers
 {

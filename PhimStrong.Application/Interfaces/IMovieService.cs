@@ -1,5 +1,6 @@
 ﻿using PhimStrong.Domain.Models;
 using PhimStrong.Domain.PagingModel;
+using PhimStrong.Domain.Parameters;
 using System.Linq.Expressions;
 
 namespace PhimStrong.Application.Interfaces
@@ -7,7 +8,7 @@ namespace PhimStrong.Application.Interfaces
     public interface IMovieService
 	{
 		Task<PagedList<Movie>> GetAllAsync(PagingParameter pagingParameter);
-		Task<PagedList<Movie>> SearchAsync(string? value, PagingParameter pagingParameter);
+		Task<PagedList<Movie>> SearchAsync(MovieParameter movieParameter);
 		Task<PagedList<Movie>> FindByTypeAsync(string type, PagingParameter pagingParameter);
 		Task<PagedList<Movie>> FindByYearAsync(int year, PagingParameter pagingParameter);
 		Task<PagedList<Movie>> FindBeforeYearAsync(int year, PagingParameter pagingParameter);

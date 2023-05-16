@@ -6,6 +6,7 @@ using PhimStrong.Application.Interfaces;
 using PhimStrong.Areas.Admin.Models.Movie;
 using PhimStrong.Domain.Models;
 using PhimStrong.Domain.PagingModel;
+using PhimStrong.Domain.Parameters;
 using PhimStrong.Models.Movie;
 using SharedLibrary.Constants;
 using System.Linq.Expressions;
@@ -38,10 +39,14 @@ namespace PhimStrong.Areas.Admin.Controllers
         [HttpGet]
         public async Task<IActionResult> Index(int page, string? value = null)
         {
-            PagedList<Movie> movies = await _movieService.SearchAsync(value, new PagingParameter(page, MOVIES_PER_PAGE));
+            PagedList<Movie> movies = await _movieService.SearchAsync(new MovieParameter(page, MOVIES_PER_PAGE)
+            {
+                Value = value,
+                OrderBy = "CreatedDate_desc"
+			});
 
             if (value != null) ViewData["value"] = value;
-            
+
             return View(_mapper.Map<PagedList<MovieViewModel>>(movies));
         }
 

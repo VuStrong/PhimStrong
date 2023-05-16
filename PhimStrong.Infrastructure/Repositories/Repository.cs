@@ -1,12 +1,13 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PhimStrong.Domain.Interfaces;
 using PhimStrong.Domain.PagingModel;
+using PhimStrong.Domain.Parameters;
 using PhimStrong.Infrastructure.Context;
 using System.Linq.Expressions;
 
 namespace PhimStrong.Infrastructure.Repositories
 {
-	public abstract class Repository<T> : IRepository<T> where T : class
+    public abstract class Repository<T> : IRepository<T> where T : class
 	{
 		protected readonly PhimStrongDbContext _context;
 
@@ -79,7 +80,7 @@ namespace PhimStrong.Infrastructure.Repositories
 				}
 			}
 
-			return await PagedList<T>.ToPagedList(
+			return await PagedList<T>.ToPagedListAsync(
 				query, pagingParameter.Page, pagingParameter.Size, pagingParameter.AllowCalculateCount);
 		}
 

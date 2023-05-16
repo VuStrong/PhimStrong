@@ -1,9 +1,10 @@
 ﻿using PhimStrong.Domain.PagingModel;
+using PhimStrong.Domain.Parameters;
 using System.Linq.Expressions;
 
 namespace PhimStrong.Domain.Interfaces
 {
-	public interface IRepository<T> where T : class
+    public interface IRepository<T> where T : class
 	{
 		/// <summary>
 		///	Get IEnumarable of T entities

@@ -5,6 +5,7 @@ using PhimStrong.Application.Interfaces;
 using PhimStrong.Areas.Admin.Models.Cast;
 using PhimStrong.Domain.Models;
 using PhimStrong.Domain.PagingModel;
+using PhimStrong.Domain.Parameters;
 using PhimStrong.Models.Cast;
 using SharedLibrary.Constants;
 

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using PhimStrong.Application.Interfaces;
 using PhimStrong.Domain.Models;
 using PhimStrong.Domain.PagingModel;
+using PhimStrong.Domain.Parameters;
 using PhimStrong.Models.Category;
 using PhimStrong.Models.Movie;
 

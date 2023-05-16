@@ -2,11 +2,12 @@
 using PhimStrong.Domain.Interfaces;
 using PhimStrong.Domain.Models;
 using PhimStrong.Domain.PagingModel;
+using PhimStrong.Domain.Parameters;
 using PhimStrong.Infrastructure.Context;
 
 namespace PhimStrong.Infrastructure.Repositories
 {
-	public class CommentRepository : Repository<Comment>, ICommentRepository
+    public class CommentRepository : Repository<Comment>, ICommentRepository
 	{
 #nullable disable
         public CommentRepository(PhimStrongDbContext context) : base(context) {}
@@ -22,7 +23,7 @@ namespace PhimStrong.Infrastructure.Repositories
 									  .Where(c => c.Movie.Id == movieId && c.ResponseTo == null)
                                       .OrderByDescending(c => c.CreatedAt);
 
-            return await PagedList<Comment>.ToPagedList(
+            return await PagedList<Comment>.ToPagedListAsync(
                 comments, pagingParameter.Page, pagingParameter.Size, pagingParameter.AllowCalculateCount);
         }
     }

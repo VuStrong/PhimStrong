@@ -7,6 +7,7 @@ using PhimStrong.Application.Interfaces;
 using PhimStrong.Domain.PagingModel;
 using AutoMapper;
 using PhimStrong.Models.User;
+using PhimStrong.Domain.Parameters;
 
 namespace PhimStrong.Areas.Admin.Controllers
 {

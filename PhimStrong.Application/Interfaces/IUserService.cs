@@ -1,6 +1,7 @@
 ﻿using PhimStrong.Application.Models;
 using PhimStrong.Domain.Models;
 using PhimStrong.Domain.PagingModel;
+using PhimStrong.Domain.Parameters;
 using System.Security.Claims;
 
 namespace PhimStrong.Application.Interfaces

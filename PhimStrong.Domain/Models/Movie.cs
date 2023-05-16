@@ -63,15 +63,5 @@ namespace PhimStrong.Domain.Models
 		[Required(ErrorMessage = "Chưa chọn trạng thái")]
 		[DisplayName("Trạng thái")]
 		public string Status { get; set; }
-
-		[NotMapped]
-		public string StatusToString
-		{
-			get
-			{
-				if (this.Type == "Phim lẻ") return this.Status;
-				else return "Tập " + this.EpisodeCount;
-			}
-		}
 	}
 }

@@ -8,6 +8,7 @@ using PhimStrong.Domain.Models;
 using PhimStrong.Domain.PagingModel;
 using AutoMapper;
 using System.Text.Encodings.Web;
+using PhimStrong.Domain.Parameters;
 
 namespace PhimStrong.Controllers
 {
@@ -60,10 +61,6 @@ namespace PhimStrong.Controllers
 				MovieId = movie.Id,
 				IsAdmin = user != null && user.RoleName != null && (user.RoleName == RoleConstant.ADMIN || user.RoleName == RoleConstant.THUY_TO)
 			};
-
-			Console.WriteLine("page : " + page);
-			Console.WriteLine("total : " + comments.TotalPage);
-			Console.WriteLine("End ?? : " + model.IsEnd);
 
 			return this.PartialView("_CommentContainerPartial", model);
 		}

@@ -7,6 +7,16 @@ using PhimStrong.Application;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("policy1", policy =>
+    {
+        policy.AllowAnyHeader();
+        policy.AllowAnyMethod();
+        policy.AllowAnyOrigin();
+    });
+});
+
 // Add services to the container.
 builder.Services.AddControllersWithViews().AddNewtonsoftJson();
 builder.Services.AddAutoMapper(typeof(DomainToViewModelProfile), typeof(ViewModelToDomainProfile));
@@ -68,6 +78,7 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+app.UseCors("policy1");
 
 app.UseAuthentication();
 app.UseAuthorization();
