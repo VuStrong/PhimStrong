@@ -45,7 +45,7 @@ namespace PhimStrong.Controllers.Api
 				return NotFound();
 			}
 
-			return Ok(_mapper.Map<CountryDetailResource>(country));
+			return Ok(_mapper.Map<CountryResource>(country));
 		}
 
 		[HttpGet("{id}/movies")]

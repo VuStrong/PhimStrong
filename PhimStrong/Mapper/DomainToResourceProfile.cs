@@ -19,16 +19,12 @@ namespace PhimStrong.Mapper
 					options => options.MapFrom(src => src.Tags != null ? src.Tags.Select(t => t.TagName) : null));
 
 			CreateMap<Cast, CastResource>();
-			CreateMap<Cast, CastDetailResource>();
 
 			CreateMap<Category, CategoryResource>();
-			CreateMap<Category, CategoryDetailResource>();
 
 			CreateMap<Country, CountryResource>();
-			CreateMap<Country, CountryDetailResource>();
 
 			CreateMap<Director, DirectorResource>();
-			CreateMap<Director, DirectorDetailResource>();
 
 			CreateMap<Video, VideoResource>();
 		}

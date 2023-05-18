@@ -45,7 +45,7 @@ namespace PhimStrong.Controllers.Api
 				return NotFound();
 			}
 
-			return Ok(_mapper.Map<DirectorDetailResource>(director));
+			return Ok(_mapper.Map<DirectorResource>(director));
 		}
 
 		[HttpGet("{id}/movies")]

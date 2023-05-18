@@ -4,6 +4,9 @@ using PhimStrong.Application.Interfaces;
 using PhimStrong.Domain.Models;
 using PhimStrong.Domain.PagingModel;
 using PhimStrong.Domain.Parameters;
+using PhimStrong.Resources.Cast;
+using PhimStrong.Resources.Category;
+using PhimStrong.Resources.Director;
 using PhimStrong.Resources.Movie;
 using System.Linq.Expressions;
 #pragma warning disable
@@ -106,6 +109,70 @@ namespace PhimStrong.Controllers.Api
 			}
 
 			return Ok(_mapper.Map<VideoResource>(video));
+		}
+
+		[HttpGet("{id}/casts")]
+		public async Task<IActionResult> GetCasts(string id)
+		{
+			Movie? movie = await _movieService.GetByIdAsync(id, new Expression<Func<Movie, object?>>[]
+			{
+				m => m.Casts
+			});
+
+			if (movie == null)
+			{
+				return NotFound(nameof(movie));
+			}
+
+			return Ok(_mapper.Map<IEnumerable<CastResource>>(movie.Casts));
+		}
+
+		[HttpGet("{id}/categories")]
+		public async Task<IActionResult> GetCategories(string id)
+		{
+			Movie? movie = await _movieService.GetByIdAsync(id, new Expression<Func<Movie, object?>>[]
+			{
+				m => m.Categories
+			});
+
+			if (movie == null)
+			{
+				return NotFound(nameof(movie));
+			}
+
+			return Ok(_mapper.Map<IEnumerable<CategoryResource>>(movie.Categories));
+		}
+
+		[HttpGet("{id}/directors")]
+		public async Task<IActionResult> GetDirectors(string id)
+		{
+			Movie? movie = await _movieService.GetByIdAsync(id, new Expression<Func<Movie, object?>>[]
+			{
+				m => m.Directors
+			});
+
+			if (movie == null)
+			{
+				return NotFound(nameof(movie));
+			}
+
+			return Ok(_mapper.Map<IEnumerable<DirectorResource>>(movie.Directors));
+		}
+
+		[HttpGet("{id}/tags")]
+		public async Task<IActionResult> GetTags(string id)
+		{
+			Movie? movie = await _movieService.GetByIdAsync(id, new Expression<Func<Movie, object?>>[]
+			{
+				m => m.Tags
+			});
+
+			if (movie == null)
+			{
+				return NotFound(nameof(movie));
+			}
+
+			return Ok(movie.Tags.Select(t => t.TagName));
 		}
 	}
 }

@@ -45,7 +45,7 @@ namespace PhimStrong.Controllers.Api
 				return NotFound();
 			}
 
-			return Ok(_mapper.Map<CategoryDetailResource>(category));
+			return Ok(_mapper.Map<CategoryResource>(category));
 		}
 
 		[HttpGet("{id}/movies")]
