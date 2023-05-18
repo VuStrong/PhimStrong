@@ -238,11 +238,11 @@ namespace PhimStrong.Controllers
 
 		[HttpPost]
 		[Route("/Movie/IncreaseView")]
-		public JsonResult IncreaseView(string id)
+		public async Task<JsonResult> IncreaseView(string id)
 		{
 			try
 			{
-				_movieService.IncreateViewAsync(id);
+				await _movieService.IncreateViewAsync(id);
 			}
 			catch
 			{
