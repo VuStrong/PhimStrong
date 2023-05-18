@@ -2,7 +2,8 @@
 
 namespace PhimStrong.Domain.Models
 {
-    public class User : IdentityUser
+	// Put IdentityUser here because I don't know where else to put it :((
+	public class User : IdentityUser
     {
         public User() : base() {}
 
