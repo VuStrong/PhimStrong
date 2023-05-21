@@ -14,7 +14,7 @@
                      class="img-fluid" alt="Phone image">
             </div>
             <div class="col-md-7 col-lg-5 col-xl-5 offset-xl-1">
-                <form id="account" method="post" asp-area="Identity" asp-controller="Authentication">
+                <form id="account" method="post">
                     <div asp-validation-summary="All" class="text-danger"></div>
 
                     <div class="form-outline mb-4">
@@ -42,7 +42,7 @@
                     </div>
 
                     <!-- Submit button -->
-                    <button type="submit" asp-action="Register" class="btn btn-success w-100 btn-lg btn-block mb-4">Đăng ký</button>
+                    <button type="submit" class="btn btn-success w-100 btn-lg btn-block mb-4">Đăng ký</button>
 
                     <div>
                         <a asp-area="Identity" asp-controller="Authentication" asp-action="Login">
