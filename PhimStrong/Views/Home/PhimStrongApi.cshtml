@@ -1,0 +1,336 @@
+﻿@{
+    ViewData["Title"] = "PhimStrong API";
+}
+
+<section style="min-height: 100vh">
+	<div class="container py-5 h-100 background-profile" style="background-image: url(/src/img/Logo/PhimStrong_Logo.png);">
+		<h1 class="text-success bg-black bg-opacity-50 p-2 text-center" style="border-radius: .5rem;">API For All</h1>
+		<div class="row d-flex justify-content-center h-100">
+			<div class="col col-lg-1 col-md-1 mb-lg-0 mb-3">
+				<ul class="nav nav-pills flex-column" id="myTab" role="tablist">
+					<li class="nav-item bg-black bg-opacity-25" role="presentation">
+						<button class="nav-link w-100 active" id="movies-tab" data-bs-toggle="tab" data-bs-target="#movies" type="button" role="tab" aria-controls="movies" aria-selected="true">Movies</button>
+					</li>
+					<li class="nav-item bg-black bg-opacity-25" role="presentation">
+						<button class="nav-link w-100" id="videos-tab" data-bs-toggle="tab" data-bs-target="#videos" type="button" role="tab" aria-controls="videos" aria-selected="false">Videos</button>
+					</li>
+					<li class="nav-item bg-black bg-opacity-25" role="presentation">
+						<button class="nav-link w-100" id="casts-tab" data-bs-toggle="tab" data-bs-target="#casts" type="button" role="tab" aria-controls="casts" aria-selected="false">Casts</button>
+					</li>
+					<li class="nav-item bg-black bg-opacity-25" role="presentation">
+						<button class="nav-link w-100" id="directors-tab" data-bs-toggle="tab" data-bs-target="#directors" type="button" role="tab" aria-controls="directors" aria-selected="false">Directors</button>
+					</li>
+					<li class="nav-item bg-black bg-opacity-25" role="presentation">
+						<button class="nav-link w-100" id="categories-tab" data-bs-toggle="tab" data-bs-target="#categories" type="button" role="tab" aria-controls="categories" aria-selected="false">Categories</button>
+					</li>
+					<li class="nav-item bg-black bg-opacity-25" role="presentation">
+						<button class="nav-link w-100" id="countries-tab" data-bs-toggle="tab" data-bs-target="#countries" type="button" role="tab" aria-controls="countries" aria-selected="false">Countries</button>
+					</li>
+				</ul>
+			</div>
+			<div class="col col-lg-6 col-md-10 col-12 ms-md-5">
+				<div class="card mb-3 p-3" style="border-radius: .5rem;">
+					<div class="tab-content">
+						<div class="tab-pane active" id="movies" role="tabpanel" aria-labelledby="movies-tab" tabindex="0">
+							<h3 class="mb-2 text-success">Movies</h3>
+							<p>
+								<span class="text-success">GET : </span>
+								https://phimstrong.azurewebsites.net/api/movies
+							</p>
+							<hr />
+							<h5 class="text-success mb-4">
+								 - Response Status :
+								<span class="text-success">200</span>, 
+								<span class="text-danger"> 500</span>
+							</h5>
+
+							<h5 class="text-success"> - Response Data : </h5>
+							<p class="mb-4">Trả về 1 mảng các movies và các thông tin phân trang</p>
+							
+							<h5 class="text-success"> - Query Parameters : </h5>
+							<ul class="mb-4">
+								<li>page (int): <span class="text-light">trang muốn lấy</span></li>
+								<li>size (int): <span class="text-light">số phần tử trên 1 trang</span></li>
+								<li>orderBy (string): <span class="text-light">sắp xếp các phần tử theo 1 field theo thứ tự tăng dần, thêm '_desc' vào cuối để sắp xếp theo thứ tự giảm dần</span></li>
+								<li>q (string): <span class="text-light">keywork để tìm kiếm</span></li>
+								<li>type ('phimle', 'phimbo'): <span class="text-light">loại phim</span></li>
+								<li>year (int): <span class="text-light">tìm theo năm phát hành</span></li>
+								<li>status ('fullhd', 'trailer', 'cam'): <span class="text-light">trạng thái phim</span></li>
+								<li>tag (string): <span class="text-light">tìm kiếm theo tag</span></li>
+							</ul>
+
+							<h5 class="text-success"> - Example : </h5>
+							<p>https://phimstrong.azurewebsites.net/api/movies?page=2&orderBy=rating_desc</p>
+							<p>https://phimstrong.azurewebsites.net/api/movies?q=doct&size=25&year=2</p>
+						
+							<hr />
+
+							<h3 class="mt-4 mb-2 text-success">Movie Detail</h3>
+							<p>
+								<span class="text-success">GET : </span>
+								https://phimstrong.azurewebsites.net/api/movies/{movie_id}
+							</p>
+
+							<h5 class="text-success mb-4">
+								- Response Status :
+								<span class="text-success">200</span>,
+								<span class="text-danger">404</span>,
+								<span class="text-danger"> 500</span>
+							</h5>
+
+							<h5 class="text-success"> - Response Data : </h5>
+							<p class="mb-4">Trả về data chứa đầy đủ thông tin về 1 bộ phim</p>
+
+							<h5 class="text-success"> - Path Params : </h5>
+							<ul class="mb-4">
+								<li>movie_id (string): <span class="text-light">id của bộ phim</span></li>
+							</ul>
+
+							<hr />
+							<h3 class="mt-4 mb-2 text-success">Another APIs :</h3>
+							<p>
+								<span class="text-success">GET : </span>
+								https://phimstrong.azurewebsites.net/api/movies/random?count={count} 
+								<br />
+								<span class="text-light">(trả về {count} bộ phim ngẫu nhiên)</span>
+							</p>
+							<p>
+								<span class="text-success">GET : </span>
+								https://phimstrong.azurewebsites.net/api/movies/{movie_id}/related?count={count}
+								<br />
+								<span class="text-light">(trả về {count} bộ phim liên quan với phim có id = 'movie_id')</span>
+							</p>
+							<p>
+								<span class="text-success">GET : </span>
+								https://phimstrong.azurewebsites.net/api/movies/{movie_id}/casts
+								<br />
+								<span class="text-light">(trả về tất cả diễn viên của phim có id = 'movie_id')</span>
+							</p>
+							<p>
+								<span class="text-success">GET : </span>
+								https://phimstrong.azurewebsites.net/api/movies/{movie_id}/directors
+								<br />
+								<span class="text-light">(trả về tất cả đạo diễn của phim có id = 'movie_id')</span>
+							</p>
+							<p>
+								<span class="text-success">GET : </span>
+								https://phimstrong.azurewebsites.net/api/movies/{movie_id}/categories
+								<br />
+								<span class="text-light">(trả về tất cả thể loại của phim có id = 'movie_id')</span>
+							</p>
+						</div>
+						
+						<div class="tab-pane" id="casts" role="tabpanel" aria-labelledby="casts-tab" tabindex="0">
+							<h3 class="mb-2 text-success">Casts</h3>
+							<p>
+								<span class="text-success">GET : </span>
+								https://phimstrong.azurewebsites.net/api/casts
+							</p>
+
+							<hr />
+							<h5 class="text-success mb-4">
+								- Response Status :
+								<span class="text-success">200</span>,
+								<span class="text-danger"> 500</span>
+							</h5>
+
+							<h5 class="text-success"> - Response Data : </h5>
+							<p class="mb-4">Trả về 1 mảng các casts và các thông tin phân trang</p>
+
+							<h5 class="text-success"> - Query Parameters : </h5>
+							<ul class="mb-4">
+								<li>page (int): <span class="text-light">trang muốn lấy</span></li>
+								<li>size (int): <span class="text-light">số phần tử trên 1 trang</span></li>
+								<li>q (string): <span class="text-light">keywork để tìm kiếm</span></li>
+							</ul>
+
+							<h5 class="text-success"> - Example : </h5>
+							<p>https://phimstrong.azurewebsites.net/api/casts?page=2&q=chris</p>
+
+							<hr />
+
+							<h3 class="mt-4 mb-2 text-success">Cast Detail</h3>
+							<p>
+								<span class="text-success">GET : </span>
+								https://phimstrong.azurewebsites.net/api/casts/{cast_id}
+							</p>
+
+							<h5 class="text-success mb-4">
+								- Response Status :
+								<span class="text-success">200</span>,
+								<span class="text-danger">404</span>,
+								<span class="text-danger"> 500</span>
+							</h5>
+
+							<h5 class="text-success"> - Response Data : </h5>
+							<p class="mb-4">Trả về data chứa đầy đủ thông tin về 1 diễn viên</p>
+
+							<h5 class="text-success"> - Path Params : </h5>
+							<ul class="mb-4">
+								<li>cast_id (string): <span class="text-light">id của diễn viên</span></li>
+							</ul>
+
+							<hr />
+							<h3 class="mt-4 mb-2 text-success">Another APIs :</h3>
+							<p>
+								<span class="text-success">GET : </span>
+								https://phimstrong.azurewebsites.net/api/casts/{cast_id}/movies
+								<br />
+								<span class="text-light">(trả về các bộ phim của 1 diễn viên có id = 'cast_id')</span>
+							</p>
+						</div>
+
+						<div class="tab-pane" id="directors" role="tabpanel" aria-labelledby="directors-tab" tabindex="0">
+							<h3 class="mb-2 text-success">Directors</h3>
+							<p>
+								<span class="text-success">GET : </span>
+								https://phimstrong.azurewebsites.net/api/directors
+							</p>
+							<hr />
+							<h5 class="text-success mb-4">
+								- Response Status :
+								<span class="text-success">200</span>,
+								<span class="text-danger"> 500</span>
+							</h5>
+
+							<h5 class="text-success"> - Response Data : </h5>
+							<p class="mb-4">Trả về 1 mảng các directors và các thông tin phân trang</p>
+
+							<h5 class="text-success"> - Query Parameters : </h5>
+							<ul class="mb-4">
+								<li>page (int): <span class="text-light">trang muốn lấy</span></li>
+								<li>size (int): <span class="text-light">số phần tử trên 1 trang</span></li>
+								<li>q (string): <span class="text-light">keywork để tìm kiếm</span></li>
+							</ul>
+
+							<h5 class="text-success"> - Example : </h5>
+							<p>https://phimstrong.azurewebsites.net/api/directors?page=2&q=chris</p>
+
+							<hr />
+
+							<h3 class="mt-4 mb-2 text-success">Director Detail</h3>
+							<p>
+								<span class="text-success">GET : </span>
+								https://phimstrong.azurewebsites.net/api/directors/{director_id}
+							</p>
+
+							<h5 class="text-success mb-4">
+								- Response Status :
+								<span class="text-success">200</span>,
+								<span class="text-danger">404</span>,
+								<span class="text-danger"> 500</span>
+							</h5>
+
+							<h5 class="text-success"> - Response Data : </h5>
+							<p class="mb-4">Trả về data chứa đầy đủ thông tin về 1 đạo diễn</p>
+
+							<h5 class="text-success"> - Path Params : </h5>
+							<ul class="mb-4">
+								<li>director_id (string): <span class="text-light">id của đạo diễn</span></li>
+							</ul>
+
+							<hr />
+							<h3 class="mt-4 mb-2 text-success">Another APIs :</h3>
+							<p>
+								<span class="text-success">GET : </span>
+								https://phimstrong.azurewebsites.net/api/directors/{director_id}/movies
+								<br />
+								<span class="text-light">(trả về các bộ phim của 1 đạo diễn có id = 'director_id')</span>
+							</p>
+						</div>
+
+						<div class="tab-pane" id="categories" role="tabpanel" aria-labelledby="categories-tab" tabindex="0">
+							<h3 class="mb-2 text-success">Categories</h3>
+							<p>
+								<span class="text-success">GET : </span>
+								https://phimstrong.azurewebsites.net/api/categories
+							</p>
+							<hr />
+							<h5 class="text-success mb-4">
+								- Response Status :
+								<span class="text-success">200</span>,
+								<span class="text-danger"> 500</span>
+							</h5>
+
+							<h5 class="text-success"> - Response Data : </h5>
+							<p class="mb-4">Trả về 1 mảng các categories</p>
+
+							<hr />
+
+							<h3 class="mt-4 mb-2 text-success">Another APIs :</h3>
+							<p>
+								<span class="text-success">GET : </span>
+								https://phimstrong.azurewebsites.net/api/categories/{category_id}/movies
+								<br />
+								<span class="text-light">(trả về các bộ phim của 1 thể loại có id = 'category_id')</span>
+							</p>
+						</div>
+
+						<div class="tab-pane" id="countries" role="tabpanel" aria-labelledby="countries-tab" tabindex="0">
+							<h3 class="mb-2 text-success">Countries</h3>
+							<p>
+								<span class="text-success">GET : </span>
+								https://phimstrong.azurewebsites.net/api/countries
+							</p>
+							<hr />
+							<h5 class="text-success mb-4">
+								- Response Status :
+								<span class="text-success">200</span>,
+								<span class="text-danger"> 500</span>
+							</h5>
+
+							<h5 class="text-success"> - Response Data : </h5>
+							<p class="mb-4">Trả về 1 mảng các countries</p>
+
+							<hr />
+
+							<h3 class="mt-4 mb-2 text-success">Another APIs :</h3>
+							<p>
+								<span class="text-success">GET : </span>
+								https://phimstrong.azurewebsites.net/api/countries/{country_id}/movies
+								<br />
+								<span class="text-light">(trả về các bộ phim của 1 quốc gia có id = 'country_id')</span>
+							</p>
+						</div>
+
+						<div class="tab-pane" id="videos" role="tabpanel" aria-labelledby="videos-tab" tabindex="0">
+							<h3 class="mb-2 text-success">Videos</h3>
+							<p>
+								<span class="text-success">GET : </span>
+								https://phimstrong.azurewebsites.net/api/movies/{movie_id}/videos
+							</p>
+							<hr />
+							<h5 class="text-success mb-4">
+								- Response Status :
+								<span class="text-success">200</span>,
+								<span class="text-danger"> 404</span>,
+								<span class="text-danger"> 500</span>
+							</h5>
+
+							<h5 class="text-success"> - Response Data : </h5>
+							<p class="mb-4">Trả về 1 mảng các videos của 1 bộ phim</p>
+
+							<hr />
+							
+							<h3 class="mb-2 text-success">Video</h3>
+							<p>
+								<span class="text-success">GET : </span>
+								https://phimstrong.azurewebsites.net/api/movies/{movie_id}/videos/{episode}
+							</p>
+
+							<h5 class="text-success mb-4">
+								- Response Status :
+								<span class="text-success">200</span>,
+								<span class="text-danger"> 404</span>,
+								<span class="text-danger"> 500</span>
+							</h5>
+
+							<h5 class="text-success"> - Response Data : </h5>
+							<p class="mb-4">Trả về video theo 'episode' của 1 bộ phim</p>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>

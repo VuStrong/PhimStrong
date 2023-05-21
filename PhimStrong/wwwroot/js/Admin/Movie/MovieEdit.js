@@ -221,7 +221,7 @@ $('#edit-movie-btn').click(function () {
     $('#edit-movie-btn').addClass('disabled');
 
     $.ajax({
-        url: '/Admin/Movie/Edit?movieid=' + movieid,
+        url: '/admin/movie/edit?movieid=' + movieid,
         dataType: "json",
         type: 'POST',
         data: formData,
@@ -230,7 +230,7 @@ $('#edit-movie-btn').click(function () {
         traditional: true,
         success: function (data) {
             if (data.success) {
-                window.location.href = "/Admin/Movie";
+                window.location.href = "/admin/movie";
             } else {
                 toastr.error(data.error);
                 $('#edit-movie-btn').removeClass('disabled');

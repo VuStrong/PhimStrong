@@ -33,8 +33,7 @@ namespace PhimStrong.Areas.Identity.Controllers
             _mapper = mapper;
         }
 
-        [HttpGet]
-        [Route("/Account")]
+        [HttpGet("/account")]
         public async Task<IActionResult> Index()
         {
             User? user = await _userService.GetByClaims(User);
@@ -45,12 +44,10 @@ namespace PhimStrong.Areas.Identity.Controllers
             return View(_mapper.Map<UserViewModel>(user));
         }
 
-        [HttpGet]
-        [Route("/Account/ChangePassword")]
+        [HttpGet("/account/change-password")]
         public IActionResult ChangePassword() => View();
 
-        [HttpPost]
-        [Route("/Account/ChangePassword")]
+        [HttpPost("/account/change-password")]
         public async Task<IActionResult> ChangePassword(ChangePasswordModel model)
         {
             User? user = await _userService.GetByClaims(User);
@@ -78,7 +75,7 @@ namespace PhimStrong.Areas.Identity.Controllers
         }
 
         [HttpGet]
-        [Route("/Account/Email")]
+        [Route("/account/email")]
         public async Task<IActionResult> Email()
         {
             var user = await _userService.GetByClaims(User);

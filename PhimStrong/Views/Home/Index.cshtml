@@ -34,7 +34,7 @@
                     {
                         <div class="carousel-item h-100 @(first ? "active" : "")">
                             <img src="@movie.Image" class="img-fit w-100 h-100" alt="...">
-                            <a href="/Movie/Detail/@movie.Id" class="d-block position-absolute play-btn">
+                            <a asp-area="" asp-controller="Movie" asp-action="Detail" asp-route-id="@movie.Id" class="d-block position-absolute play-btn">
                                 <i class="bi bi-play-circle-fill"></i>
                             </a>
                             <div class="carousel-caption d-none d-md-block background-blur" style="display: block !important">
@@ -64,7 +64,7 @@
             {
                 foreach (var movie in Model.ListRandomMovies)
                 {
-                    <a href="/Movie/Detail/@movie.Id" class="movie-slide-item @(first2 ? "active" : "") row py-2">
+                    <a asp-area="" asp-controller="Movie" asp-action="Detail" asp-route-id="@movie.Id" class="movie-slide-item @(first2 ? "active" : "") row py-2">
                         <div class="col-5 h-100">
                             <img src="@movie.Image" class="img-fit w-100 h-100" alt="">
                         </div>
@@ -92,7 +92,7 @@
             @if (Model.ListMovieNew != null && listMovieNewLength > 0)
             {
                 <div class="movie-item movie-item-large">
-                    <a href="/Movie/Detail/@Model.ListMovieNew[0].Id" class="movie-item-body">
+                    <a asp-area="" asp-controller="Movie" asp-action="Detail" asp-route-id="@Model.ListMovieNew[0].Id" class="movie-item-body">
                         <img src="@(Model.ListMovieNew[0].Image ?? "~/src/img/UserAvatars/default_avatar.png")" class="w-100 h-100 img-fit">
                         <p class="movie-item-name background-blur text-truncate w-100">@Model.ListMovieNew[0].TranslateName</p>
                         <p class="movie-status">@Model.ListMovieNew[0].StatusToString</p>
@@ -107,7 +107,7 @@
                         if (i >= listMovieNewLength) break;
 
                         <div class="movie-item">
-                            <a href="/Movie/Detail/@Model.ListMovieNew[i].Id" class="movie-item-body">
+                            <a asp-area="" asp-controller="Movie" asp-action="Detail" asp-route-id="@Model.ListMovieNew[i].Id" class="movie-item-body">
                                 <img src="@(Model.ListMovieNew[i].Image ?? "~/src/img/UserAvatars/default_avatar.png")"
                                     class="w-100 h-100 img-fit">
                                 <p class="movie-item-name background-blur text-truncate w-100">@Model.ListMovieNew[i].TranslateName</p>
@@ -126,7 +126,7 @@
                     if (i >= listMovieNewLength) break;
 
                     <div class="movie-item">
-                        <a href="/Movie/Detail/@Model.ListMovieNew[i].Id" class="movie-item-body">
+                        <a asp-area="" asp-controller="Movie" asp-action="Detail" asp-route-id="@Model.ListMovieNew[i].Id" class="movie-item-body">
                             <img src="@(Model.ListMovieNew[i].Image ?? "~/src/img/UserAvatars/default_avatar.png")"
                                 class="w-100 h-100 img-fit">
                             <p class="movie-item-name background-blur text-truncate w-100">@Model.ListMovieNew[i].TranslateName</p>
@@ -150,7 +150,7 @@
             @if (Model.ListMovieTopRating != null && listMovieTopRatingLength > 0)
             {
                 <div class="movie-item movie-item-large">
-                    <a href="/Movie/Detail/@Model.ListMovieTopRating[0].Id" class="movie-item-body">
+                    <a asp-area="" asp-controller="Movie" asp-action="Detail" asp-route-id="@Model.ListMovieTopRating[0].Id" class="movie-item-body">
                         <img src="@(Model.ListMovieTopRating[0].Image ?? "~/src/img/UserAvatars/default_avatar.png")" 
                             class="w-100 h-100 img-fit">
                         <p class="movie-item-name background-blur text-truncate w-100">@Model.ListMovieTopRating[0].TranslateName</p>
@@ -166,7 +166,7 @@
                         if (i >= listMovieTopRatingLength) break;
 
                         <div class="movie-item">
-                            <a href="/Movie/Detail/@Model.ListMovieTopRating[i].Id" class="movie-item-body">
+                            <a asp-area="" asp-controller="Movie" asp-action="Detail" asp-route-id="@Model.ListMovieTopRating[i].Id" class="movie-item-body">
                                 <img src="@(Model.ListMovieTopRating[i].Image ?? "~/src/img/UserAvatars/default_avatar.png")"
                                      class="w-100 h-100 img-fit">
                                 <p class="movie-item-name background-blur text-truncate w-100">@Model.ListMovieTopRating[i].TranslateName</p>
@@ -185,7 +185,7 @@
                     if (i >= listMovieTopRatingLength) break;
 
                     <div class="movie-item">
-                        <a href="/Movie/Detail/@Model.ListMovieTopRating[i].Id" class="movie-item-body">
+                        <a asp-area="" asp-controller="Movie" asp-action="Detail" asp-route-id="@Model.ListMovieTopRating[i].Id" class="movie-item-body">
                             <img src="@(Model.ListMovieTopRating[i].Image ?? "~/src/img/UserAvatars/default_avatar.png")"
                                 class="w-100 h-100 img-fit">
                             <p class="movie-item-name background-blur text-truncate w-100">@Model.ListMovieTopRating[i].TranslateName</p>
@@ -209,7 +209,7 @@
             @if (Model.ListPhimLe != null && listPhimLeLength > 0)
             {
                 <div class="movie-item movie-item-large">
-                    <a href="/Movie/Detail/@Model.ListPhimLe[0].Id" class="movie-item-body">
+                    <a asp-area="" asp-controller="Movie" asp-action="Detail" asp-route-id="@Model.ListPhimLe[0].Id" class="movie-item-body">
                         <img src="@(Model.ListPhimLe[0].Image ?? "~/src/img/UserAvatars/default_avatar.png")"
                             class="w-100 h-100 img-fit">
                         <p class="movie-item-name background-blur text-truncate w-100">@Model.ListPhimLe[0].TranslateName</p>
@@ -225,7 +225,7 @@
                         if (i >= listPhimLeLength) break;
 
                         <div class="movie-item">
-                            <a href="/Movie/Detail/@Model.ListPhimLe[i].Id" class="movie-item-body">
+                            <a asp-area="" asp-controller="Movie" asp-action="Detail" asp-route-id="@Model.ListPhimLe[i].Id" class="movie-item-body">
                                 <img src="@(Model.ListPhimLe[i].Image ?? "~/src/img/UserAvatars/default_avatar.png")"
                                      class="w-100 h-100 img-fit">
                                 <p class="movie-item-name background-blur text-truncate w-100">@Model.ListPhimLe[i].TranslateName</p>
@@ -244,7 +244,7 @@
                     if (i >= listPhimLeLength) break;
 
                     <div class="movie-item">
-                        <a href="/Movie/Detail/@Model.ListPhimLe[i].Id" class="movie-item-body">
+                        <a asp-area="" asp-controller="Movie" asp-action="Detail" asp-route-id="@Model.ListPhimLe[i].Id" class="movie-item-body">
                             <img src="@(Model.ListPhimLe[i].Image ?? "~/src/img/UserAvatars/default_avatar.png")"
                                 class="w-100 h-100 img-fit">
                             <p class="movie-item-name background-blur text-truncate w-100">@Model.ListPhimLe[i].TranslateName</p>
@@ -268,7 +268,7 @@
             @if (Model.ListPhimBo != null && listPhimBoLength > 0)
             {
                 <div class="movie-item movie-item-large">
-                    <a href="/Movie/Detail/@Model.ListPhimBo[0].Id" class="movie-item-body">
+                    <a asp-area="" asp-controller="Movie" asp-action="Detail" asp-route-id="@Model.ListPhimBo[0].Id" class="movie-item-body">
                         <img src="@(Model.ListPhimBo[0].Image ?? "~/src/img/UserAvatars/default_avatar.png")"
                             class="w-100 h-100 img-fit">
                         <p class="movie-item-name background-blur text-truncate w-100">@Model.ListPhimBo[0].TranslateName</p>
@@ -284,7 +284,7 @@
                         if (i >= listPhimBoLength) break;
 
                         <div class="movie-item">
-                            <a href="/Movie/Detail/@Model.ListPhimBo[i].Id" class="movie-item-body">
+                            <a asp-area="" asp-controller="Movie" asp-action="Detail" asp-route-id="@Model.ListPhimBo[i].Id" class="movie-item-body">
                                 <img src="@(Model.ListPhimBo[i].Image ?? "~/src/img/UserAvatars/default_avatar.png")"
                                     class="w-100 h-100 img-fit">
                                 <p class="movie-item-name background-blur text-truncate w-100">@Model.ListPhimBo[i].TranslateName</p>
@@ -303,7 +303,7 @@
                     if (i >= listPhimBoLength) break;
 
                     <div class="movie-item">
-                        <a href="/Movie/Detail/@Model.ListPhimBo[i].Id" class="movie-item-body">
+                        <a asp-area="" asp-controller="Movie" asp-action="Detail" asp-route-id="@Model.ListPhimBo[i].Id" class="movie-item-body">
                             <img src="@(Model.ListPhimBo[i].Image ?? "~/src/img/UserAvatars/default_avatar.png")"
                                 class="w-100 h-100 img-fit">
                             <p class="movie-item-name background-blur text-truncate w-100">@Model.ListPhimBo[i].TranslateName</p>

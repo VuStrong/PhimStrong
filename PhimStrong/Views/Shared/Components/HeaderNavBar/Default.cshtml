@@ -27,7 +27,7 @@
                         <div class="row">
                             @foreach (var category in categories)
                             {
-                                <a class="dropdown-item" style="width:50%;" href="/Category/@category.Name">@category.Name</a>
+                                <a class="dropdown-item" style="width:50%;" asp-area="" asp-controller="Category" asp-action="Index" asp-route-value="@category.Name">@category.Name</a>
                             }
                         </div>
                     </div>
@@ -38,7 +38,7 @@
                         <div class="row">
                             @foreach (var country in countries)
                             {
-                                <a class="dropdown-item" style="width:50%;" href="/Country/@country.Name">@country.Name</a>
+                                <a class="dropdown-item" style="width:50%;" asp-area="" asp-controller="Country" asp-action="Index" asp-route-value="@country.Name">@country.Name</a>
                             }
                         </div>
                     </div>
@@ -49,11 +49,11 @@
                         <div class="row">
                             @if(years.Any())
                             {
-                                <a class="dropdown-item" style="width:50%;" href="/movie/before-year/@(years[0] - 1)">Trước @(years[0] - 1)</a>
+                                <a class="dropdown-item" style="width:50%;" asp-area="" asp-controller="Movie" asp-action="GetMovieBeforeYear" asp-route-year="@(years[0] - 1)">Trước @(years[0] - 1)</a>
                             }
                             @foreach (int year in years)
                             {
-                                <a class="dropdown-item" style="width:50%;" href="/movie/year/@year">@year</a>
+                                <a class="dropdown-item" style="width:50%;" asp-area="" asp-controller="Movie" asp-action="GetMovieByReleaseYear" asp-route-year="@year">@year</a>
                             }
                         </div>
                     </div>
@@ -76,7 +76,7 @@
                     </li>
                 }
             </ul>
-            <form id="search-form" class="d-flex" method="get" action="/Movie/">
+            <form id="search-form" class="d-flex" method="get" action="/movie/">
                 <input class="form-control me-sm-2" type="search" placeholder="Tìm phim...">
                 <button class="btn btn-secondary my-2 my-sm-0" type="submit">Tìm</button>
             </form>

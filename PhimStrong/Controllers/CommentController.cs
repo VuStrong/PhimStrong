@@ -12,6 +12,7 @@ using PhimStrong.Domain.Parameters;
 
 namespace PhimStrong.Controllers
 {
+	[Route("[controller]")]
     public class CommentController : Controller
 	{
 #pragma warning disable
@@ -37,8 +38,7 @@ namespace PhimStrong.Controllers
 			_commentService = commentService;
 		}
 
-		[HttpGet]
-		[Route("/Comment/GetCommentsPartial")]
+		[HttpGet("get-comments-partial")]
 		public async Task<IActionResult> GetCommentsPartial(int page, string movieid)
 		{
 			Movie? movie = await _movieService.GetByIdAsync(movieid);
@@ -65,8 +65,7 @@ namespace PhimStrong.Controllers
 			return this.PartialView("_CommentContainerPartial", model);
 		}
 
-		[HttpGet]
-		[Route("/Comment/LoadMoreComments")]
+		[HttpGet("load-more-comments")]
 		public async Task<IActionResult> LoadMoreComments(int page, string movieid)
 		{
 			Movie? movie = await _movieService.GetByIdAsync(movieid);
@@ -89,8 +88,7 @@ namespace PhimStrong.Controllers
 			return this.PartialView("_CommentContainerPartial", model);
 		}
 
-		[HttpPost]
-		[Route("/Comment/CreateComment")]
+		[HttpPost("create")]
 		public async Task<JsonResult> CreateComment(CreateCommentViewModel? model)
 		{
 			User? user = await _userService.GetByClaims(User);
@@ -150,8 +148,7 @@ namespace PhimStrong.Controllers
 			});
 		}
 
-		[HttpPost]
-		[Route("/Comment/LikeComment")]
+		[HttpPost("like-comment")]
 		public async Task<JsonResult> LikeComment(int commentid)
 		{
 			try
@@ -166,8 +163,7 @@ namespace PhimStrong.Controllers
 			return Json(new {success = true});
 		}
 
-        [HttpPost]
-        [Route("/Comment/DeleteComment")]
+        [HttpPost("delete")]
 		[Authorize(Roles = $"{RoleConstant.ADMIN}, {RoleConstant.THUY_TO}")]
 		public async Task<JsonResult> DeleteComment(int commentid)
         {

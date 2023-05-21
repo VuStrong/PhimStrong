@@ -4,6 +4,8 @@ using System.Security.Claims;
 using PhimStrong.Mapper;
 using PhimStrong.Infrastructure;
 using PhimStrong.Application;
+using Microsoft.AspNetCore.Mvc.ApplicationModels;
+using PhimStrong.Transformer;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,11 +19,19 @@ builder.Services.AddCors(options =>
     });
 });
 
-// Add services to the container.
-builder.Services.AddControllersWithViews().AddNewtonsoftJson();
+builder.Services.AddRouting(option =>
+{
+	option.ConstraintMap["slugify"] = typeof(SlugifyParameterTransformer);
+});
+
+builder.Services.AddControllersWithViews(options =>
+{
+	options.Conventions.Add(new RouteTokenTransformerConvention(
+								 new SlugifyParameterTransformer()));
+}).AddNewtonsoftJson();
+
 builder.Services.AddAutoMapper(typeof(DomainToViewModelProfile), typeof(ViewModelToDomainProfile));
 
-// Add Send Email Service
 builder.Services.AddOptions(); // Kích hoạt Options
 
 builder.Services.AddInfrastructureServices(builder.Configuration);
@@ -85,11 +95,13 @@ app.UseAuthorization();
 
 // Area Route
 app.MapControllerRoute(
-    name: "MyArea",
-    pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
+		name: "MyArea",
+		pattern: "{area:slugify}/{controller:slugify}/{action:slugify}/{id:slugify?}",
+		defaults: new { controller = "Home", action = "Index" });
 
 app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+		name: "default",
+		pattern: "{controller:slugify}/{action:slugify}/{id:slugify?}",
+		defaults: new { controller = "Home", action = "Index" });
 
 app.Run();

@@ -18,7 +18,7 @@
     </div>
 </div>
 <div class="my-3">
-    <a class="btn btn-success" asp-controller="Country" asp-action="Create">Thêm quốc gia</a>
+    <a class="btn btn-success" asp-area="Admin" asp-controller="Country" asp-action="Create">Thêm quốc gia</a>
 </div>
 
 @if (ViewData["value"] != null)
@@ -69,25 +69,6 @@ else
 }
 
 <partial name="/Views/Shared/_PagingPartial.cshtml" for="@pagingModel"></partial>
-
-@*@section Scripts{
-    <script type="text/javascript">
-        // trước khi sumbit thì thay lại giá trị cho thẻ input
-        $('#search-name-form').submit(function (e) {
-            e.preventDefault();
-
-            var searchBtn = $('input[name="filter"]');
-
-            if (!searchBtn.val() || searchBtn.val().trim() == "") return;
-
-            searchBtn.val(`<@PageFilterConstant.FILTER_BY_NAME>${searchBtn.val()}`);
-
-            this.submit();
-
-            searchBtn.val('');
-        });
-    </script>
-}*@
 
 
 

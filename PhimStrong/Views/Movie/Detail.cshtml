@@ -59,7 +59,7 @@
 				{
 					foreach (var cate in Model.Categories)
 					{
-						<a href="/Category/@cate.Name" class="d-inline my-link my-link-gray">@cate.Name</a>
+						<a asp-area="" asp-controller="Category" asp-action="Index" asp-route-value="@cate.Name" class="d-inline my-link my-link-gray">@cate.Name</a>
 						<span style="color: gray">, </span>
 					}
 				}
@@ -70,7 +70,7 @@
 				<strong>Năm phát hành</strong>:
 				@if (movieYear > 0)
 				{
-					<a href="/movie/year/@movieYear" class="d-inline my-link my-link-gray">
+					<a asp-area="" asp-controller="Movie" asp-action="GetMovieByReleaseYear" asp-route-year="@movieYear" class="d-inline my-link my-link-gray">
 						@movieYear
 					</a>
 				}
@@ -81,7 +81,7 @@
 				{
 					foreach (var director in Model.Directors)
 					{
-						<a href="/Director/@director.Name" class="d-inline my-link my-link-gray">@director.Name</a>
+						<a asp-area="" asp-controller="Director" asp-action="Index" asp-route-value="@director.Name" class="d-inline my-link my-link-gray">@director.Name</a>
 						<span style="color: gray">, </span>
 					}
 				}
@@ -92,7 +92,7 @@
 				{
 					foreach (var cast in Model.Casts)
 					{
-						<a href="/Cast/@cast.Name" class="d-inline my-link my-link-gray">@cast.Name</a>
+						<a asp-area="" asp-controller="Cast" asp-action="Index" asp-route-value="@cast.Name" class="d-inline my-link my-link-gray">@cast.Name</a>
 						<span style="color: gray">, </span>
 					}
 				}
@@ -103,7 +103,7 @@
 				<strong>Quốc gia</strong>:
 				@if (movieCountry != "")
 				{
-					<a href="/Country/@movieCountry" class="d-inline my-link my-link-gray">
+					<a asp-area="" asp-controller="Country" asp-action="Index" asp-route-value="@movieCountry" class="d-inline my-link my-link-gray">
 						@movieCountry
 					</a>
 				}
@@ -145,7 +145,7 @@
 		{
 			foreach (var tag in Model.Tags)
 			{
-				<a href="/Movie/tag/@tag.TagName" class="d-inline my-link my-link-gray">@tag.TagName</a>
+				<a asp-area="" asp-controller="Movie" asp-action="GetMovieByTag" asp-route-value="@tag.TagName" class="d-inline my-link my-link-gray">@tag.TagName</a>
 				<span style="color: gray">, </span>
 			}
 		}

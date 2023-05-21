@@ -41,17 +41,20 @@ namespace PhimStrong.Controllers
             });
         }
 
-        [Route("/chinh-sach-rieng-tu")]
+        [HttpGet("/chinh-sach-rieng-tu")]
         public IActionResult Privacy() => View();
 
-        [Route("/dieu-khoan-su-dung")]
+        [HttpGet("/dieu-khoan-su-dung")]
         public IActionResult TermsOfUse() => View();
 
-        [Route("/khieu-nai-ban-quyen")]
+        [HttpGet("/khieu-nai-ban-quyen")]
         public IActionResult License() => View();
 
-        [Route("/contact")]
+        [HttpGet("/contact")]
         public IActionResult Contact() => View();
+
+        [HttpGet("/phimstrong-api")]
+        public IActionResult PhimStrongApi() => View();
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()

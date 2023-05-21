@@ -35,7 +35,7 @@
         formData.append('Hobby', $("#edit-hobby").val());
 
         $.ajax({
-            url: '/Identity/Account/EditInformation',
+            url: '/identity/account/edit-information',
             dataType: "json",
             type: 'POST',
             data: formData,

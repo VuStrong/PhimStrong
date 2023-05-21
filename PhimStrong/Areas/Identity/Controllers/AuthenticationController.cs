@@ -25,8 +25,7 @@ namespace PhimStrong.Areas.Identity.Controllers
             _emailSender = emailSender;
         }
 
-        [HttpGet]
-        [Route("/register")]
+        [HttpGet("/register")]
         public async Task<IActionResult> Register()
         {
             if (User.Identity.IsAuthenticated)
@@ -40,8 +39,7 @@ namespace PhimStrong.Areas.Identity.Controllers
             });
         }
 
-        [HttpPost]
-        [Route("/register")]
+        [HttpPost("/register")]
         public async Task<IActionResult> Register([FromForm] RegisterModel model, [FromRoute] string? returnUrl = null)
         {
             returnUrl ??= Url.Action("Index", "Home", new { area = "" });
@@ -88,8 +86,7 @@ namespace PhimStrong.Areas.Identity.Controllers
             });
         }
 
-        [HttpGet]
-        [Route("/login")]
+        [HttpGet("/login")]
         public async Task<IActionResult> Login(string? returnUrl = null)
         {
             if (User.Identity.IsAuthenticated)
@@ -103,8 +100,7 @@ namespace PhimStrong.Areas.Identity.Controllers
             });
         }
 
-        [HttpPost]
-        [Route("/login")]
+        [HttpPost("/login")]
         public async Task<IActionResult> Login([FromForm] LoginModel model, string? returnUrl = null)
         {
             returnUrl ??= Url.Action("Index", "Home", new { area = "" });
@@ -171,12 +167,10 @@ namespace PhimStrong.Areas.Identity.Controllers
         [HttpGet]
         public IActionResult AccessDenied(string text = null) => View(model: text);
 
-        [HttpGet]
-        [Route("/forgot-password")]
+        [HttpGet("/forgot-password")]
         public IActionResult ForgotPassword() => View();
 
-        [HttpPost]
-        [Route("/forgot-password")]
+        [HttpPost("/forgot-password")]
         public async Task<IActionResult> ForgotPassword([FromForm] ForgotPasswordModel model)
         {
             if (ModelState.IsValid)
@@ -197,7 +191,7 @@ namespace PhimStrong.Areas.Identity.Controllers
                     values: new { area = "Identity", code },
                     protocol: Request.Scheme);
 
-                await _emailSender.SendEmailAsync(
+                _emailSender.SendEmailAsync(
                     model.Email,
                     "Reset Password",
                     $"<a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>Ấn vào đây</a> để đặt lại mật khẩu của bạn.");
@@ -208,12 +202,10 @@ namespace PhimStrong.Areas.Identity.Controllers
             return View();
         }
 
-        [HttpGet]
-        [Route("/forgot-password-confirmation")]
+        [HttpGet("/forgot-password-confirmation")]
         public IActionResult ForgotPasswordConfirmation() => View();
 
-        [HttpGet]
-        [Route("/reset-password")]
+        [HttpGet("/reset-password")]
         public IActionResult ResetPassword(string code = null)
         {
             if (code == null)
@@ -229,8 +221,7 @@ namespace PhimStrong.Areas.Identity.Controllers
             }
         }
 
-        [HttpPost]
-        [Route("/reset-password")]
+        [HttpPost("/reset-password")]
         public async Task<IActionResult> ResetPassword([FromForm] ResetPasswordModel model)
         {
             if (!ModelState.IsValid)
@@ -252,8 +243,7 @@ namespace PhimStrong.Areas.Identity.Controllers
             return View(model);
         }
 
-        [HttpGet]
-        [Route("/reset-password-confirmation")]
+        [HttpGet("/reset-password-confirmation")]
         public IActionResult ResetPasswordConfirmation()
         {
             return View();

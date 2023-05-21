@@ -202,7 +202,7 @@ $('#create-movie-btn').click(function () {
     $('#create-movie-btn').addClass('disabled');
 
     $.ajax({
-        url: '/Admin/Movie/Create',
+        url: '/admin/movie/create',
         dataType: "json",
         type: 'POST',
         data: formData,
@@ -211,7 +211,7 @@ $('#create-movie-btn').click(function () {
         traditional: true,
         success: function (data) {
             if (data.success) {
-                window.location.href = "/Admin/Movie";
+                window.location.href = "/admin/movie";
             } else {
                 toastr.error(data.error);
                 $('#create-movie-btn').removeClass('disabled');

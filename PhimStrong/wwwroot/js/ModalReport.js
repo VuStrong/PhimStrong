@@ -12,7 +12,7 @@
     if (email && content) {
         $('#report-modal-btn').addClass('disabled');
         $.post(
-            `/User/Report`,
+            `/user/report`,
             {
                 Email: email,
                 Content: content

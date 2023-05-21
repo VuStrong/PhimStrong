@@ -2,7 +2,7 @@
     // increase view after 5s
     setTimeout(function () {
         $.post(
-            '/Movie/IncreaseView?id=' + movieid,
+            '/movie/increase-view?id=' + movieid,
         );
     }, 5000);
 

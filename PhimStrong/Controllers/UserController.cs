@@ -7,6 +7,7 @@ using PhimStrong.Models.User;
 
 namespace PhimStrong.Controllers
 {
+	[Route("[controller]")]
 #pragma warning disable
 	public class UserController : Controller
 	{
@@ -21,7 +22,7 @@ namespace PhimStrong.Controllers
 			_mapper = mapper;
 		}
 
-		[Route("/User/{id?}")]
+		[HttpGet("{id?}")]
 		public async Task<IActionResult> Index(string id)
 		{
 			User? user = await _userService.FindByIdAsync(id);
@@ -34,7 +35,7 @@ namespace PhimStrong.Controllers
 			return View(_mapper.Map<UserViewModel>(user));
 		}
 
-		[Route("/User/Report")]
+		[HttpPost("report")]
 		public async Task<JsonResult> Report(ReportModel model)
 		{
 			_emailSender.SendEmailAsync(

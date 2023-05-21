@@ -1,16 +1,16 @@
 ﻿$(function () {
 	// render like movie button after page loaded
-	$('.like-movie').load("/Movie/GetLikeButton?movieid=" + movieid, "", function () {
+	$('.like-movie').load("/movie/get-like-button?movieid=" + movieid, "", function () {
 		$('#like-movie-btn').click(function (e) {
 			e.preventDefault();
 
 			if ($(this).is('[notsignin]')) {
-				window.location.href = "/login?returnUrl=/Movie/Detail/" + movieid;
+				window.location.href = "/login?returnUrl=/movie/detail/" + movieid;
 				return;
 			}
 
 			$.post(
-				"/Movie/LikeMovie?movieid=" + movieid,
+				"/movie/like-movie?movieid=" + movieid,
 				{},
 				function (data) {
 					if (data.success) {

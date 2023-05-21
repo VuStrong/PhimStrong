@@ -14,7 +14,7 @@
                      class="img-fluid" alt="Phone image">
             </div>
             <div class="col-md-7 col-lg-5 col-xl-5 offset-xl-1">
-                <form id="account" method="post">
+                <form id="account" method="post" asp-area="Identity" asp-controller="Authentication">
                     <div asp-validation-summary="All" class="text-danger"></div>
 
                     <!-- Email input -->
@@ -44,7 +44,7 @@
                     </div>
 
                     <!-- Submit button -->
-                    <button type="submit" class="btn btn-success w-100 btn-lg btn-block mb-3">Đăng nhập</button>
+                    <button type="submit" class="btn btn-success w-100 btn-lg btn-block mb-3" asp-action="Login">Đăng nhập</button>
                     <a asp-area="Identity" asp-controller="Authentication" asp-action="Register">Chưa có tài khoản ?, ấn đây để đăng ký.</a>
 
                     <div class="divider d-flex align-items-center my-4">
@@ -52,7 +52,7 @@
                     </div>
 
                 </form>
-                <form id="external-account" method="post" asp-action="ExternalLogin">
+                <form id="external-account" method="post" asp-area="Identity" asp-controller="Authentication" asp-action="ExternalLogin">
                     <button type="submit" class="btn btn-primary btn-lg" name="provider" value="Facebook"
                         style="background-color: #3b5998" title="Sử dụng tài khoản Facebook của bạn để đăng nhập.">
                         <i class="bi bi-facebook"></i>Đăng nhập với Facebook

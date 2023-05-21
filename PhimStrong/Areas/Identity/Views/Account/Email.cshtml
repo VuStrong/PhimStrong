@@ -9,7 +9,7 @@
     <div class="col px-5 py-3">
         <partial name="_StatusMessage" for="@TempData["status"]" />
 
-        <form id="email-form" method="post">
+        <form id="email-form" method="post" asp-area="Identity" asp-controller="Account">
             <div asp-validation-summary="All" class="text-danger"></div>
             @if (Model.IsEmailConfirmed)
             {

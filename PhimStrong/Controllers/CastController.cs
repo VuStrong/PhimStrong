@@ -9,6 +9,7 @@ using PhimStrong.Models.Movie;
 
 namespace PhimStrong.Controllers
 {
+	[Route("[controller]")]
 	public class CastController : Controller
 	{
 		private const int MOVIES_PER_PAGE = 25;
@@ -24,8 +25,7 @@ namespace PhimStrong.Controllers
 			_mapper = mapper;
 		}
 
-		[HttpGet]
-		[Route("/Cast/{value}")]
+		[HttpGet("{value}")]
 		public async Task<IActionResult> Index(string? value, int page)
 		{
 			Cast? cast = await _castService.GetByNameAsync(value ?? "");

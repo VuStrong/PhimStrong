@@ -7,7 +7,7 @@
 			var likeBtn = $(this);
 			let cmtid = likeBtn.closest('.cmt-item').attr('cmt-id');
 			$.post(
-				`/Comment/LikeComment?commentid=${cmtid}`,
+				`/comment/like-comment?commentid=${cmtid}`,
 				{},
 				function (data) {
 					if (data.success) {
@@ -65,7 +65,7 @@
 					$(this).addClass('disabled');
 
 					$.post(
-						'/Comment/CreateComment',
+						'/comment/create',
 						{
 							Content: content,
 							MovieId: movieid,
@@ -111,7 +111,7 @@
 	}
 
 	var commentPage = 1;
-	var firstUrl = `/Comment/GetCommentsPartial?movieid=${movieid}&page=${commentPage}`;
+	var firstUrl = `/comment/get-comments-partial?movieid=${movieid}&page=${commentPage}`;
 	// render comment after page finish loaded
 	$('#cmt-container').load(firstUrl, "", function () {
 		handleLikeAndResponse();
@@ -119,7 +119,7 @@
 		// event click expand btn to load more comment
 		$('#expand-cmt-btn').click(function () {
 			commentPage++;
-			let url = `/Comment/LoadMoreComments?movieid=${movieid}&page=${commentPage}`;
+			let url = `/comment/load-more-comments?movieid=${movieid}&page=${commentPage}`;
 
 			$('#expand-cmt-btn').addClass('disabled');
 
@@ -138,7 +138,7 @@
 				$(this).addClass('disabled');
 
 				$.post(
-					'/Comment/CreateComment',
+					'/comment/create',
 					{
 						Content: content,
 						MovieId: movieid
@@ -186,7 +186,7 @@
 	});
 
 	// Render related movie after page loaded
-	$('#relate-movies').load("/Movie/GetRelateMovies?movieid=" + movieid, "", function () {
+	$('#relate-movies').load("/movie/get-related-movies?movieid=" + movieid, "", function () {
 		// scroll
 		var itemIndex = 1;
 		var distance = $('.owl-slide .movie-item:nth-child(2)').offset().left - $('.owl-slide').offset().left

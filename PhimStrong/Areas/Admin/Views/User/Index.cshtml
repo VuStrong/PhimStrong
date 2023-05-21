@@ -17,7 +17,7 @@
                     <a class="dropdown-item" href="@Url.Action("Index", "User", 
                         new {
                             area = "Admin",
-                            page = 1 
+                            page = 1,
                         })">Tất cả</a>
                     
                     @foreach(var role in roles)
@@ -26,7 +26,7 @@
                             {
                                 area = "Admin",
                                 page = 1, 
-                                role = role
+                                role = role,
                             })">
                             @role
                         </a>
@@ -35,7 +35,7 @@
             </li>
             <li class="nav-item">
                 <form id="search-name-form" class="d-flex" method="get" asp-area="Admin" asp-controller="User" asp-action="Index" asp-route-page="1">
-                    <input name="value" class="form-control me-sm-2" type="text" placeholder="Nhập tên">
+                    <input name="value" class="form-control me-sm-2" type="text" required placeholder="Nhập tên">
                     <button id="search-name-btn" class="btn btn-secondary my-2 my-sm-0" type="submit">Search</button>
                 </form>
             </li>
@@ -43,9 +43,13 @@
     </div>
 </div>
 
-@if (TempData["FilterMessage"] != null)
+@if (ViewData["value"] != null)
 {
-    <h3 class="text-success">Kết quả tìm kiếm cho User có @TempData["FilterMessage"].</h3>
+    <h3 class="text-success">Kết quả tìm kiếm: @ViewData["value"].</h3>
+}
+else if (ViewData["role"] != null)
+{
+    <h3 class="text-success">Role: @ViewData["role"].</h3>
 }
 
 @if(Model != null && Model.Any())
@@ -105,22 +109,3 @@ else
 }
 
 <partial name="/Views/Shared/_PagingPartial.cshtml" for="@pagingModel"></partial>
-
-@*@section Scripts{
-    <script type="text/javascript">
-        // trước khi sumbit thì thay lại giá trị cho thẻ input
-        $('#search-name-form').submit(function (e) {
-            e.preventDefault();
-
-            var searchBtn = $('input[name="filter"]');
-
-            if(!searchBtn.val() || searchBtn.val().trim() == "") return;
-            
-            searchBtn.val(`<@PageFilterConstant.FILTER_BY_NAME>${searchBtn.val()}`);
-            
-            this.submit();
-        
-            searchBtn.val('');
-        });
-    </script>
-}*@

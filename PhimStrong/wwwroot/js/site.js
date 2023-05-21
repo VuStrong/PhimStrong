@@ -22,6 +22,6 @@ $('#search-form').submit(function (e) {
     var value = $(this).children('input').val().trim();
     if (!value) return;
 
-    $(this).attr('action', "/Movie/" + value);
+    $(this).attr('action', "/movie/" + value);
     this.submit();
 });
