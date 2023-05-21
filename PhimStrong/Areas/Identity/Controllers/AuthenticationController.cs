@@ -127,10 +127,10 @@ namespace PhimStrong.Areas.Identity.Controllers
             });
         }
 
-        [HttpGet]
+        [HttpGet("/lockout")]
         public IActionResult Lockout() => View();
 
-        [HttpPost]
+        [HttpPost("/logout")]
         public async Task<IActionResult> Logout(string? returnUrl = null)
         {
             await _authenticationService.LogoutAsync();
@@ -145,7 +145,7 @@ namespace PhimStrong.Areas.Identity.Controllers
             }
         }
 
-        [HttpGet]
+        [HttpGet("/confirm-email")]
         public async Task<IActionResult> ConfirmEmail(string userid, string token)
         {
             if (userid == null || token == null)
@@ -164,7 +164,7 @@ namespace PhimStrong.Areas.Identity.Controllers
             return View(model: "Xác thực Email thành công. Chúc xem phim vui vẻ nhé :>");
         }
 
-        [HttpGet]
+        [HttpGet("/access-denied")]
         public IActionResult AccessDenied(string text = null) => View(model: text);
 
         [HttpGet("/forgot-password")]
