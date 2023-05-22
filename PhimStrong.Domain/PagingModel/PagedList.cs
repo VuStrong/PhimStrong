@@ -49,7 +49,7 @@ namespace PhimStrong.Domain.PagingModel
 		{
 			return new
 			{
-				Data = this,
+				Results = this,
 				TotalItems = TotalItems,
 				TotalPage = TotalPage,
 				CurrentPage = CurrentPage,
