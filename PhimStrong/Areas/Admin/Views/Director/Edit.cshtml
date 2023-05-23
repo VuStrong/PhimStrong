@@ -40,7 +40,7 @@
         <button type="submit" class="btn btn-primary mt-4">Chỉnh sửa</button>
     </form>
 
-    <form id="delete-director" method="post" asp-action="Delete" asp-route-directorid="@Model.Id">
+    <form id="delete-director" method="post" asp-area="Admin" asp-action="Delete" asp-route-directorid="@Model.Id">
         <button id="delete-director-btn" type="submit" class="btn btn-danger mt-4">Xóa đạo diễn</button>
     </form>
 </div>

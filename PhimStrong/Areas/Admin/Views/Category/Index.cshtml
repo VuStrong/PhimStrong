@@ -9,8 +9,8 @@
     <div>
         <ul class="d-flex align-items-center" style="list-style: none">
             <li class="nav-item">
-                <form id="search-name-form" class="d-flex" method="get" asp-route-page="1">
-                    <input name="value" class="form-control me-sm-2" type="text" placeholder="Nhập tên">
+                <form id="search-name-form" class="d-flex" method="get" asp-area="Admin" asp-route-page="1">
+                    <input name="value" class="form-control me-sm-2" type="text" required placeholder="Nhập tên">
                     <button id="search-name-btn" class="btn btn-secondary my-2 my-sm-0" type="submit">Search</button>
                 </form>
             </li>

@@ -63,7 +63,7 @@ namespace PhimStrong.Areas.Admin.Controllers
             }
 
             TempData["success"] = $"Đã thêm quốc gia {model.Name}.";
-            return RedirectToAction("Index");
+            return RedirectToAction("Index", new { area = "Admin" });
         }
 
         [HttpGet]
@@ -100,7 +100,7 @@ namespace PhimStrong.Areas.Admin.Controllers
             }
 
             TempData["success"] = "Chỉnh sửa thành công";
-            return RedirectToAction("Index");
+            return RedirectToAction("Index", new { area = "Admin" });
         }
 
         [HttpPost]
@@ -113,11 +113,11 @@ namespace PhimStrong.Areas.Admin.Controllers
             catch (Exception e)
             {
                 TempData["status"] = "Lỗi, " + e.Message;
-                return RedirectToAction("Edit", new { countryid = countryid });
+                return RedirectToAction("Edit", new { area = "Admin", countryid = countryid });
             }
 
             TempData["success"] = "Xóa thành công";
-            return RedirectToAction("Index");
+            return RedirectToAction("Index", new { area = "Admin" });
         }
     }
 }

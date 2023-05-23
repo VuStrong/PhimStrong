@@ -41,7 +41,7 @@
         <button type="submit" class="btn btn-primary mt-4">Chỉnh sửa</button>
     </form>
 
-    <form id="delete-cast" method="post" asp-action="Delete" asp-route-castid="@Model.Id">
+    <form id="delete-cast" method="post" asp-area="Admin" asp-action="Delete" asp-route-castid="@Model.Id">
         <button id="delete-cast-btn" type="submit" class="btn btn-danger mt-4">Xóa diễn viên</button>
     </form>
 </div>

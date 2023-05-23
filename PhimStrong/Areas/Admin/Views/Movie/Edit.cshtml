@@ -131,7 +131,7 @@
             }
         </div>
         <button id="edit-movie-btn" class="btn btn-primary mt-4">Sửa</button>
-        <form id="delete-movie" method="post" asp-action="Delete" asp-route-movieid="@Model.Id">
+        <form id="delete-movie" method="post" asp-area="Admin" asp-action="Delete" asp-route-movieid="@Model.Id">
             <button id="delete-movie-btn" class="btn btn-danger mt-4">Xóa phim</button>
         </form>
     </div>

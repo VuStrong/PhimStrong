@@ -25,7 +25,7 @@
         <button type="submit" class="btn btn-primary mt-4">Chỉnh sửa</button>
     </form>
 
-    <form id="delete-cate" method="post" asp-action="Delete" asp-route-cateid="@Model.Id">
+    <form id="delete-cate" method="post" asp-area="Admin" asp-action="Delete" asp-route-cateid="@Model.Id">
         <button id="delete-cate-btn" type="submit" class="btn btn-danger mt-4">Xóa thể loại</button>
     </form>
 </div>
