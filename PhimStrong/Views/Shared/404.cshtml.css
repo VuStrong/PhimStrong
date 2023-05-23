@@ -5,6 +5,8 @@
 }
 
 img {
+    max-width: 687px;
+    width: 100%;
     display: block;
     margin-left: auto;
     margin-right: auto;
