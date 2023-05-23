@@ -38,44 +38,63 @@ namespace PhimStrong.Infrastructure.Identity
 			LoginResult loginResult = LoginResult.FromSignInResult(result);
 			if (!loginResult.Success && !loginResult.IsLockedOut)
 			{
-				var user = new User();
-				user.EmailConfirmed = true;
+				User? emailUser = null;
 
-				// get profile's picture from google account :
-				if (info.Principal.HasClaim(c => c.Type == "image"))
+                if (info.Principal.HasClaim(c => c.Type == ClaimTypes.Email))
+                {
+					emailUser = await _userManager.FindByEmailAsync(info.Principal.FindFirstValue(ClaimTypes.Email));
+                }
+
+				if (emailUser != null)
 				{
-					user.Avatar = info.Principal.FindFirstValue("image");
-				}
-
-				// get profile's name from google account :
-				if (info.Principal.HasClaim(c => c.Type == ClaimTypes.Name))
-				{
-					user.DisplayName = info.Principal.FindFirstValue(ClaimTypes.Name);
-					user.NormalizeDisplayName = user.DisplayName.RemoveMarks();
-				}
-
-				// get Email address from google account :
-				if (info.Principal.HasClaim(c => c.Type == ClaimTypes.Email))
-				{
-					user.Email = info.Principal.FindFirstValue(ClaimTypes.Email);
-					user.UserName = user.Email;
-				}
-
-				var result2 = await _userManager.CreateAsync(user);
-				if (result2.Succeeded)
-				{
-					result2 = await _userManager.AddLoginAsync(user, info);
-
-					if (result2.Succeeded)
+					if (!emailUser.EmailConfirmed)
 					{
-						await _signInManager.SignInAsync(user, isPersistent: false, info.LoginProvider);
+						string code = await _userManager.GenerateEmailConfirmationTokenAsync(emailUser);
+						await _userManager.ConfirmEmailAsync(emailUser, code);
+					}
+
+					if ((await _userManager.AddLoginAsync(emailUser, info)).Succeeded) {
+						await _signInManager.SignInAsync(emailUser, false);
 						loginResult = LoginResult.OK();
 					}
 				}
 				else
 				{
-					return LoginResult.Error("Lỗi, Email đã tồn tại !");
-				}
+                    var user = new User();
+                    user.EmailConfirmed = true;
+
+                    // get profile's picture from google account :
+                    if (info.Principal.HasClaim(c => c.Type == "image"))
+                    {
+                        user.Avatar = info.Principal.FindFirstValue("image");
+                    }
+
+                    // get profile's name from google account :
+                    if (info.Principal.HasClaim(c => c.Type == ClaimTypes.Name))
+                    {
+                        user.DisplayName = info.Principal.FindFirstValue(ClaimTypes.Name);
+                        user.NormalizeDisplayName = user.DisplayName.RemoveMarks();
+                    }
+
+                    // get Email address from google account :
+                    if (info.Principal.HasClaim(c => c.Type == ClaimTypes.Email))
+                    {
+                        user.Email = info.Principal.FindFirstValue(ClaimTypes.Email);
+                        user.UserName = user.Email;
+                    }
+
+                    var result2 = await _userManager.CreateAsync(user);
+                    if (result2.Succeeded)
+                    {
+                        result2 = await _userManager.AddLoginAsync(user, info);
+
+                        if (result2.Succeeded)
+                        {
+                            await _signInManager.SignInAsync(user, isPersistent: false, info.LoginProvider);
+                            loginResult = LoginResult.OK();
+                        }
+                    }
+                }
 			}
 
 			return loginResult;
