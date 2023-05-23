@@ -91,7 +91,7 @@ namespace PhimStrong.Areas.Admin.Controllers
 
             if (cast == null)
             {
-                return NotFound("Không tìm thấy diễn viên.");
+                return View("/Views/Shared/404.cshtml");
             }
 
             return View(_mapper.Map<EditCastViewModel>(cast));

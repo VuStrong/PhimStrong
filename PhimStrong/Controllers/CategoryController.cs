@@ -32,7 +32,7 @@ namespace PhimStrong.Controllers
 
 			if (category == null)
 			{
-				return NotFound("Không tìm thấy thể loại " + value);
+				return View("/Views/Shared/404.cshtml");
 			}
 
 			PagedList<Movie> movies = await _movieService.FindByCategoryIdAsync(

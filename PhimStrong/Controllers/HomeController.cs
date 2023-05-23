@@ -61,5 +61,16 @@ namespace PhimStrong.Controllers
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
-    }
+
+        [HttpGet("/home/handle-error/{code}")]
+		public IActionResult HandleError(int code)
+		{
+            if (code == 404)
+            {
+                return View("/Views/Shared/404.cshtml");
+            }
+
+			return View("/Views/Shared/Error.cshtml", new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+		}
+	}
 }

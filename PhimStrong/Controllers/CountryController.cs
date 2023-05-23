@@ -32,7 +32,7 @@ namespace PhimStrong.Controllers
 
 			if (country == null)
 			{
-				return NotFound("Không tìm thấy quốc gia " + value);
+				return View("/Views/Shared/404.cshtml");
 			}
 
 			PagedList<Movie> movies = await _movieService.FindByCountryIdAsync(

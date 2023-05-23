@@ -55,7 +55,7 @@ namespace PhimStrong.Areas.Admin.Controllers
 
 			if (user == null || myUser == null)
 			{
-				return NotFound("Không tìm thấy User :((");
+				return View("/Views/Shared/404.cshtml");
 			}
 
 			if (await _userService.IsInRoleAsync(user, RoleConstant.THUY_TO) && !await _userService.IsInRoleAsync(myUser, RoleConstant.THUY_TO))

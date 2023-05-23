@@ -84,6 +84,8 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
+app.UseStatusCodePagesWithReExecute("/home/handle-error/{0}");
+
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 

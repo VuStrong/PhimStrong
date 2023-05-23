@@ -32,7 +32,7 @@ namespace PhimStrong.Controllers
 
 			if (director == null)
 			{
-				return NotFound("Không tìm thấy đạo diễn " + value);
+				return View("/Views/Shared/404.cshtml");
 			}
 
 			PagedList<Movie> movies = await _movieService.FindByDirectorIdAsync(

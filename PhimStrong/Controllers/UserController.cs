@@ -29,7 +29,7 @@ namespace PhimStrong.Controllers
 
 			if (user == null)
 			{
-				return NotFound("Không tìm thấy User :((");
+				return View("/Views/Shared/404.cshtml");
 			}
 
 			return View(_mapper.Map<UserViewModel>(user));

@@ -90,7 +90,7 @@ namespace PhimStrong.Areas.Admin.Controllers
 
             if (director == null)
             {
-                return NotFound("Không tìm thấy đạo diễn.");
+                return View("/Views/Shared/404.cshtml");
             }
 
             return View(_mapper.Map<EditDirectorViewModel>(director));

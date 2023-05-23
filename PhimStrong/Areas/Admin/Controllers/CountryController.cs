@@ -73,7 +73,7 @@ namespace PhimStrong.Areas.Admin.Controllers
 
             if (country == null)
             {
-                return NotFound("Không tìm thấy quốc gia.");
+                return View("/Views/Shared/404.cshtml");
             }
 
             return View(_mapper.Map<EditCountryViewModel>(country));

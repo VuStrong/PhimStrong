@@ -73,7 +73,7 @@ namespace PhimStrong.Areas.Admin.Controllers
 
             if (category == null)
             {
-                return NotFound("Không tìm thấy thể loại.");
+                return View("/Views/Shared/404.cshtml");
             }
 
             return View(_mapper.Map<EditCategoryViewModel>(category));

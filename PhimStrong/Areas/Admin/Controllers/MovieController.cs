@@ -106,7 +106,7 @@ namespace PhimStrong.Areas.Admin.Controllers
 
             if (movie == null)
             {
-                return NotFound("Không tìm thấy phim.");
+                return View("/Views/Shared/404.cshtml");
             }
 
             var countries = await _countryService.GetAllAsync();

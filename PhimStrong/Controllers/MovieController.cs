@@ -153,10 +153,10 @@ namespace PhimStrong.Controllers
 
 			if (movie == null)
 			{
-				return NotFound("Không tìm thấy phim :((");
-			}
+                return View("/Views/Shared/404.cshtml");
+            }
 
-			return View(_mapper.Map<MovieViewModel>(movie));
+            return View(_mapper.Map<MovieViewModel>(movie));
 		}
 
 		[HttpGet("get-related-movies")]
@@ -214,10 +214,10 @@ namespace PhimStrong.Controllers
 
 			if (movie == null)
 			{
-				return NotFound();
-			}
+                return View("/Views/Shared/404.cshtml");
+            }
 
-			Video? video = movie.Videos?.FirstOrDefault(v => v.Episode == episode);
+            Video? video = movie.Videos?.FirstOrDefault(v => v.Episode == episode);
 
 			return View(new WatchMovieViewModel(movie.Id, movie.TranslateName, movie.Type)
 			{
