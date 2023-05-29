@@ -145,7 +145,7 @@
 		{
 			foreach (var tag in Model.Tags)
 			{
-				<a asp-area="" asp-controller="Movie" asp-action="GetMovieByTag" asp-route-value="@tag.TagName" class="d-inline my-link my-link-gray">@tag.TagName</a>
+				<a asp-area="" asp-controller="Movie" asp-action="GetMovieByTag" asp-route-tag="@tag.TagName" class="d-inline my-link my-link-gray">@tag.TagName</a>
 				<span style="color: gray">, </span>
 			}
 		}

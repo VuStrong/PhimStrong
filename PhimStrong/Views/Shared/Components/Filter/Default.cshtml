@@ -1,0 +1,18 @@
+﻿@model FilterViewModel
+
+<form class="filter-form" method="get" asp-area="" asp-controller="Movie" asp-action="AdvancedSearch">
+	<select name="categories" asp-items="Model.Categories" multiple="multiple" class="m-1 select" placeholder="Thể loại"></select>
+    <select name="country" asp-items="Model.Countries" class="mx-1 select">
+        <option value="">Quốc gia</option>
+    </select>
+    <select name="year" asp-items="Model.Years" class="m-1 select">
+        <option value="">Năm phát hành</option>
+    </select>
+    <select name="orderBy" asp-items="Model.OrderByOptions" class="m-1 select">
+        <option value="">Sắp xếp</option>
+    </select>
+    <select name="type" asp-items="Model.Types" class="m-1 select">
+        <option value="">Loại</option>
+    </select>
+	<button type="submit" class="btn btn-success m-1">Lọc</button>
+</form>

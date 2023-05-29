@@ -1,9 +1,4 @@
-﻿@{
-    UserViewModel? user = (UserViewModel?)ViewData["User"];
-    List<CategoryViewModel> categories = (List<CategoryViewModel>?)ViewData["Categories"] ?? new List<CategoryViewModel>();
-    List<CountryViewModel> countries = (List<CountryViewModel>?)ViewData["Countries"] ?? new List<CountryViewModel>();
-    List<int> years = (List<int>?)ViewData["Years"] ?? new List<int>();
-}
+﻿@model HeaderNavBarViewModel
 
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark p-0">
     <div class="container-fluid">
@@ -25,7 +20,7 @@
                     <a class="nav-link dropdown-toggle text-uppercase" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">thể loại</a>
                     <div class="dropdown-menu row" style="width:400px">
                         <div class="row">
-                            @foreach (var category in categories)
+                            @foreach (var category in Model.Categories)
                             {
                                 <a class="dropdown-item" style="width:50%;" asp-area="" asp-controller="Category" asp-action="Index" asp-route-value="@category.Name">@category.Name</a>
                             }
@@ -36,7 +31,7 @@
                     <a class="nav-link dropdown-toggle text-uppercase" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">quốc gia</a>
                     <div class="dropdown-menu row" style="width:400px">
                         <div class="row">
-                            @foreach (var country in countries)
+                            @foreach (var country in Model.Countries)
                             {
                                 <a class="dropdown-item" style="width:50%;" asp-area="" asp-controller="Country" asp-action="Index" asp-route-value="@country.Name">@country.Name</a>
                             }
@@ -47,11 +42,11 @@
                     <a class="nav-link dropdown-toggle text-uppercase" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">năm phát hành</a>
                     <div class="dropdown-menu row" style="width:400px">
                         <div class="row">
-                            @if(years.Any())
+                            @if(Model.Years.Any())
                             {
-                                <a class="dropdown-item" style="width:50%;" asp-area="" asp-controller="Movie" asp-action="GetMovieBeforeYear" asp-route-year="@(years[0] - 1)">Trước @(years[0] - 1)</a>
+                                <a class="dropdown-item" style="width:50%;" asp-area="" asp-controller="Movie" asp-action="GetMovieBeforeYear" asp-route-year="@(Model.Years[0] - 1)">Trước @(Model.Years[0] - 1)</a>
                             }
-                            @foreach (int year in years)
+                            @foreach (int year in Model.Years)
                             {
                                 <a class="dropdown-item" style="width:50%;" asp-area="" asp-controller="Movie" asp-action="GetMovieByReleaseYear" asp-route-year="@year">@year</a>
                             }
@@ -61,7 +56,7 @@
                 <li class="nav-item">
                     <a class="nav-link text-uppercase" asp-area="" asp-controller="Movie" asp-action="GetTrailer">trailer</a>
                 </li>
-                @if (user != null && (user.RoleName == RoleConstant.ADMIN || user.RoleName == RoleConstant.THUY_TO))
+                @if (Model.User != null && (Model.User.RoleName == RoleConstant.ADMIN || Model.User.RoleName == RoleConstant.THUY_TO))
                 {
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle text-uppercase" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">quản lý</a>
@@ -76,20 +71,20 @@
                     </li>
                 }
             </ul>
-            <form id="search-form" class="d-flex" method="get" action="/movie/">
-                <input class="form-control me-sm-2" type="search" placeholder="Tìm phim...">
+            <form id="search-form" class="d-flex" method="get" action="/movie/search">
+                <input name="q" class="form-control me-sm-2" type="search" required placeholder="Tìm phim...">
                 <button class="btn btn-secondary my-2 my-sm-0" type="submit">Tìm</button>
             </form>
             
             <ul class="navbar-nav ms-md-3">
-                @if (user != null)
+                @if (Model.User != null)
                 {
                     <li class="nav-item dropdown mt-3 mt-lg-0">
                         <a class="nav-link dropdown-toggle"
                             data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
-                            <img src="@(user != null ? user.Avatar ?? "/src/img/UserAvatars/default_avatar.png" : "/src/img/UserAvatars/default_avatar.png")"
+                            <img src="@(Model.User.Avatar ?? "/src/img/UserAvatars/default_avatar.png")"
                              class="avatar">
-                            <span class="text-truncate d-inline-flex" style="max-width: 100px">@(user != null ? user.DisplayName : "null")</span>
+                            <span class="text-truncate d-inline-flex" style="max-width: 100px">@(Model.User.DisplayName)</span>
                         </a>
                         <div class="dropdown-menu dropdown-menu-end">
                             <a class="dropdown-item" asp-area="Identity" asp-controller="Account" asp-action="Index">Profile</a>

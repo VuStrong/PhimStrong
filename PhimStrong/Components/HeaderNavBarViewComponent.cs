@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using PhimStrong.Application.Interfaces;
+using PhimStrong.Models;
 using PhimStrong.Models.Category;
 using PhimStrong.Models.Country;
 using PhimStrong.Models.User;
@@ -28,13 +29,13 @@ namespace PhimStrong.Components
 
         public async Task<IViewComponentResult> InvokeAsync()
         {
-            ViewData["Categories"] = _mapper.Map<List<CategoryViewModel>>(
+            List<CategoryViewModel> categoryViewModels = _mapper.Map<List<CategoryViewModel>>(
                 (await _categoryService.GetAllAsync()).ToList());
-            
-            ViewData["Countries"] = _mapper.Map<List<CountryViewModel>>(
+
+			List<CountryViewModel> countryViewModels = _mapper.Map<List<CountryViewModel>>(
                 (await _countryService.GetAllAsync()).ToList());
 
-            ViewData["User"] = _mapper.Map<UserViewModel>(
+            UserViewModel userViewModel = _mapper.Map<UserViewModel>(
                 await _userService.GetByClaims((System.Security.Claims.ClaimsPrincipal)User));
 
             List<int> years = new();
@@ -44,9 +45,14 @@ namespace PhimStrong.Components
             {
                 years.Add(i);
             }
-            ViewData["Years"] = years;
             
-            return View();
+            return View(new HeaderNavBarViewModel
+            {
+                User = userViewModel,
+                Categories = categoryViewModels,
+                Countries = countryViewModels,
+                Years = years
+            });
         }
     }
 }

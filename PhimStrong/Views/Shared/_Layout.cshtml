@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/PhimStrong.styles.css" asp-append-version="true" />
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" />
+    @await RenderSectionAsync("Css", required: false)
 </head>
 <body>
     <!-- Facebook comment -->

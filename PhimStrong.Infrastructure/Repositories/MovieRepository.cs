@@ -78,11 +78,23 @@ namespace PhimStrong.Infrastructure.Repositories
 				}
 			}
 
-			if (movieParameter.Tag != null)
+			if (!String.IsNullOrEmpty(movieParameter.Tag))
 			{
 				movieParameter.Tag = movieParameter.Tag.ToLower().Trim();
 				movies = movies.Where(m => m.Tags.Any(t => t.TagName.ToLower() == movieParameter.Tag));
 			}
+
+            if (!String.IsNullOrEmpty(movieParameter.Country))
+            {
+                movieParameter.Country = movieParameter.Country.ToLower().Trim();
+                movies = movies.Where(m => m.Country.Id == movieParameter.Country);
+            }
+
+            if (movieParameter.Categories != null && movieParameter.Categories.Length > 0)
+            {
+				movies = movies.Include(m => m.Categories)
+							   .Where(m => m.Categories.Select(c => c.Id).Where(c => movieParameter.Categories.Contains(c)).Count() == movieParameter.Categories.Length);
+            }
 
 			if (!String.IsNullOrEmpty(movieParameter.OrderBy))
 			{

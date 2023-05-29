@@ -8,7 +8,9 @@
 		public string? Status { get; set; }
 		public string? Tag { get; set; }
 		public string? OrderBy { get; set; }
-		public int Year { get; set; }
+        public string? Country { get; set; }
+        public string[]? Categories { get; set; }
+        public int Year { get; set; }
 		public int BeforeYear { get; set; }
 
 		public MovieParameter() { }

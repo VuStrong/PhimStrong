@@ -253,6 +253,13 @@ body {
     background-color: black;
 }
 
+.placeholder {
+    opacity: 1;
+    cursor: pointer;
+    color: #444 !important;
+    background-color: rgba(1,1,1,0);
+}
+
 /* Comment */
 .cmt-user-name strong:hover {
     text-decoration: underline !important;

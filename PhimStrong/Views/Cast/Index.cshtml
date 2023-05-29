@@ -23,7 +23,11 @@ else
 	</div>
 }
 
-<h2 class="text-success mt-5">Phim : </h2>
+<h2 class="text-success mt-5 mb-2">Phim : </h2>
+<div class="d-flex align-items-center flex-wrap">
+	@await Component.InvokeAsync("Filter")
+</div>
+
 <partial name="_MovieContainerPartial" for="@Model.Movies"></partial>
 
 @{
@@ -44,3 +48,42 @@ else
 }
 
 <partial name="/Views/Shared/_PagingPartial.cshtml" for="@pagingModel"></partial>
+
+@section Css{
+	<link rel="stylesheet" href="https://unpkg.com/multiple-select@1.5.2/dist/multiple-select.min.css">
+}
+
+@section Scripts{
+	<script src="https://unpkg.com/multiple-select@1.5.2/dist/multiple-select.min.js"></script>
+	<script type="text/javascript">
+		$(function () {
+			$('.select').multipleSelect({
+				selectAll: false,
+				keepOpen: false,
+				isOpen: false
+			})
+
+			$('.filter-form').submit(function (e) {
+				e.preventDefault();
+
+				if (!$(this).find('[name=country]').val().trim()) {
+					$(this).find('[name=country]').removeAttr('name');
+				};
+
+				if (!$(this).find('[name=year]').val().trim()) {
+					$(this).find('[name=year]').removeAttr('name');
+				};
+
+				if (!$(this).find('[name=orderBy]').val().trim()) {
+					$(this).find('[name=orderBy]').removeAttr('name');
+				};
+
+				if (!$(this).find('[name=type]').val().trim()) {
+					$(this).find('[name=type]').removeAttr('name');
+				};
+
+				this.submit();
+			})
+		})
+	</script>
+}
