@@ -1,0 +1,28 @@
+﻿<div id="modal-director" class="modal" tabindex="-1" role="dialog" style="display:none; background-color:rgba(0,0,0,0.5)">
+    <div class="modal-director-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title text-success">Chọn các đạo diễn</h5>
+                <button onclick="hideModalDirector()" type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <p class="text-success">
+                Các đạo diễn đã chọn :
+                <strong id="directors-text"></strong>
+            </p>
+            <div class="d-flex justify-content-center">
+                <input id="search-director" type="search" placeholder="nhập tên để tìm.." />
+            </div>
+            <div class="modal-body overflow-scroll" style="height:400px">
+                <table class="table table-hover">
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button id="confirm-modal-director-btn" type="button" class="btn btn-primary">Close</button>
+            </div>
+        </div>
+    </div>
+</div>

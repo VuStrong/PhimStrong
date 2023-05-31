@@ -11,6 +11,9 @@
 <h2 class="text-success">@ViewData["Title"]</h2>
 
 <partial name="_StatusMessage" for="@TempData["status"]" />
+<partial name="_ModalCast"/>
+<partial name="_ModalCategory" />
+<partial name="_ModalDirector" />
 
 <div class="mt-4">
     <div id="create-movie-form">
@@ -36,7 +39,7 @@
         </div>
         <div class="form-group mt-3">
             <label class="text-success" asp-for="Rating">Điểm Rating</label>
-            <input id="movie-rating" type="text" asp-for="Rating" class="form-control" />
+            <input id="movie-rating" type="number" asp-for="Rating" class="form-control" />
             <span id="movie-rating-valid" class="text-danger"></span>
         </div>
         <div class="form-group mt-3">
@@ -97,8 +100,11 @@
 
 @section Scripts {
     <script src="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
-    @await Component.InvokeAsync("ModalCast")
-    @await Component.InvokeAsync("ModalCategory")
-    @await Component.InvokeAsync("ModalDirector")
+    <script type="text/javascript">
+        var movieid = '';
+    </script>
+    <script src="/js/Admin/Movie/ModalCast.js"></script>
+    <script src="/js/Admin/Movie/ModalCategory.js"></script>
+    <script src="/js/Admin/Movie/ModalDirector.js"></script>
     <script src="/js/Admin/Movie/MovieCreate.js"></script>
 }

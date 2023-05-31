@@ -30,56 +30,17 @@ namespace PhimStrong.Areas.Admin.Models.Movie
         public string? Trailer { get; set; }
 
 		public string[]? Categories { get; set; }
-        public string? CategoryToString
-        {
-            get
-            {
-                if (this.Categories != null)
-                {
-                    return String.Join(",", this.Categories);
-                }
-                else
-                {
-                    return null;
-                }
-            }
-        }
+        public string? CategoryToString { get; set; }
 
         public string? Country { get; set; }
 
 		[DisplayName("Đạo diễn")]
 		public string[]? Directors { get; set; }
-        public string? DirectorToString
-        {
-            get
-            {
-                if (this.Directors != null)
-                {
-                    return String.Join(",", this.Directors);
-                }
-                else
-                {
-                    return null;
-                }
-            }
-        }
+        public string? DirectorToString { get; set; }
 
         [DisplayName("Diễn viên")]
 		public string[]? Casts { get; set; }
-        public string? CastToString
-        {
-            get
-            {
-                if (this.Casts != null)
-                {
-                    return String.Join(",", this.Casts);
-                }
-                else
-                {
-                    return null;
-                }
-            }
-        }
+        public string? CastToString { get; set; }
 
         public float Rating { get; set; }
 
@@ -136,43 +97,28 @@ namespace PhimStrong.Areas.Admin.Models.Movie
 
             if (movie.Categories != null)
             {
-                List<string> cateList = new();
+                model.Categories = movie.Categories.Select(c => c.Id).ToArray();
 
-                movie.Categories.ForEach((c) =>
-                {
-                    cateList.Add(c.Name);
-                });
-
-                model.Categories = cateList.ToArray();
+                model.CategoryToString = String.Join(", ", movie.Categories.Select(c => c.Name));
             }
 
             if (movie.Casts != null)
             {
-                List<string> castList = new();
+                model.Casts = movie.Casts.Select(c => c.Id).ToArray();
 
-                movie.Casts.ForEach((c) =>
-                {
-                    castList.Add(c.Name);
-                });
-
-                model.Casts = castList.ToArray();
+                model.CastToString = String.Join(", ", movie.Casts.Select(c => c.Name));
             }
 
             if (movie.Directors != null)
             {
-                List<string> directorList = new();
+                model.Directors = movie.Directors.Select(d => d.Id).ToArray();
 
-                movie.Directors.ForEach((d) =>
-                {
-                    directorList.Add(d.Name);
-                });
-
-                model.Directors = directorList.ToArray();
+                model.DirectorToString = String.Join(", ", movie.Directors.Select(d => d.Name));
             }
 
             if (movie.Country != null)
             {
-                model.Country = movie.Country.Name;
+                model.Country = movie.Country.Id;
             }
 
             if (movie.Videos != null)

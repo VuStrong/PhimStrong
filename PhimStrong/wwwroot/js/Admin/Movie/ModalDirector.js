@@ -1,47 +1,56 @@
-﻿var jsDirectorList = [];
-var jsDirectorSearchList = [];
-var jsSelectedDirector = [];
+﻿var jsSelectedDirector = [];
+var directorController;
 
-$('.hidden-director p').each(function (e) {
-    jsSelectedDirector.push($(this).text());
-});
+$(function () {
+    if (movieid) {
+        $.get(`/api/movies/${movieid}/directors`, function (data, status) {
+            if (status === 'success') {
+                data.forEach(d => {
+                    jsSelectedDirector.push({
+                        id: d.id,
+                        name: d.name
+                    });
+                })
 
-// push director name to director array
-$('.director-name').each(function (i, cast) {
-    jsDirectorList.push(cast.innerText);
-});
-
-$('#search-director').on('keyup', function () {
-    let content = $(this).val();
-
-    if (content) {
-        jsDirectorList.forEach(function (d) {
-            if (d.toLowerCase().includes(content.toLowerCase())) {
-                jsDirectorSearchList.push(d);
+                $('#directors-text').text(
+                    jsSelectedDirector.map(d => d.name).join(', ')
+                );
             }
+
+            fetchDirectors();
         });
     } else {
-        jsDirectorSearchList = jsDirectorList;
+        fetchDirectors();
     }
+});
+
+async function fetchDirectors(name, signal) {
+    const url = name ? `/api/directors?q=${name}&size=100` : '/api/directors?size=100';
+    const res = await fetch(url, { signal });
+
+    if (!res.ok) return;
+
+    const data = await res.json();
+    const directors = data.results;
 
     let htmlContent = "";
-    if (jsDirectorSearchList) {
-        jsDirectorSearchList.forEach(function (e) {
+    if (directors.length > 0) {
+        directors.forEach(function (director) {
             let isAdded = 'Thêm';
             let addedBtn = 'btn-info';
 
-            if (jsSelectedDirector.includes(e)) {
+            if (jsSelectedDirector.some(d => d.id == director.id)) {
                 isAdded = 'Đã thêm';
                 addedBtn = 'btn-success';
             }
 
             htmlContent = htmlContent.concat(
                 `<tr>
-                        <th class="director-name" scope="row">${e}</th>
-                        <td>
-                            <button name="${e}" class="btn ${addedBtn} add-director-btn">${isAdded}</button>
-                        </td>
-                    </tr>`
+                    <th class="director-name" scope="row">${director.name}</th>
+                    <td>
+                        <button directorid="${director.id}" name="${director.name}" class="btn ${addedBtn} add-director-btn">${isAdded}</button>
+                    </td>
+                </tr>`
             );
         });
     }
@@ -50,37 +59,44 @@ $('#search-director').on('keyup', function () {
     $('.add-director-btn').click(function () {
         onClickAddDirectorBtn(this);
     });
+}
 
-    htmlContent = "";
-    jsDirectorSearchList = [];
-});
+$('#search-director').on('keyup', function () {
+    let content = $(this).val();
 
-$('.add-director-btn').click(function () {
-    onClickAddDirectorBtn(this);
+    if (directorController) directorController.abort();
+
+    directorController = new AbortController();
+    const signal = directorController.signal;
+
+    fetchDirectors(content, signal);
 });
 
 function onClickAddDirectorBtn(btn) {
     let btnName = $(btn).attr('name');
-    let ind = jsSelectedDirector.indexOf(btnName);
+    let directorid = $(btn).attr('directorid');
 
-    if (ind > -1) {
-        jsSelectedDirector.splice(ind, 1);
+    if (jsSelectedDirector.some(d => d.id === directorid)) {
+        jsSelectedDirector = jsSelectedDirector.filter(d => d.id !== directorid);
+
         $(btn).removeClass('btn-success').addClass('btn-info').text('Thêm');
     } else {
-        jsSelectedDirector.push(btnName);
+        jsSelectedDirector.push({
+            id: directorid,
+            name: btnName
+        });
+
         $(btn).removeClass('btn-info').addClass('btn-success').text('Đã thêm');
     }
 
     $('#directors-text').text(
-        jsSelectedDirector.join(',')
+        jsSelectedDirector.map(d => d.name).join(', ')
     );
 }
 
-function modalDirector(callback) {
-    $('#confirm-modal-director-btn').click(function () {
-        callback();
-    });
-}
+$('#confirm-modal-director-btn').click(function () {
+    hideModalDirector();
+});
 
 $('#modal-director').click(function () {
     hideModalDirector();
@@ -98,4 +114,7 @@ function showModalDirector() {
 // hide modal :
 function hideModalDirector() {
     $('#modal-director').hide();
+
+    let temp = jsSelectedDirector.map(d => d.name).join(', ');
+    $('#select-director').val(temp);
 }

@@ -1,51 +1,53 @@
-﻿var jsCateList = [];
-var jsCateSearchList = [];
-var jsSelectedCate = [];
+﻿var jsSelectedCate = [];
 
-// push selected category from hidden to array
-$('.hidden-category p').each(function (e) {
-    jsSelectedCate.push($(this).text());
-});
+$(function () {
+    if (movieid) {
+        $.get(`/api/movies/${movieid}/categories`, function (data, status) {
+            if (status === 'success') {
+                data.forEach(d => {
+                    jsSelectedCate.push({
+                        id: d.id,
+                        name: d.name
+                    });
+                })
 
-// push category name to cate array
-$('.category-name').each(function (i, cate) {
-    jsCateList.push(cate.innerText);
-});
-
-// event khi search
-$('#search-category').on('keyup', function () {
-    let content = $(this).val();
-
-    if (content) {
-        // push ptử khớp kết quả vào array
-        jsCateList.forEach(function (c) {
-            if (c.toLowerCase().includes(content.toLowerCase())) {
-                jsCateSearchList.push(c);
+                $('#categories-text').text(
+                    jsSelectedCate.map(c => c.name).join(', ')
+                );
             }
+
+            fetchCategories();
         });
     } else {
-        jsCateSearchList = jsCateList;
+        fetchCategories();
     }
+});
 
-    // tạo html chứa các ptử khớp vs kết quả search
+async function fetchCategories() {
+    const res = await fetch('/api/categories');
+
+    if (!res.ok) return;
+
+    const categories = await res.json();
+
     let htmlContent = "";
-    if (jsCateSearchList) {
-        jsCateSearchList.forEach(function (e) {
+    if (categories.length > 0) {
+        categories.forEach(function (category) {
             let isAdded = 'Thêm';
             let addedBtn = 'btn-info';
 
-            if (jsSelectedCate.includes(e)) {
+            if (jsSelectedCate.some(c => c.id == category.id)) {
                 isAdded = 'Đã thêm';
                 addedBtn = 'btn-success';
             }
 
             htmlContent = htmlContent.concat(
                 `<tr>
-                        <th class="category-name" scope="row">${e}</th>
-                        <td>
-                            <button name="${e}" class="btn ${addedBtn} add-cate-btn">${isAdded}</button>
-                        </td>
-                    </tr>`
+                    <th class="cate-name" scope="row">${category.name}</th>
+                    <td>
+                        <button cateid="${category.id}" name="${category.name}" class="btn ${addedBtn} add-cate-btn">${isAdded}</button>
+                    </td>
+                </tr>`
             );
         });
     }
@@ -54,40 +56,34 @@ $('#search-category').on('keyup', function () {
     $('.add-cate-btn').click(function () {
         onClickAddCateBtn(this);
     });
-
-    // reset
-    htmlContent = "";
-    jsCateSearchList = [];
-});
-
-$('.add-cate-btn').click(function () {
-    onClickAddCateBtn(this);
-});
+}
 
 // hàm push selected category vào array
 function onClickAddCateBtn(btn) {
     let btnName = $(btn).attr('name');
-    let ind = jsSelectedCate.indexOf(btnName);
+    let cateid = $(btn).attr('cateid');
 
-    if (ind > -1) {
-        jsSelectedCate.splice(ind, 1);
+    if (jsSelectedCate.some(c => c.id === cateid)) {
+        jsSelectedCate = jsSelectedCate.filter(c => c.id !== cateid);
+
         $(btn).removeClass('btn-success').addClass('btn-info').text('Thêm');
     } else {
-        jsSelectedCate.push(btnName);
+        jsSelectedCate.push({
+            id: cateid,
+            name: btnName
+        });
+
         $(btn).removeClass('btn-info').addClass('btn-success').text('Đã thêm');
     }
 
     $('#categories-text').text(
-        jsSelectedCate.join(',')
+        jsSelectedCate.map(c => c.name).join(', ')
     );
 }
 
-// tạo event khi chọn confirm
-function modalCategory(callback) {
-    $('#confirm-modal-category-btn').click(function () {
-        callback();
-    });
-}
+$('#confirm-modal-category-btn').click(function () {
+    hideModalCategory();
+});
 
 $('#modal-category').click(function () {
     hideModalCategory();
@@ -105,4 +101,7 @@ function showModalCategory() {
 // hide modal :
 function hideModalCategory() {
     $('#modal-category').hide();
+
+    let temp = jsSelectedCate.map(c => c.name).join(', ');
+    $('#select-category').val(temp);
 }

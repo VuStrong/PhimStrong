@@ -1,27 +1,4 @@
-﻿modalCategory(function () {
-    hideModalCategory();
-
-    let temp = jsSelectedCate.join(',');
-    $('#select-category').val(temp);
-});
-
-// Tạo event khi ấn nút confirm modal của cast modal
-modalCast(function () {
-    hideModalCast();
-
-    let temp = jsSelectedCast.join(',');
-    $('#select-cast').val(temp);
-});
-
-// Tạo event khi ấn nút confirm modal của director modal
-modalDirector(function () {
-    hideModalDirector();
-
-    let temp = jsSelectedDirector.join(',');
-    $('#select-director').val(temp);
-});
-
-$('#movie-name').on('change', function () {
+﻿$('#movie-name').on('change', function () {
     $('#movie-name-valid').text('');
 });
 
@@ -121,13 +98,6 @@ $('#create-movie-btn').click(function () {
         error = "error";
     }
 
-    // Check rating valid
-    var ratingPattern = /^\d+,?\d*$/;
-    if (!ratingPattern.test($('#movie-rating').val())) {
-        $('#movie-rating-valid').text('Điểm rating không phù hợp !');
-        error = "error";
-    }
-
     // check .png, .jpg image
     var files = $('#movie-img').prop("files");
     if (files.length > 0) {
@@ -171,19 +141,19 @@ $('#create-movie-btn').click(function () {
 
     if (jsSelectedCate.length > 0) {
         jsSelectedCate.forEach(c => {
-            formData.append("Categories[]", c);
+            formData.append("Categories[]", c.id);
         })
     }
 
     if (jsSelectedCast.length > 0) {
         jsSelectedCast.forEach(c => {
-            formData.append("Casts[]", c);
+            formData.append("Casts[]", c.id);
         })
     }
 
     if (jsSelectedDirector.length > 0) {
         jsSelectedDirector.forEach(d => {
-            formData.append("Directors[]", d);
+            formData.append("Directors[]", d.id);
         })
     }
 

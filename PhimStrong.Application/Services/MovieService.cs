@@ -46,7 +46,7 @@ namespace PhimStrong.Application.Services
             {
                 foreach (string cate in categories)
                 {
-                    Category? category = await _unitOfWork.CategoryRepository.FirstOrDefaultAsync(c => c.Name == cate);
+                    Category? category = await _unitOfWork.CategoryRepository.FirstOrDefaultAsync(c => c.Id == cate);
 
                     if (category == null) continue;
 
@@ -61,7 +61,7 @@ namespace PhimStrong.Application.Services
                 foreach (string castName in casts)
                 {
 
-                    Cast? cast = await _unitOfWork.CastRepository.FirstOrDefaultAsync(c => c.Name == castName);
+                    Cast? cast = await _unitOfWork.CastRepository.FirstOrDefaultAsync(c => c.Id == castName);
 
                     if (cast == null) continue;
 
@@ -76,7 +76,7 @@ namespace PhimStrong.Application.Services
                 foreach (string directorName in directors)
                 {
 
-                    Director? director = await _unitOfWork.DirectorRepository.FirstOrDefaultAsync(d => d.Name == directorName);
+                    Director? director = await _unitOfWork.DirectorRepository.FirstOrDefaultAsync(d => d.Id == directorName);
 
                     if (director == null) continue;
 
@@ -88,7 +88,7 @@ namespace PhimStrong.Application.Services
 
             if (!String.IsNullOrEmpty(country))
             {
-                Country? countryToAdd = await _unitOfWork.CountryRepository.FirstOrDefaultAsync(c => c.Name == country);
+                Country? countryToAdd = await _unitOfWork.CountryRepository.FirstOrDefaultAsync(c => c.Id == country);
 
                 if (countryToAdd != null)
                 {
@@ -211,7 +211,7 @@ namespace PhimStrong.Application.Services
             {
                 if (!String.IsNullOrEmpty(country) && country != movieToEdit.Country.Name)
                 {
-                    Country? countryToEdit = await _unitOfWork.CountryRepository.FirstOrDefaultAsync(c => c.Name == country);
+                    Country? countryToEdit = await _unitOfWork.CountryRepository.FirstOrDefaultAsync(c => c.Id == country);
 
                     if (countryToEdit != null)
                     {
@@ -223,7 +223,7 @@ namespace PhimStrong.Application.Services
             {
                 if (!String.IsNullOrEmpty(country))
                 {
-                    Country? countryToEdit = await _unitOfWork.CountryRepository.FirstOrDefaultAsync(c => c.Name == country);
+                    Country? countryToEdit = await _unitOfWork.CountryRepository.FirstOrDefaultAsync(c => c.Id == country);
 
                     if (countryToEdit != null)
                     {
@@ -242,7 +242,7 @@ namespace PhimStrong.Application.Services
 
                 foreach (string cate in categories)
                 {
-                    Category? category = await _unitOfWork.CategoryRepository.FirstOrDefaultAsync(c => c.Name == cate);
+                    Category? category = await _unitOfWork.CategoryRepository.FirstOrDefaultAsync(c => c.Id == cate);
 
                     if (category == null) continue;
 
@@ -262,7 +262,7 @@ namespace PhimStrong.Application.Services
 
                 foreach (string castName in casts)
                 {
-                    Cast? cast = await _unitOfWork.CastRepository.FirstOrDefaultAsync(c => c.Name == castName);
+                    Cast? cast = await _unitOfWork.CastRepository.FirstOrDefaultAsync(c => c.Id == castName);
 
                     if (cast == null) continue;
 
@@ -282,7 +282,7 @@ namespace PhimStrong.Application.Services
 
                 foreach (string directorName in directors)
                 {
-                    Director? director = await _unitOfWork.DirectorRepository.FirstOrDefaultAsync(d => d.Name == directorName);
+                    Director? director = await _unitOfWork.DirectorRepository.FirstOrDefaultAsync(d => d.Id == directorName);
 
                     if (director == null) continue;
 

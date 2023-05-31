@@ -54,7 +54,7 @@ namespace PhimStrong.Areas.Admin.Controllers
         public async Task<IActionResult> Create()
         {
             var countries = await _countryService.GetAllAsync();
-            ViewData["countries"] = new SelectList(countries, "Name", "Name");
+            ViewData["countries"] = new SelectList(countries, "Id", "Name");
 
             return View(new CreateMovieViewModel());
         }
@@ -110,7 +110,7 @@ namespace PhimStrong.Areas.Admin.Controllers
             }
 
             var countries = await _countryService.GetAllAsync();
-            ViewData["countries"] = new SelectList(countries, "Name", "Name");
+            ViewData["countries"] = new SelectList(countries, "Id", "Name");
 
             return View(EditMovieViewModel.FromMovie(movie));
         }

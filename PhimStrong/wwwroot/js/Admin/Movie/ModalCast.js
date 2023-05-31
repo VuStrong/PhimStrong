@@ -1,45 +1,54 @@
-﻿var jsCastList = [];
-var jsCastSearchList = [];
-var jsSelectedCast = [];
+﻿var jsSelectedCast = [];
+var castController;
 
-$('.hidden-cast p').each(function (e) {
-    jsSelectedCast.push($(this).text());
-});
+$(function () {
+    if (movieid) {
+        $.get(`/api/movies/${movieid}/casts`, function (data, status) {
+            if (status === 'success') {
+                data.forEach(d => {
+                    jsSelectedCast.push({
+                        id: d.id,
+                        name: d.name
+                    });
+                })
 
-// push cast name to cast array
-$('.cast-name').each(function (i, cast) {
-    jsCastList.push(cast.innerText);
-});
-
-$('#search-cast').on('keyup', function () {
-    let content = $(this).val();
-
-    if (content) {
-        jsCastList.forEach(function (c) {
-            if (c.toLowerCase().includes(content.toLowerCase())) {
-                jsCastSearchList.push(c);
+                $('#casts-text').text(
+                    jsSelectedCast.map(c => c.name).join(', ')
+                );
             }
+
+            fetchCasts();
         });
     } else {
-        jsCastSearchList = jsCastList;
+        fetchCasts();
     }
+});
+
+async function fetchCasts(name, signal) {
+    const url = name ? `/api/casts?q=${name}&size=100` : '/api/casts?size=100';
+    const res = await fetch(url, { signal });
+
+    if (!res.ok) return;
+
+    const data = await res.json();
+    const casts = data.results;
 
     let htmlContent = "";
-    if (jsCastSearchList) {
-        jsCastSearchList.forEach(function (e) {
+    if (casts.length > 0) {
+        casts.forEach(function (cast) {
             let isAdded = 'Thêm';
             let addedBtn = 'btn-info';
 
-            if (jsSelectedCast.includes(e)) {
+            if (jsSelectedCast.some(c => c.id == cast.id)) {
                 isAdded = 'Đã thêm';
                 addedBtn = 'btn-success';
             }
 
             htmlContent = htmlContent.concat(
                 `<tr>
-                    <th class="cast-name" scope="row">${e}</th>
+                    <th class="cast-name" scope="row">${cast.name}</th>
                     <td>
-                        <button name="${e}" class="btn ${addedBtn} add-cast-btn">${isAdded}</button>
+                        <button castid="${cast.id}" name="${cast.name}" class="btn ${addedBtn} add-cast-btn">${isAdded}</button>
                     </td>
                 </tr>`
             );
@@ -50,37 +59,44 @@ $('#search-cast').on('keyup', function () {
     $('.add-cast-btn').click(function () {
         onClickAddCastBtn(this);
     });
+}
 
-    htmlContent = "";
-    jsCastSearchList = [];
-});
+$('#search-cast').on('keyup', function () {
+    let content = $(this).val();
 
-$('.add-cast-btn').click(function () {
-    onClickAddCastBtn(this);
+    if (castController) castController.abort();
+
+    castController = new AbortController();
+    const signal = castController.signal;
+
+    fetchCasts(content, signal);
 });
 
 function onClickAddCastBtn(btn) {
     let btnName = $(btn).attr('name');
-    let ind = jsSelectedCast.indexOf(btnName);
+    let castid = $(btn).attr('castid');
 
-    if (ind > -1) {
-        jsSelectedCast.splice(ind, 1);
+    if (jsSelectedCast.some(c => c.id === castid)) {
+        jsSelectedCast = jsSelectedCast.filter(c => c.id !== castid);
+
         $(btn).removeClass('btn-success').addClass('btn-info').text('Thêm');
     } else {
-        jsSelectedCast.push(btnName);
+        jsSelectedCast.push({
+            id: castid,
+            name: btnName
+        });
+
         $(btn).removeClass('btn-info').addClass('btn-success').text('Đã thêm');
     }
 
     $('#casts-text').text(
-        jsSelectedCast.join(',')
+        jsSelectedCast.map(c => c.name).join(', ')
     );
 }
 
-function modalCast(callback) {
-    $('#confirm-modal-cast-btn').click(function () {
-        callback();
-    });
-}
+$('#confirm-modal-cast-btn').click(function () {
+    hideModalCast();
+});
 
 $('#modal-cast').click(function () {
     hideModalCast();
@@ -98,4 +114,7 @@ function showModalCast() {
 // hide modal :
 function hideModalCast() {
     $('#modal-cast').hide();
+
+    let temp = jsSelectedCast.map(c => c.name).join(', ');
+    $('#select-cast').val(temp);
 }
