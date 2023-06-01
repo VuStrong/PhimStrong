@@ -9,7 +9,8 @@
 
     @if (ViewData["Image"] != null)
     {
-        <meta property="og:image" content="@ViewData["Image"]">
+        string imgUrl = $"https://phimstrong.azurewebsites.net{@ViewData["Image"]}";
+        <meta property="og:image" content="@imgUrl">
     }
 
     <meta property="og:description" content="@ViewData["Description"]">
@@ -27,7 +28,7 @@
     <!-- Facebook comment -->
     <div id="fb-root"></div>
     <script async defer crossorigin="anonymous" src="https://connect.facebook.net/vi_VN/sdk.js#xfbml=1&version=v15.0&appId=704182008049475&autoLogAppEvents=1" nonce="ocr3C23S"></script>
-    
+   
     <header>
         @await Component.InvokeAsync("HeaderNavBar")
     </header>
