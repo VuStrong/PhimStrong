@@ -34,6 +34,8 @@
         formData.append('FavoriteMovie', $("#edit-fav-movie").val());
         formData.append('Hobby', $("#edit-hobby").val());
 
+        if ($("#avatar-url-input").val()) formData.append('Avatar', $("#avatar-url-input").val());
+
         $.ajax({
             url: '/identity/account/edit-information',
             dataType: "json",

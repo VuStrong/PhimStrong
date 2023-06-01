@@ -262,6 +262,8 @@ namespace PhimStrong.Infrastructure.Identity
                 userToEdit.FavoriteMovie = user.FavoriteMovie;
             }
 
+            userToEdit.Avatar = user.Avatar;
+
             var result = await _userManager.UpdateAsync(userToEdit);
 
             return Result.ToAppResult(result);

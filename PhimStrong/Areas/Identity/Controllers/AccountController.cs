@@ -213,7 +213,6 @@ namespace PhimStrong.Areas.Identity.Controllers
                 userModel.Avatar = "/src/img/UserAvatars/" + user.Id + ".jpg";
             }
 
-
             var result = await _userService.UpdateAsync(user.Id, userModel);
 
             if (!result.Success)
