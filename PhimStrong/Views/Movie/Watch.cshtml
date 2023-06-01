@@ -2,6 +2,9 @@
 @{
 	Layout = "/Views/Movie/_Layout.cshtml";
 	ViewData["MovieId"] = Model.MovieId;
+	ViewData["Description"] = Model.MovieDescription;
+
+	if (Model.MovieImage != null) ViewData["Image"] = Model.MovieImage;
 
 	int currentVideoEpi = Model.Episode;
 	

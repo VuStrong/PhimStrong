@@ -1,6 +1,8 @@
 ﻿@model DirectorViewModel
 @{
 	ViewData["Title"] = Model.Name;
+	ViewData["Description"] = "Đạo diễn " + Model.Name;
+	ViewData["Image"] = Model.Avatar ?? "/src/img/UserAvatars/default_avatar.png";
 }
 
 @if (Model.About != null)

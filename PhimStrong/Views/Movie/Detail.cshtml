@@ -2,6 +2,10 @@
 @{
 	Layout = "/Views/Movie/_Layout.cshtml";
 	ViewData["Title"] = Model.TranslateName;
+	ViewData["Description"] = Model.Description;
+
+	if (Model.Image != null) ViewData["Image"] = Model.Image;
+
 	ViewData["MovieName"] = Model.TranslateName;
 	ViewData["MovieId"] = Model.Id;
 

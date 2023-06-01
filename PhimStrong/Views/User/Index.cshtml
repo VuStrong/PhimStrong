@@ -1,6 +1,8 @@
 ﻿@model UserViewModel
 @{
     ViewData["Title"] = Model.DisplayName;
+    ViewData["Image"] = Model.Avatar ?? "/src/img/UserAvatars/default_avatar.png";
+
     TempData["currentNav"] = "Index";
     string role = Model.RoleName ?? "";
 }

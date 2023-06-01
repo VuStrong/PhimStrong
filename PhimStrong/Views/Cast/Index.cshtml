@@ -1,6 +1,8 @@
 ﻿@model CastViewModel
 @{
 	ViewData["Title"] = Model.Name;
+	ViewData["Description"] = "Diễn viên " + Model.Name;
+	ViewData["Image"] = Model.Avatar ?? "/src/img/UserAvatars/default_avatar.png";
 }
 
 @if (Model.About != null)

@@ -1,7 +1,8 @@
 ﻿@model HomeViewModel
 @{
     ViewData["Title"] = "Trang chủ";
-    
+    ViewData["Description"] = "PhimStrong - nền tảng xem phim trực tuyến miễn phí, không quảng cáo.";
+
     int listMovieRandomLength = Model.ListRandomMovies != null ? Model.ListRandomMovies.Count : 0;
 
     int listMovieNewLength = Model.ListMovieNew != null ? Model.ListMovieNew.Length : 0;

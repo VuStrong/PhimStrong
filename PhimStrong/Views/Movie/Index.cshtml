@@ -1,6 +1,7 @@
 ﻿@model PagedList<MovieViewModel>
 @{
 	Layout = "/Views/Shared/_Layout.cshtml";
+	ViewData["Description"] = ViewData["Title"];
 }
 
 <h1 class="text-success mt-5 mb-3">@($"{ViewData["Filter"]}: {ViewData["Title"]}")</h1>

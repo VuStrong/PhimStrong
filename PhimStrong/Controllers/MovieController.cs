@@ -244,7 +244,7 @@ namespace PhimStrong.Controllers
 
             Video? video = movie.Videos?.FirstOrDefault(v => v.Episode == episode);
 
-			return View(new WatchMovieViewModel(movie.Id, movie.TranslateName, movie.Type)
+			return View(new WatchMovieViewModel(movie.Id, movie.TranslateName, movie.Description ?? "", movie.Type)
 			{
 				MovieImage = movie.Image,
 				VideoUrl = video?.VideoUrl,

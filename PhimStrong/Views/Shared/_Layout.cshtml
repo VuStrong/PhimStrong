@@ -4,6 +4,16 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - PhimStrong</title>
+    <meta name="keywords" content="@ViewData["Title"]">
+    <meta name="description" content="@ViewData["Description"]">
+
+    @if (ViewData["Image"] != null)
+    {
+        <meta property="og:image" content="@ViewData["Image"]">
+    }
+
+    <meta property="og:description" content="@ViewData["Description"]">
+    <meta property="og:type" content="movie">
 
     <link rel="icon" href="~/src/img/Logo/LogoIcon.png">
     <link rel="stylesheet" href="~/css/BootswatchTheme.min.css" />

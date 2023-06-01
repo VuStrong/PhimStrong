@@ -1,6 +1,7 @@
 ﻿@model CategoryViewModel
 @{
 	ViewData["Title"] = Model.Name;
+	ViewData["Description"] = "Thể loại " + Model.Name;
 }
 
 @if (Model.Description != null)
