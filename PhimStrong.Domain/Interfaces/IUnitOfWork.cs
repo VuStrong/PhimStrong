@@ -11,6 +11,7 @@ namespace PhimStrong.Domain.Interfaces
 		ICountryRepository CountryRepository { get; }
 		IRepository<Tag> TagRepository { get; }
 		IRepository<Video> VideoRepository { get; }
+		IRepository<User> UserRepository { get; }
         ICommentRepository CommentRepository { get; }
         Task SaveAsync();
 	}

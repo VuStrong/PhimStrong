@@ -11,7 +11,8 @@ namespace PhimStrong.Application.Interfaces
         Task<User?> FindByIdAsync(string id);
         Task<User?> FindByEmailAsync(string email);
 		Task<User?> GetByClaims(ClaimsPrincipal claims);
-		bool IsSignIn(ClaimsPrincipal claims);
+		Task<User?> GetUserWithLikedMovies(string id);
+        bool IsSignIn(ClaimsPrincipal claims);
 		Task<bool> IsInRoleAsync(User? user, string role);
 		Task<bool> IsLockedOutAsync(User user);
         Task<PagedList<User>> SearchAsync(PagingParameter pagingParameter, string? value = null, string? role = null);

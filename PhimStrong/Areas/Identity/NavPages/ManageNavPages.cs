@@ -9,6 +9,12 @@ namespace PhimStrong.Areas.Identity.NavPages
             return value;
         }
 
+        public static string LikedMoviesNavClass(string page)
+        {
+            string value = page == "LikedMovies" ? "active" : "";
+            return value;
+        }
+
         public static string EmailNavClass(string page)
         {
             string value = page == "Email" ? "active" : "";

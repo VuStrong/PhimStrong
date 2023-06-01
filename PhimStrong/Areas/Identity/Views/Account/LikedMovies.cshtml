@@ -1,0 +1,35 @@
+﻿@model List<MovieViewModel>
+@{
+    TempData["currentNav"] = "LikedMovies";
+}
+
+<div class="row g-0">
+    <div class="col px-5 py-3">
+        <h3 class="text-success">Phim đã thích (@Model.Count)</h3>
+		<div class="movie-container mb-2 mt-4">
+			@if (Model.Any())
+			{
+				<div class="liked-movies-container movie-row d-flex row-cols-lg-2 row-cols-1 overflow-auto flex-wrap">
+					@foreach (var movie in Model)
+					{
+						if (movie != null)
+						{
+							<div class="movie-item">
+								<a asp-area="" asp-controller="Movie" asp-action="Detail" asp-route-id="@movie.Id" class="movie-item-body">
+									<img src="@(movie.Image ?? "~/src/img/UserAvatars/default_avatar.png")"
+										class="w-100 h-100 img-fit">
+									<p class="movie-item-name background-blur text-truncate w-100">@movie.TranslateName</p>
+									<p class="movie-status">@movie.StatusToString</p>
+								</a>
+							</div>
+						}
+					}
+				</div>
+			}
+			else
+			{
+				<h5 class="text-light">Không có phim</h5>
+			}
+		</div>
+    </div>
+</div>

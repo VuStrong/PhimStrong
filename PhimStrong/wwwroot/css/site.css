@@ -265,6 +265,10 @@ body {
     text-decoration: underline !important;
 }
 
+.liked-movies-container {
+    max-height: 400px;
+}
+
 @media (min-width: 768px) {
     html {
         font-size: 16px;
@@ -314,5 +318,9 @@ body {
 
     #movie-player video {
         height: 600px;
+    }
+
+    .liked-movies-container {
+        max-height: 270px;
     }
 }

@@ -25,7 +25,7 @@ namespace PhimStrong.Controllers
 		[HttpGet("{id?}")]
 		public async Task<IActionResult> Index(string id)
 		{
-			User? user = await _userService.FindByIdAsync(id);
+			User? user = await _userService.GetUserWithLikedMovies(id);
 
 			if (user == null)
 			{

@@ -5,7 +5,9 @@ using Microsoft.AspNetCore.WebUtilities;
 using PhimStrong.Application.Interfaces;
 using PhimStrong.Areas.Identity.Models;
 using PhimStrong.Domain.Models;
+using PhimStrong.Models.Movie;
 using PhimStrong.Models.User;
+using System.Security.Claims;
 using System.Text;
 using System.Text.Encodings.Web;
 #pragma warning disable
@@ -42,6 +44,21 @@ namespace PhimStrong.Areas.Identity.Controllers
                 return NotFound("Không tìm thấy user :((");
 
             return View(_mapper.Map<UserViewModel>(user));
+        }
+
+        [HttpGet("/account/liked-movies")]
+        public async Task<IActionResult> LikedMovies()
+        {
+            string userid = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            User? user = await _userService.GetUserWithLikedMovies(userid);
+
+            if (user == null)
+                return NotFound("Không tìm thấy user :((");
+
+            user.LikedMovies ??= new List<Movie>();
+
+            return View(_mapper.Map<List<MovieViewModel>>(user.LikedMovies));
         }
 
         [HttpGet("/account/change-password")]

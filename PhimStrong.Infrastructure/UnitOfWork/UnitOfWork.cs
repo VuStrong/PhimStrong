@@ -91,6 +91,17 @@ namespace PhimStrong.Infrastructure.UnitOfWork
 			}
 		}
 
+        private IRepository<User>? _userRepository;
+        public IRepository<User> UserRepository
+        {
+            get
+            {
+                _userRepository ??= new UserRepository(_context);
+
+                return _userRepository;
+            }
+        }
+
         private ICommentRepository? _commentRepository;
         public ICommentRepository CommentRepository
         {

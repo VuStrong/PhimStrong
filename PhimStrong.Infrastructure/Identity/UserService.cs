@@ -266,5 +266,15 @@ namespace PhimStrong.Infrastructure.Identity
 
             return Result.ToAppResult(result);
         }
+
+        public async Task<User?> GetUserWithLikedMovies(string id)
+        {
+            return await _unitOfWork.UserRepository.FirstOrDefaultAsync(
+                u => u.Id == id,
+                new Expression<Func<User, object?>>[]
+                {
+                    u => u.LikedMovies
+                });
+        }
     }
 }

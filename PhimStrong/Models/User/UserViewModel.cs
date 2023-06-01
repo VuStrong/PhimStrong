@@ -1,4 +1,6 @@
-﻿namespace PhimStrong.Models.User
+﻿using PhimStrong.Models.Movie;
+
+namespace PhimStrong.Models.User
 {
     public class UserViewModel
     {
@@ -11,6 +13,7 @@
         public string? FavoriteMovie { get; set; }
         public string? Hobby { get; set; }
         public string? RoleName { get; set; }
+        public List<MovieViewModel>? LikedMovies { get; set; }
 
         public UserViewModel(string id, string displayName, string phoneNumber, string email)
         {
