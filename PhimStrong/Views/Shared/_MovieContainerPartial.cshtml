@@ -10,7 +10,7 @@
 				{
 					<div class="movie-item">
 						<a asp-area="" asp-controller="Movie" asp-action="Detail" asp-route-id="@movie.Id" class="movie-item-body">
-							<img src="@(movie.Image ?? "~/src/img/UserAvatars/default_avatar.png")"
+							<img loading="lazy" src="@(movie.Image ?? "~/src/img/UserAvatars/default_avatar.png")"
 								class="w-100 h-100 img-fit">
 							<p class="movie-item-name background-blur text-truncate w-100">@movie.TranslateName</p>
 							<p class="movie-status">@movie.StatusToString</p>

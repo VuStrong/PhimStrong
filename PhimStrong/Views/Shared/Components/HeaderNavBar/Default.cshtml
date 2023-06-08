@@ -3,7 +3,7 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark p-0">
     <div class="container-fluid">
         <a class="navbar-brand logo" asp-area="" asp-controller="Home" asp-action="Index">
-            <img src="/src/img/Logo/Logo.png" alt="PhimStrong" class="w-100"/>
+            <img loading="lazy" src="/src/img/Logo/Logo.png" alt="PhimStrong" class="w-100"/>
         </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarColor02" aria-controls="navbarColor02" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
@@ -82,7 +82,7 @@
                     <li class="nav-item dropdown mt-3 mt-lg-0">
                         <a class="nav-link dropdown-toggle"
                             data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
-                            <img src="@(Model.User.Avatar ?? "/src/img/UserAvatars/default_avatar.png")"
+                            <img loading="lazy" src="@(Model.User.Avatar ?? "/src/img/UserAvatars/default_avatar.png")"
                              class="avatar">
                             <span class="text-truncate d-inline-flex" style="max-width: 100px">@(Model.User.DisplayName)</span>
                         </a>

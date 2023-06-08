@@ -46,7 +46,10 @@ async function fetchCasts(name, signal) {
 
             htmlContent = htmlContent.concat(
                 `<tr>
-                    <th class="cast-name" scope="row">${cast.name}</th>
+                    <th scope="row">
+                        <img src="${cast.avatar || '/src/img/UserAvatars/default_avatar.png'}" class="avatar avatar-square img-fit" style="width: 50px; height:50px;">
+                    </th>
+                    <td class="cast-name overflow-hidden">${cast.name}</td>
                     <td>
                         <button castid="${cast.id}" name="${cast.name}" class="btn ${addedBtn} add-cast-btn">${isAdded}</button>
                     </td>

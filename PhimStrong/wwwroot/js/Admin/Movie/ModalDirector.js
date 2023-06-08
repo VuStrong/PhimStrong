@@ -46,7 +46,10 @@ async function fetchDirectors(name, signal) {
 
             htmlContent = htmlContent.concat(
                 `<tr>
-                    <th class="director-name" scope="row">${director.name}</th>
+                    <th scope="row">
+                        <img src="${director.avatar || '/src/img/UserAvatars/default_avatar.png'}" class="avatar avatar-square img-fit" style="width: 50px; height:50px;">
+                    </th>
+                    <td class="director-name">${director.name}</td>
                     <td>
                         <button directorid="${director.id}" name="${director.name}" class="btn ${addedBtn} add-director-btn">${isAdded}</button>
                     </td>

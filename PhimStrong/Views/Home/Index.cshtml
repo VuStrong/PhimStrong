@@ -34,7 +34,7 @@
                     foreach (var movie in Model.ListRandomMovies)
                     {
                         <div class="carousel-item h-100 @(first ? "active" : "")">
-                            <img src="@movie.Image" class="img-fit w-100 h-100" alt="...">
+                            <img loading="lazy" src="@movie.Image" class="img-fit w-100 h-100" alt="...">
                             <a asp-area="" asp-controller="Movie" asp-action="Detail" asp-route-id="@movie.Id" class="d-block position-absolute play-btn">
                                 <i class="bi bi-play-circle-fill"></i>
                             </a>
@@ -67,7 +67,7 @@
                 {
                     <a asp-area="" asp-controller="Movie" asp-action="Detail" asp-route-id="@movie.Id" class="movie-slide-item @(first2 ? "active" : "") row py-2">
                         <div class="col-5 h-100">
-                            <img src="@movie.Image" class="img-fit w-100 h-100" alt="">
+                            <img loading ="lazy" src="@movie.Image" class="img-fit w-100 h-100" alt="">
                         </div>
                         <div class="col-7">
                             <p class="movie-slide-name text-success text-truncate my-0">@movie.TranslateName</p>
@@ -94,7 +94,7 @@
             {
                 <div class="movie-item movie-item-large">
                     <a asp-area="" asp-controller="Movie" asp-action="Detail" asp-route-id="@Model.ListMovieNew[0].Id" class="movie-item-body">
-                        <img src="@(Model.ListMovieNew[0].Image ?? "~/src/img/UserAvatars/default_avatar.png")" class="w-100 h-100 img-fit">
+                        <img loading="lazy" src="@(Model.ListMovieNew[0].Image ?? "~/src/img/UserAvatars/default_avatar.png")" class="w-100 h-100 img-fit">
                         <p class="movie-item-name background-blur text-truncate w-100">@Model.ListMovieNew[0].TranslateName</p>
                         <p class="movie-status">@Model.ListMovieNew[0].StatusToString</p>
                     </a>
@@ -109,7 +109,7 @@
 
                         <div class="movie-item">
                             <a asp-area="" asp-controller="Movie" asp-action="Detail" asp-route-id="@Model.ListMovieNew[i].Id" class="movie-item-body">
-                                <img src="@(Model.ListMovieNew[i].Image ?? "~/src/img/UserAvatars/default_avatar.png")"
+                                <img loading="lazy" src="@(Model.ListMovieNew[i].Image ?? "~/src/img/UserAvatars/default_avatar.png")"
                                     class="w-100 h-100 img-fit">
                                 <p class="movie-item-name background-blur text-truncate w-100">@Model.ListMovieNew[i].TranslateName</p>
                                 <p class="movie-status">@Model.ListMovieNew[i].StatusToString</p>
@@ -128,7 +128,7 @@
 
                     <div class="movie-item">
                         <a asp-area="" asp-controller="Movie" asp-action="Detail" asp-route-id="@Model.ListMovieNew[i].Id" class="movie-item-body">
-                            <img src="@(Model.ListMovieNew[i].Image ?? "~/src/img/UserAvatars/default_avatar.png")"
+                            <img loading="lazy" src="@(Model.ListMovieNew[i].Image ?? "~/src/img/UserAvatars/default_avatar.png")"
                                 class="w-100 h-100 img-fit">
                             <p class="movie-item-name background-blur text-truncate w-100">@Model.ListMovieNew[i].TranslateName</p>
                             <p class="movie-status">@Model.ListMovieNew[i].StatusToString</p>
@@ -152,8 +152,8 @@
             {
                 <div class="movie-item movie-item-large">
                     <a asp-area="" asp-controller="Movie" asp-action="Detail" asp-route-id="@Model.ListMovieTopRating[0].Id" class="movie-item-body">
-                        <img src="@(Model.ListMovieTopRating[0].Image ?? "~/src/img/UserAvatars/default_avatar.png")" 
-                            class="w-100 h-100 img-fit">
+                        <img loading="lazy" src="@(Model.ListMovieTopRating[0].Image ?? "~/src/img/UserAvatars/default_avatar.png")"
+                         class="w-100 h-100 img-fit">
                         <p class="movie-item-name background-blur text-truncate w-100">@Model.ListMovieTopRating[0].TranslateName</p>
                         <p class="movie-status">@Model.ListMovieTopRating[0].StatusToString</p>
                     </a>
@@ -168,7 +168,7 @@
 
                         <div class="movie-item">
                             <a asp-area="" asp-controller="Movie" asp-action="Detail" asp-route-id="@Model.ListMovieTopRating[i].Id" class="movie-item-body">
-                                <img src="@(Model.ListMovieTopRating[i].Image ?? "~/src/img/UserAvatars/default_avatar.png")"
+                                <img loading="lazy" src="@(Model.ListMovieTopRating[i].Image ?? "~/src/img/UserAvatars/default_avatar.png")"
                                      class="w-100 h-100 img-fit">
                                 <p class="movie-item-name background-blur text-truncate w-100">@Model.ListMovieTopRating[i].TranslateName</p>
                                 <p class="movie-status">@Model.ListMovieTopRating[i].StatusToString</p>
@@ -187,7 +187,7 @@
 
                     <div class="movie-item">
                         <a asp-area="" asp-controller="Movie" asp-action="Detail" asp-route-id="@Model.ListMovieTopRating[i].Id" class="movie-item-body">
-                            <img src="@(Model.ListMovieTopRating[i].Image ?? "~/src/img/UserAvatars/default_avatar.png")"
+                            <img loading="lazy" src="@(Model.ListMovieTopRating[i].Image ?? "~/src/img/UserAvatars/default_avatar.png")"
                                 class="w-100 h-100 img-fit">
                             <p class="movie-item-name background-blur text-truncate w-100">@Model.ListMovieTopRating[i].TranslateName</p>
                             <p class="movie-status">@Model.ListMovieTopRating[i].StatusToString</p>
@@ -211,7 +211,7 @@
             {
                 <div class="movie-item movie-item-large">
                     <a asp-area="" asp-controller="Movie" asp-action="Detail" asp-route-id="@Model.ListPhimLe[0].Id" class="movie-item-body">
-                        <img src="@(Model.ListPhimLe[0].Image ?? "~/src/img/UserAvatars/default_avatar.png")"
+                        <img loading="lazy" src="@(Model.ListPhimLe[0].Image ?? "~/src/img/UserAvatars/default_avatar.png")"
                             class="w-100 h-100 img-fit">
                         <p class="movie-item-name background-blur text-truncate w-100">@Model.ListPhimLe[0].TranslateName</p>
                         <p class="movie-status">@Model.ListPhimLe[0].StatusToString</p>
@@ -227,7 +227,7 @@
 
                         <div class="movie-item">
                             <a asp-area="" asp-controller="Movie" asp-action="Detail" asp-route-id="@Model.ListPhimLe[i].Id" class="movie-item-body">
-                                <img src="@(Model.ListPhimLe[i].Image ?? "~/src/img/UserAvatars/default_avatar.png")"
+                                <img loading="lazy" src="@(Model.ListPhimLe[i].Image ?? "~/src/img/UserAvatars/default_avatar.png")"
                                      class="w-100 h-100 img-fit">
                                 <p class="movie-item-name background-blur text-truncate w-100">@Model.ListPhimLe[i].TranslateName</p>
                                 <p class="movie-status">@Model.ListPhimLe[i].StatusToString</p>
@@ -246,7 +246,7 @@
 
                     <div class="movie-item">
                         <a asp-area="" asp-controller="Movie" asp-action="Detail" asp-route-id="@Model.ListPhimLe[i].Id" class="movie-item-body">
-                            <img src="@(Model.ListPhimLe[i].Image ?? "~/src/img/UserAvatars/default_avatar.png")"
+                            <img loading="lazy" src="@(Model.ListPhimLe[i].Image ?? "~/src/img/UserAvatars/default_avatar.png")"
                                 class="w-100 h-100 img-fit">
                             <p class="movie-item-name background-blur text-truncate w-100">@Model.ListPhimLe[i].TranslateName</p>
                             <p class="movie-status">@Model.ListPhimLe[i].StatusToString</p>
@@ -270,7 +270,7 @@
             {
                 <div class="movie-item movie-item-large">
                     <a asp-area="" asp-controller="Movie" asp-action="Detail" asp-route-id="@Model.ListPhimBo[0].Id" class="movie-item-body">
-                        <img src="@(Model.ListPhimBo[0].Image ?? "~/src/img/UserAvatars/default_avatar.png")"
+                        <img loading="lazy" src="@(Model.ListPhimBo[0].Image ?? "~/src/img/UserAvatars/default_avatar.png")"
                             class="w-100 h-100 img-fit">
                         <p class="movie-item-name background-blur text-truncate w-100">@Model.ListPhimBo[0].TranslateName</p>
                         <p class="movie-status">@Model.ListPhimBo[0].StatusToString</p>
@@ -286,7 +286,7 @@
 
                         <div class="movie-item">
                             <a asp-area="" asp-controller="Movie" asp-action="Detail" asp-route-id="@Model.ListPhimBo[i].Id" class="movie-item-body">
-                                <img src="@(Model.ListPhimBo[i].Image ?? "~/src/img/UserAvatars/default_avatar.png")"
+                                <img loading="lazy" src="@(Model.ListPhimBo[i].Image ?? "~/src/img/UserAvatars/default_avatar.png")"
                                     class="w-100 h-100 img-fit">
                                 <p class="movie-item-name background-blur text-truncate w-100">@Model.ListPhimBo[i].TranslateName</p>
                                 <p class="movie-status">@Model.ListPhimBo[i].StatusToString</p>
@@ -305,7 +305,7 @@
 
                     <div class="movie-item">
                         <a asp-area="" asp-controller="Movie" asp-action="Detail" asp-route-id="@Model.ListPhimBo[i].Id" class="movie-item-body">
-                            <img src="@(Model.ListPhimBo[i].Image ?? "~/src/img/UserAvatars/default_avatar.png")"
+                            <img loading="lazy" src="@(Model.ListPhimBo[i].Image ?? "~/src/img/UserAvatars/default_avatar.png")"
                                 class="w-100 h-100 img-fit">
                             <p class="movie-item-name background-blur text-truncate w-100">@Model.ListPhimBo[i].TranslateName</p>
                             <p class="movie-status">@Model.ListPhimBo[i].StatusToString</p>
