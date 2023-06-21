@@ -38,7 +38,7 @@ namespace PhimStrong.Controllers
 			_commentService = commentService;
 		}
 
-		[HttpGet("get-comments-partial")]
+		[HttpGet("[action]")]
 		public async Task<IActionResult> GetCommentsPartial(int page, string movieid)
 		{
 			Movie? movie = await _movieService.GetByIdAsync(movieid);
@@ -65,7 +65,7 @@ namespace PhimStrong.Controllers
 			return this.PartialView("_CommentContainerPartial", model);
 		}
 
-		[HttpGet("load-more-comments")]
+		[HttpGet("[action]")]
 		public async Task<IActionResult> LoadMoreComments(int page, string movieid)
 		{
 			Movie? movie = await _movieService.GetByIdAsync(movieid);
@@ -148,7 +148,7 @@ namespace PhimStrong.Controllers
 			});
 		}
 
-		[HttpPost("like-comment")]
+		[HttpPost("[action]")]
 		public async Task<JsonResult> LikeComment(int commentid)
 		{
 			try

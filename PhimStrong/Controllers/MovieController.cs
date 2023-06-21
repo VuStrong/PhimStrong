@@ -33,16 +33,14 @@ namespace PhimStrong.Controllers
 			PagedList<Movie> movies = await _movieService.GetAllAsync(new PagingParameter(page, MOVIES_PER_PAGE));
 
 			ViewData["Title"] = "Danh sách phim";
-            ViewData["Filter"] = "Phim";
 
             return View(_mapper.Map<PagedList<MovieViewModel>>(movies));
         }
 
-        [HttpGet("search")]
-        public async Task<IActionResult> SearchByMovieName([FromQuery(Name = "q")] string? value, int page)
+        [HttpGet("[action]")]
+        public async Task<IActionResult> Search([FromQuery(Name = "q")] string? value, int page)
         {
-			ViewData["Filter"] = "Từ khóa";
-			ViewData["Title"] = value;
+			ViewData["Title"] = $"Từ khóa: {value}";
 
 			PagedList<Movie> movies = await _movieService.SearchAsync(new MovieParameter(page, MOVIES_PER_PAGE)
 			{
@@ -56,10 +54,10 @@ namespace PhimStrong.Controllers
 			return View("Index", _mapper.Map<PagedList<MovieViewModel>>(movies));
 		}
 
-		[HttpGet("advanced-search")]
+		[HttpGet("[action]")]
 		public async Task<IActionResult> AdvancedSearch(MovieParameterResource movieParameterResource)
 		{
-            ViewData["Filter"] = "Tìm kiếm nâng cao";
+            ViewData["Title"] = "Tìm kiếm nâng cao";
 
 			movieParameterResource.Size = MOVIES_PER_PAGE;
 
@@ -87,7 +85,6 @@ namespace PhimStrong.Controllers
 
 			ViewData["Action"] = "GetPhimLe";
 			ViewData["Title"] = "Phim lẻ";
-			ViewData["Filter"] = "Phim";
 
 			return View("Index", _mapper.Map<PagedList<MovieViewModel>>(movies));
 		}
@@ -99,7 +96,6 @@ namespace PhimStrong.Controllers
 
 			ViewData["Action"] = "GetPhimBo";
 			ViewData["Title"] = "Phim bộ";
-			ViewData["Filter"] = "Phim";
 
 			return View("Index", _mapper.Map<PagedList<MovieViewModel>>(movies));
 		}
@@ -110,8 +106,7 @@ namespace PhimStrong.Controllers
             PagedList<Movie> movies = await _movieService.FindByYearAsync(year, new PagingParameter(page, MOVIES_PER_PAGE));
 
 			ViewData["Action"] = "GetMovieByReleaseYear";
-			ViewData["Title"] = year.ToString();
-            ViewData["Filter"] = "Phim ra mắt năm";
+            ViewData["Title"] = $"Phim ra mắt năm {year}";
 
 			return View("Index", _mapper.Map<PagedList<MovieViewModel>>(movies));
 		}
@@ -122,8 +117,7 @@ namespace PhimStrong.Controllers
 			PagedList<Movie> movies = await _movieService.FindBeforeYearAsync(year, new PagingParameter(page, MOVIES_PER_PAGE));
 
 			ViewData["Action"] = "GetMovieBeforeYear";
-			ViewData["Title"] = year.ToString();
-			ViewData["Filter"] = "Phim ra mắt trước năm";
+			ViewData["Title"] = $"Phim ra mắt trước năm {year}";
 
 			return View("Index", _mapper.Map<PagedList<MovieViewModel>>(movies));
 		}
@@ -134,8 +128,7 @@ namespace PhimStrong.Controllers
 			PagedList<Movie> movies = await _movieService.FindByTagAsync(tag ?? "", new PagingParameter(page, MOVIES_PER_PAGE));
 
 			ViewData["Action"] = "GetMovieByTag";
-			ViewData["Title"] = tag;
-			ViewData["Filter"] = "Phim có Tag";
+			ViewData["Title"] = $"Phim có Tag: {tag}";
 
 			return View("Index", _mapper.Map<PagedList<MovieViewModel>>(movies));
 		}
@@ -147,7 +140,6 @@ namespace PhimStrong.Controllers
 
 			ViewData["Action"] = "GetTopRatingMovie";
 			ViewData["Title"] = "Top Rating";
-            ViewData["Filter"] = "Phim";
 
             return View("Index", _mapper.Map<PagedList<MovieViewModel>>(movies));
         }
@@ -158,8 +150,7 @@ namespace PhimStrong.Controllers
 			PagedList<Movie> movies = await _movieService.GetTrailerAsync(new PagingParameter(page, MOVIES_PER_PAGE));
 
 			ViewData["Action"] = "GetTrailer";
-			ViewData["Title"] = "";
-            ViewData["Filter"] = "Trailer";
+            ViewData["Title"] = "Trailer";
 
             return View("Index", _mapper.Map<PagedList<MovieViewModel>>(movies));
         }
@@ -184,7 +175,7 @@ namespace PhimStrong.Controllers
             return View(_mapper.Map<MovieViewModel>(movie));
 		}
 
-		[HttpGet("get-related-movies")]
+		[HttpGet("[action]")]
 		public async Task<IActionResult> GetRelatedMovies(string movieid)
 		{
 			List<Movie> movies = (await _movieService.GetRelateMoviesAsync(movieid, 10)).ToList();
@@ -192,7 +183,7 @@ namespace PhimStrong.Controllers
 			return this.PartialView("_RelatedMoviePartial", _mapper.Map<List<MovieViewModel>>(movies));
 		}
 
-		[HttpGet("get-like-button")]
+		[HttpGet("[action]")]
 		public async Task<IActionResult> GetLikeButton(string movieid)
 		{
 			Movie? movie = await _movieService.GetByIdAsync(movieid, new Expression<Func<Movie, object?>>[]
@@ -211,7 +202,7 @@ namespace PhimStrong.Controllers
 			});
 		}
 
-		[HttpPost("like-movie")]
+		[HttpPost("[action]")]
 		public async Task<JsonResult> LikeMovie(string movieid)
 		{
 			string userid = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -253,7 +244,7 @@ namespace PhimStrong.Controllers
 			});
 		}
 
-		[HttpPost("increase-view")]
+		[HttpPost("[action]")]
 		public async Task<JsonResult> IncreaseView(string id)
 		{
 			try
