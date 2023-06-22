@@ -1,11 +1,14 @@
-﻿using PhimStrong.Application.Interfaces;
+﻿using Microsoft.EntityFrameworkCore;
+using PhimStrong.Application.Interfaces;
 using PhimStrong.Domain.Exceptions.NotFound;
 using PhimStrong.Domain.Interfaces;
 using PhimStrong.Domain.Models;
 using PhimStrong.Domain.PagingModel;
 using PhimStrong.Domain.Parameters;
 using SharedLibrary.Helpers;
+using System.Drawing;
 using System.Linq.Expressions;
+using System.Security.Policy;
 using System.Text.RegularExpressions;
 #pragma warning disable
 
@@ -399,9 +402,10 @@ namespace PhimStrong.Application.Services
 														orderBy: movies => movies.OrderByDescending(m => m.Rating));
 		}
 
-		public async Task<IEnumerable<Movie>> GetRelateMoviesAsync(string movieid, int maxCount)
+		public async Task<IEnumerable<Movie>> GetRelateMoviesAsync(string movieid, int maxCount, Expression<Func<Movie, object?>>[]? includes = null)
 		{
-			if (maxCount <= 0) maxCount = 1;
+			// clamp if maxCount > number of movies
+			maxCount = Math.Clamp(maxCount, 1, await _unitOfWork.MovieRepository.CountAsync());
 
 			Movie? movie = await this.GetByIdAsync(movieid, new Expression<Func<Movie, object?>>[]
 			{
@@ -415,69 +419,73 @@ namespace PhimStrong.Application.Services
 			}
 
 			List<Movie> movies = new();
-			List<Movie> movieList = (await _unitOfWork.MovieRepository.GetAsync(
-				includes: new Expression<Func<Movie, object?>>[]
-				{
-					m => m.Categories
-				})).ToList();
 
 			// find movie with similar tag
 			if (movie.Tags != null && movie.Tags.Any())
 			{
-				string tagToFind = movie.Tags[0].TagName.ToLower();
+				var movieTags = movie.Tags.Select(t => t.TagName.ToLower());
 
-				movies.AddRange(
-					(await _unitOfWork.TagRepository.GetAsync(
-						new PagingParameter(1, maxCount, false),
-						t => t.TagName.ToLower() == tagToFind && t.Movie.Id != movieid,
-						includes: new Expression<Func<Tag, object?>>[]
-						{
-							t => t.Movie
-						}))
-					.Select(t => t.Movie).ToList());
+				var moviesToAdd = await _unitOfWork.MovieRepository.GetAsync(
+					new PagingParameter(1, maxCount, false),
+					mv => mv.Tags.Any(tag => movieTags.Contains(tag.TagName.ToLower())) &&
+						  mv.Id != movie.Id,
+					includes: includes
+				);
+
+				movies.AddRange(moviesToAdd);
 			}
-
+			
 			// find movie with similar category
 			if (movies.Count < maxCount && movie.Categories != null && movie.Categories.Any())
 			{
-				Category? cateToFind = movie.Categories[0];
+				var categoryIds = movie.Categories.Select(c => c.Id);
+				var addedMovieIds = movies.Select(m => m.Id);
 
-				movies.AddRange(
-					movieList.Where(m => !movies.Contains(m) &&
-						!m.Equals(movie) &&
-						m.Categories != null &&
-						m.Categories.Any(c => c.Equals(cateToFind)))
-					.Take(maxCount - movies.Count).ToList());
+				var moviesToAdd = await _unitOfWork.MovieRepository.GetAsync(
+					new PagingParameter(1, maxCount - movies.Count, false),
+					mv => mv.Id != movie.Id &&
+						  !addedMovieIds.Contains(mv.Id) &&
+						  mv.Categories.Any(category => categoryIds.Contains(category.Id)),
+					includes: includes
+				);
+
+				movies.AddRange(moviesToAdd);
 			}
 
-			// if less than 10 movies, add more
+			// if still less than maxCount, add any movie :))
 			if (movies.Count < maxCount)
 			{
-				Random random = new();
-				int ran;
-				int count = movieList.Count;
-				while (movies.Count < maxCount)
-				{
-					if (movies.Count >= count) break;
+				var addedMovieIds = movies.Select(m => m.Id);
 
-					ran = random.Next(0, count);
-					if (!movies.Contains(movieList[ran]) && !movieList[ran].Equals(movie))
-					{
-						movies.Add(movieList[ran]);
-					}
-				}
+				var moviesToAdd = await _unitOfWork.MovieRepository.GetAsync(
+					new PagingParameter(1, maxCount - movies.Count, false),
+					mv => mv.Id != movie.Id &&
+						  !addedMovieIds.Contains(mv.Id),
+					includes: includes
+				);
+
+				movies.AddRange(moviesToAdd);
 			}
 
 			return movies;
 		}
 
-		public async Task<IEnumerable<Movie>> GetRandomMoviesAsync(int count)
+		public async Task<IEnumerable<Movie>> GetRandomMoviesAsync(int count, Expression<Func<Movie, object?>>[]? includes = null)
 		{
-			PagingParameter pagingParameter = new(1, count, false);
+			var random = new Random();
 
-			return await _unitOfWork.MovieRepository.GetAsync(
-														pagingParameter,
-														orderBy: movies => movies.OrderBy(mv => Guid.NewGuid()));
+			int movieCount = await _unitOfWork.MovieRepository.CountAsync();
+			count = Math.Clamp(count, 1, movieCount);
+			
+			int randomPage = random.Next(1, (int)Math.Ceiling((double)(movieCount - count) / count) + 1);
+
+			var movies = await _unitOfWork.MovieRepository.GetAsync(
+				new PagingParameter(randomPage, count, false),
+				m => m.IdNumber > 0,
+				includes: includes
+			);
+
+			return movies.OrderBy(m => Guid.NewGuid());
 		}
 
 		public async Task IncreateViewAsync(string movieid)
@@ -532,35 +540,51 @@ namespace PhimStrong.Application.Services
 			}
 		}
 
-		public async Task<PagedList<Movie>> FindByCastIdAsync(string castid, PagingParameter pagingParameter)
+		public async Task<PagedList<Movie>> FindByCastIdAsync(
+			string castid, 
+			PagingParameter pagingParameter,
+			Expression<Func<Movie, object?>>[]? includes = null)
 		{
 			return await _unitOfWork.MovieRepository.GetAsync(
 					pagingParameter,
-					m => m.Casts.Any(c => c.Id == castid)
+					m => m.Casts.Any(c => c.Id == castid),
+					includes: includes
 				);
 		}
 
-		public async Task<PagedList<Movie>> FindByCategoryIdAsync(string categoryid, PagingParameter pagingParameter)
+		public async Task<PagedList<Movie>> FindByCategoryIdAsync(
+			string categoryid, 
+			PagingParameter pagingParameter,
+			Expression<Func<Movie, object?>>[]? includes = null)
 		{
 			return await _unitOfWork.MovieRepository.GetAsync(
 					pagingParameter,
-					m => m.Categories.Any(c => c.Id == categoryid)
+					m => m.Categories.Any(c => c.Id == categoryid),
+					includes: includes
 				);
 		}
 
-		public async Task<PagedList<Movie>> FindByDirectorIdAsync(string directorid, PagingParameter pagingParameter)
+		public async Task<PagedList<Movie>> FindByDirectorIdAsync(
+			string directorid, 
+			PagingParameter pagingParameter,
+			Expression<Func<Movie, object?>>[]? includes = null)
 		{
 			return await _unitOfWork.MovieRepository.GetAsync(
 					pagingParameter,
-					m => m.Directors.Any(d => d.Id == directorid)
+					m => m.Directors.Any(d => d.Id == directorid),
+					includes: includes
 				);
 		}
 
-		public async Task<PagedList<Movie>> FindByCountryIdAsync(string countryid, PagingParameter pagingParameter)
+		public async Task<PagedList<Movie>> FindByCountryIdAsync(
+			string countryid, 
+			PagingParameter pagingParameter,
+			Expression<Func<Movie, object?>>[]? includes = null)
 		{
 			return await _unitOfWork.MovieRepository.GetAsync(
 					pagingParameter,
-					m => m.Country.Id == countryid
+					m => m.Country.Id == countryid,
+					includes: includes
 				);
 		}
 	}

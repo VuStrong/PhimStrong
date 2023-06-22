@@ -31,6 +31,9 @@ namespace PhimStrong.Controllers.Api
 		{
 			MovieParameter movieParameter = _mapper.Map<MovieParameter>(movieParameterResource);
 
+			// always load movies with categories and country 
+			movieParameter.Includes = "Categories,Country";
+			
 			PagedList<Movie> movies = await _movieService.SearchAsync(movieParameter);
 
 			return Ok(_mapper.Map<PagedList<MovieResource>>(movies).GetMetaData());
@@ -39,7 +42,13 @@ namespace PhimStrong.Controllers.Api
 		[HttpGet("random")]
 		public async Task<IActionResult> GetRandomMovies(int count = 10)
 		{
-			IEnumerable<Movie> randomMovies = await _movieService.GetRandomMoviesAsync(count);
+			IEnumerable<Movie> randomMovies = await _movieService.GetRandomMoviesAsync(
+				count,
+				new Expression<Func<Movie, object>>[]
+				{
+					m => m.Categories,
+					m => m.Country
+				});
 
 			return Ok(_mapper.Map<IEnumerable<MovieResource>>(randomMovies));
 		}
@@ -67,7 +76,14 @@ namespace PhimStrong.Controllers.Api
 		[HttpGet("{id}/related")]
 		public async Task<IActionResult> GetRelatedMovies(string id, int count = 10)
 		{
-			IEnumerable<Movie> relatedMovies = await _movieService.GetRelateMoviesAsync(id, count);
+			IEnumerable<Movie> relatedMovies = await _movieService.GetRelateMoviesAsync(
+				id, 
+				count, 
+				new Expression<Func<Movie, object>>[]
+				{
+					m => m.Categories,
+					m => m.Country
+				});
 
 			return Ok(_mapper.Map<IEnumerable<MovieResource>>(relatedMovies));
 		}

@@ -125,5 +125,10 @@ namespace PhimStrong.Infrastructure.Repositories
 		{
 			return await _context.Set<T>().AnyAsync();
 		}
+
+		public async Task<int> CountAsync()
+		{
+			return await _context.Set<T>().CountAsync();
+		}
 	}
 }

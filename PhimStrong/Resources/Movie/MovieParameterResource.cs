@@ -17,5 +17,6 @@ namespace PhimStrong.Resources.Movie
 		public string[]? Categories { get; set; }
 		public int Year { get; set; }
 		public int BeforeYear { get; set; }
+		public string? Includes { get; set; }
 	}
 }

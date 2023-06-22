@@ -19,5 +19,7 @@
 		public int EpisodeCount { get; set; }
 		public string Status { get; set; }
 
+		public string? Country { get; set; }
+		public string[]? Categories { get; set; }
 	}
 }

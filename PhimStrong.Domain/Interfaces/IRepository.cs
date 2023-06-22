@@ -52,5 +52,7 @@ namespace PhimStrong.Domain.Interfaces
 		void Delete(T entity);
 
 		Task<bool> AnyAsync();
+
+		Task<int> CountAsync();
 	}
 }

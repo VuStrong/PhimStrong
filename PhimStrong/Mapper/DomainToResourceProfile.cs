@@ -12,7 +12,14 @@ namespace PhimStrong.Mapper
 	{
 		public DomainToResourceProfile()
 		{
-			CreateMap<Movie, MovieResource>();
+			CreateMap<Movie, MovieResource>()
+				.ForMember(
+					des => des.Country,
+					options => options.MapFrom(src => src.Country != null ? src.Country.Name : null))
+				.ForMember(
+					des => des.Categories,
+					options => options.MapFrom(src => src.Categories != null ? src.Categories.Select(c => c.Name) : null));
+
 			CreateMap<Movie, MovieDetailResource>()
 				.ForMember(
 					des => des.Tags,

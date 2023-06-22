@@ -5,6 +5,8 @@ using PhimStrong.Domain.PagingModel;
 using PhimStrong.Domain.Parameters;
 using PhimStrong.Infrastructure.Context;
 using SharedLibrary.Helpers;
+using System.Linq.Expressions;
+
 #nullable disable
 
 namespace PhimStrong.Infrastructure.Repositories
@@ -32,7 +34,7 @@ namespace PhimStrong.Infrastructure.Repositories
 		public async Task<PagedList<Movie>> GetAsync(MovieParameter movieParameter)
 		{
 			movieParameter.Value = movieParameter.Value?.RemoveMarks();
-
+			
 			IQueryable<Movie> movies = _context.Movies;
 
 			if (!String.IsNullOrEmpty(movieParameter.Value))
@@ -90,10 +92,14 @@ namespace PhimStrong.Infrastructure.Repositories
                 movies = movies.Where(m => m.Country.Id == movieParameter.Country);
             }
 
-            if (movieParameter.Categories != null && movieParameter.Categories.Length > 0)
+            if (movieParameter.Categories != null && movieParameter.Categories.Any())
             {
-				movies = movies.Include(m => m.Categories)
-							   .Where(m => m.Categories.Select(c => c.Id).Where(c => movieParameter.Categories.Contains(c)).Count() == movieParameter.Categories.Length);
+				int length = movieParameter.Categories.Length;
+
+				movies = movies.Where(m => m.Categories
+					.Select(c => c.Id)
+					.Where(c => movieParameter.Categories.Contains(c))
+					.Count() == length);
             }
 
 			if (!String.IsNullOrEmpty(movieParameter.OrderBy))
@@ -120,6 +126,16 @@ namespace PhimStrong.Infrastructure.Repositories
 						movies = movies.OrderBy(m => EF.Property<object>(m, propertyInfo.Name));
 					}
 				}
+			}
+
+			if (!String.IsNullOrEmpty(movieParameter.Includes))
+			{
+				movieParameter.Includes.Split(',')
+					.ToList()
+					.ForEach(x =>
+					{
+						movies = movies.Include(x.Trim());
+					});
 			}
 
 			return await PagedList<Movie>.ToPagedListAsync(

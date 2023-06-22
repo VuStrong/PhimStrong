@@ -6,6 +6,7 @@ using PhimStrong.Domain.PagingModel;
 using PhimStrong.Domain.Parameters;
 using PhimStrong.Resources.Category;
 using PhimStrong.Resources.Movie;
+using System.Linq.Expressions;
 
 namespace PhimStrong.Controllers.Api
 {
@@ -51,7 +52,14 @@ namespace PhimStrong.Controllers.Api
 		[HttpGet("{id}/movies")]
 		public async Task<IActionResult> GetMovies(string id, [FromQuery] PagingParameter pagingParameter)
 		{
-			PagedList<Movie> movies = await _movieService.FindByCategoryIdAsync(id, pagingParameter);
+			PagedList<Movie> movies = await _movieService.FindByCategoryIdAsync(
+				id, 
+				pagingParameter,
+				new Expression<Func<Movie, object?>>[]
+				{
+					m => m.Categories,
+					m => m.Country
+				});
 
 			return Ok(_mapper.Map<PagedList<MovieResource>>(movies).GetMetaData());
 		}
