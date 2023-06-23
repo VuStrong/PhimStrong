@@ -48,7 +48,7 @@ namespace PhimStrong.Controllers
 				OrderBy = "CreatedDate_desc"
 			});
 
-			ViewData["Action"] = "SearchByMovieName";
+			ViewData["Action"] = "Search";
 			ViewData["q"] = value;
 
 			return View("Index", _mapper.Map<PagedList<MovieViewModel>>(movies));
