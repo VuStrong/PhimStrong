@@ -427,8 +427,8 @@ namespace PhimStrong.Application.Services
 
 				var moviesToAdd = await _unitOfWork.MovieRepository.GetAsync(
 					new PagingParameter(1, maxCount, false),
-					mv => mv.Tags.Any(tag => movieTags.Contains(tag.TagName.ToLower())) &&
-						  mv.Id != movie.Id,
+					mv => mv.Id != movie.Id &&
+						  mv.Tags.Any(tag => movieTags.Contains(tag.TagName.ToLower())),
 					includes: includes
 				);
 
@@ -472,20 +472,11 @@ namespace PhimStrong.Application.Services
 
 		public async Task<IEnumerable<Movie>> GetRandomMoviesAsync(int count, Expression<Func<Movie, object?>>[]? includes = null)
 		{
-			var random = new Random();
-
-			int movieCount = await _unitOfWork.MovieRepository.CountAsync();
-			count = Math.Clamp(count, 1, movieCount);
-			
-			int randomPage = random.Next(1, (int)Math.Ceiling((double)(movieCount - count) / count) + 1);
-
-			var movies = await _unitOfWork.MovieRepository.GetAsync(
-				new PagingParameter(randomPage, count, false),
-				m => m.IdNumber > 0,
+			return await _unitOfWork.MovieRepository.GetAsync(
+				new PagingParameter(1, count, false),
+				orderBy: movies => movies.OrderBy(m => Guid.NewGuid()),
 				includes: includes
 			);
-
-			return movies.OrderBy(m => Guid.NewGuid());
 		}
 
 		public async Task IncreateViewAsync(string movieid)

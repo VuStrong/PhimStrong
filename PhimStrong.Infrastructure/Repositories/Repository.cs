@@ -39,11 +39,6 @@ namespace PhimStrong.Infrastructure.Repositories
 				{
 					query = query.Include(include);
 				}
-
-				if (includes.Length > 1)
-				{
-					query = query.AsSplitQuery();
-				}
 			}
 
 			return await query.ToListAsync();
@@ -72,11 +67,6 @@ namespace PhimStrong.Infrastructure.Repositories
 				foreach (var include in includes)
 				{
 					query = query.Include(include);
-				}
-
-				if (includes.Length > 1)
-				{
-					query = query.AsSplitQuery();
 				}
 			}
 
