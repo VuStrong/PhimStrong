@@ -106,7 +106,8 @@ namespace PhimStrong.Controllers
             PagedList<Movie> movies = await _movieService.FindByYearAsync(year, new PagingParameter(page, MOVIES_PER_PAGE));
 
 			ViewData["Action"] = "GetMovieByReleaseYear";
-            ViewData["Title"] = $"Phim ra mắt năm {year}";
+			ViewData["Year"] = year;
+			ViewData["Title"] = $"Phim ra mắt năm {year}";
 
 			return View("Index", _mapper.Map<PagedList<MovieViewModel>>(movies));
 		}
@@ -117,6 +118,7 @@ namespace PhimStrong.Controllers
 			PagedList<Movie> movies = await _movieService.FindBeforeYearAsync(year, new PagingParameter(page, MOVIES_PER_PAGE));
 
 			ViewData["Action"] = "GetMovieBeforeYear";
+			ViewData["Year"] = year;
 			ViewData["Title"] = $"Phim ra mắt trước năm {year}";
 
 			return View("Index", _mapper.Map<PagedList<MovieViewModel>>(movies));
