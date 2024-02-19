@@ -1,5 +1,5 @@
 # Introduction
-- This is a movie streaming website project with ASP.Net Core MVC and Sql Server
+- A movie website project with ASP.Net Core MVC and Sql Server
 
 # Page
 
